@@ -2136,7 +2136,7 @@ export const words: WordEntry[] = [
     ["sign"],
   ),
   word(
-    "pit",
+    "pit-sign",
     "ปิด",
     "pit",
     "closed; shut",
@@ -2207,7 +2207,7 @@ export const words: WordEntry[] = [
     ["sign"],
   ),
   word(
-    "hongnam",
+    "hongnam-sign",
     "ห้องน้ำ",
     "hong naam",
     "bathroom; toilet",
