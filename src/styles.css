@@ -1,0 +1,176 @@
+:root {
+  color-scheme: light;
+  font-family: "Atkinson Hyperlegible Next", "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: oklch(24% 0.03 30);
+  background:
+    radial-gradient(circle at top left, oklch(92% 0.06 80), transparent 28%),
+    linear-gradient(180deg, oklch(98% 0.02 80), oklch(95% 0.03 70));
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --paper: oklch(98% 0.02 75);
+  --paper-strong: oklch(94% 0.03 70);
+  --ink: oklch(24% 0.03 30);
+  --muted: oklch(44% 0.03 38);
+  --accent: oklch(53% 0.12 45);
+  --accent-soft: oklch(83% 0.06 55);
+  --edge: oklch(78% 0.03 60);
+  --shadow: color-mix(in srgb, oklch(25% 0.03 20) 14%, transparent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1rem 0 3rem;
+}
+
+.hero {
+  padding: 0.25rem 0 0.75rem;
+}
+
+.eyebrow,
+.card-label,
+.stats span,
+.search-field span {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.study-layout {
+  display: grid;
+  gap: 1rem;
+  container-type: inline-size;
+}
+
+.search-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.search-field input {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--edge);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--paper) 92%, white);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.stats article,
+.card-panel {
+  background: color-mix(in srgb, var(--paper) 94%, white);
+  border: 1px solid var(--edge);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 45px -28px var(--shadow);
+}
+
+.stats article {
+  padding: 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.stats strong {
+  font-size: 1.8rem;
+  font-family: "Fraunces", Georgia, serif;
+}
+
+.card-panel {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  display: grid;
+  gap: 1rem;
+}
+
+.thai-word {
+  font-size: clamp(3.5rem, 12vw, 7rem);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.reveal-button {
+  justify-self: start;
+  padding: 0.85rem 1.2rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: oklch(98% 0.01 80);
+}
+
+.card-details {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.rating-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 0.6rem;
+}
+
+.rating-button {
+  border: 1px solid var(--edge);
+  background: transparent;
+  color: var(--ink);
+  padding: 0.8rem 1.1rem;
+  border-radius: 999px;
+}
+
+.rating-button.strong {
+  background: color-mix(in srgb, var(--accent) 14%, var(--paper));
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--edge));
+}
+
+.rating-button.subtle {
+  color: var(--muted);
+}
+
+.card-details p,
+.empty-state p {
+  margin: 0;
+}
+
+.empty-detail {
+  color: var(--muted);
+}
+
+@container (min-width: 48rem) {
+  .study-layout {
+    grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .card-panel {
+    min-height: 25rem;
+    align-content: start;
+  }
+}
