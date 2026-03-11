@@ -14,9 +14,10 @@ A minimal responsive web app for native English speakers learning to read common
 ## Features
 
 - Flashcard-based Thai reading practice
-- 253 common Thai words with transliteration, meaning, and reading notes
+- 281 common Thai words with transliteration, meaning, and reading notes
 - Local progress saved in the browser
 - Search by Thai text, transliteration, or English meaning
+- Static Opus pronunciation audio for each Thai word
 - Responsive UI for desktop and mobile
 
 ## Development
@@ -50,3 +51,21 @@ Auto-fix formatting and lint issues:
 npm run format
 npm run lint:fix
 ```
+
+## Audio Generation
+
+Generate static Thai pronunciation assets with ElevenLabs:
+
+```bash
+cp .env.example .env
+npm run audio:list-voices
+npm run audio:generate -- --voice-id=YOUR_THAI_VOICE_ID
+```
+
+The generator uses:
+
+- model: `eleven_v3`
+- language code: `th`
+- format: `opus_48000_96`
+
+Generated files are saved to `public/audio/th/<word-id>.opus`.

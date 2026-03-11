@@ -12,7 +12,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "audio:generate": "node scripts/generate-thai-audio.mjs",
+    "audio:list-voices": "node scripts/generate-thai-audio.mjs --list-voices"
   },
   "dependencies": {
     "react": "^19.1.0",

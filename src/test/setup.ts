@@ -1,6 +1,6 @@
 import { cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
-import { afterEach } from "vitest";
+import { afterEach, vi } from "vitest";
 
 class MemoryStorage implements Storage {
   private store = new Map<string, string>();
@@ -40,6 +40,20 @@ if (
   });
 }
 
+Object.defineProperty(HTMLMediaElement.prototype, "play", {
+  configurable: true,
+  writable: true,
+  value: vi.fn().mockResolvedValue(undefined),
+});
+
+Object.defineProperty(HTMLMediaElement.prototype, "pause", {
+  configurable: true,
+  writable: true,
+  value: vi.fn(),
+});
+
 afterEach(() => {
+  vi.mocked(HTMLMediaElement.prototype.play).mockClear();
+  vi.mocked(HTMLMediaElement.prototype.pause).mockClear();
   cleanup();
 });

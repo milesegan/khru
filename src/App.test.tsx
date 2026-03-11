@@ -60,6 +60,23 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
+  it("plays pronunciation audio from the static opus asset path", async () => {
+    const user = userEvent.setup();
+    render(<App words={words} />);
+
+    const playButton = screen.getByRole("button", {
+      name: /play pronunciation for ฉัน/i,
+    });
+    const audio = document.querySelector("audio");
+
+    expect(audio).not.toBeNull();
+    expect(audio).toHaveAttribute("src", "/audio/th/chan.opus");
+
+    await user.click(playButton);
+
+    expect(vi.mocked(HTMLMediaElement.prototype.play)).toHaveBeenCalledTimes(1);
+  });
+
   it("rates the current card and advances to the next one", async () => {
     const user = userEvent.setup();
     render(<App words={words} />);

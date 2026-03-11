@@ -41,6 +41,14 @@ export default [
     },
   },
   {
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     files: ["src/test/setup.ts", "**/*.test.{ts,tsx}"],
     languageOptions: {
       globals: {
