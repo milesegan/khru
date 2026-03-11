@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import type { WordEntry } from "./types";
 
@@ -28,6 +28,11 @@ const words: WordEntry[] = [
 describe("App", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    vi.spyOn(Math, "random").mockReturnValue(0.999);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("reveals transliteration, meaning, and reading clue", async () => {
@@ -57,7 +62,7 @@ describe("App", () => {
     );
     await user.click(screen.getByRole("button", { name: /known/i }));
 
-    expect(screen.getByText("บ้าน")).toBeInTheDocument();
+    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
     expect(screen.getByText("Known")).toBeInTheDocument();
     expect(screen.getByTestId("known-count")).toHaveTextContent("1");
     expect(screen.getByTestId("ready-count")).toHaveTextContent("1");

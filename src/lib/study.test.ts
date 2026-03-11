@@ -67,6 +67,22 @@ describe("study helpers", () => {
     ).toEqual(["chan"]);
   });
 
+  it("randomizes words that share the same priority", () => {
+    const progress = createInitialProgress(words);
+    const randomValues = [0.0];
+    let index = 0;
+
+    const queue = getDueWords(
+      words,
+      progress,
+      new Date(),
+      "",
+      () => randomValues[index++] ?? 0,
+    );
+
+    expect(queue.map((word) => word.id)).toEqual(["baan", "chan"]);
+  });
+
   it("falls back to fresh progress when storage data is corrupt", () => {
     const storage = {
       getItem: vi.fn(() => "{nope"),

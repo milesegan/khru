@@ -69,10 +69,11 @@ export function getDueWords(
   progress: StudyProgress,
   now = new Date(),
   query = "",
+  random = Math.random,
 ): WordEntry[] {
   const normalized = query.trim().toLowerCase();
 
-  return words
+  const dueWords = words
     .filter((word) => {
       const haystack =
         `${word.thai} ${word.transliteration} ${word.meaning}`.toLowerCase();
@@ -97,6 +98,43 @@ export function getDueWords(
 
       return left.thai.localeCompare(right.thai);
     });
+
+  const shuffledDueWords: WordEntry[] = [];
+  let groupStart = 0;
+
+  while (groupStart < dueWords.length) {
+    const firstWord = dueWords[groupStart];
+    const firstProgress = progress.words[firstWord.id];
+    let groupEnd = groupStart + 1;
+
+    while (groupEnd < dueWords.length) {
+      const nextWord = dueWords[groupEnd];
+      const nextProgress = progress.words[nextWord.id];
+
+      if (
+        nextProgress.familiarity !== firstProgress.familiarity ||
+        nextProgress.exposureCount !== firstProgress.exposureCount
+      ) {
+        break;
+      }
+
+      groupEnd += 1;
+    }
+
+    const group = [...dueWords.slice(groupStart, groupEnd)];
+
+    for (let index = group.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(random() * (index + 1));
+      const current = group[index];
+      group[index] = group[swapIndex];
+      group[swapIndex] = current;
+    }
+
+    shuffledDueWords.push(...group);
+    groupStart = groupEnd;
+  }
+
+  return shuffledDueWords;
 }
 
 export function getMatchingWords(words: WordEntry[], query = ""): WordEntry[] {
