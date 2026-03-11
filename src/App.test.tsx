@@ -23,6 +23,15 @@ const words: WordEntry[] = [
     difficulty: 1,
     tags: ["place"],
   },
+  {
+    id: "poet",
+    thai: "เปิด",
+    transliteration: "poet",
+    meaning: "open",
+    patternNote: "A common sign word with a final t stop.",
+    difficulty: 1,
+    tags: ["sign"],
+  },
 ];
 
 describe("App", () => {
@@ -65,7 +74,7 @@ describe("App", () => {
     expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
     expect(screen.getByText("Known")).toBeInTheDocument();
     expect(screen.getByTestId("known-count")).toHaveTextContent("1");
-    expect(screen.getByTestId("ready-count")).toHaveTextContent("1");
+    expect(screen.getByTestId("ready-count")).toHaveTextContent("2");
   });
 
   it("filters the deck by search query", async () => {
@@ -78,6 +87,22 @@ describe("App", () => {
     );
 
     expect(screen.getByText("บ้าน")).toBeInTheDocument();
+    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
+  });
+
+  it("defaults to all words and lets the user pick a category", async () => {
+    const user = userEvent.setup();
+    render(<App words={words} />);
+
+    expect(screen.getByTestId("total-count")).toHaveTextContent("3");
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study category/i }),
+      "signs",
+    );
+
+    expect(screen.getByTestId("total-count")).toHaveTextContent("1");
+    expect(screen.getByText("เปิด")).toBeInTheDocument();
     expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
   });
 });

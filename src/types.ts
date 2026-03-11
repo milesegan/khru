@@ -1,5 +1,18 @@
 export type StudyRating = "again" | "okay" | "known";
 
+export type StudyCategory =
+  | "all"
+  | "basics"
+  | "people"
+  | "food"
+  | "places"
+  | "time"
+  | "actions"
+  | "describing"
+  | "home"
+  | "body"
+  | "signs";
+
 export type WordEntry = {
   id: string;
   thai: string;

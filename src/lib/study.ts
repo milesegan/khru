@@ -1,6 +1,24 @@
-import type { StudyProgress, StudyRating, WordEntry } from "../types";
+import type {
+  StudyCategory,
+  StudyProgress,
+  StudyRating,
+  WordEntry,
+} from "../types";
 
 export const STORAGE_KEY = "khru-study-progress";
+export const STUDY_CATEGORIES: { value: StudyCategory; label: string }[] = [
+  { value: "all", label: "All words" },
+  { value: "basics", label: "Basics" },
+  { value: "people", label: "People" },
+  { value: "food", label: "Food & drink" },
+  { value: "places", label: "Places & travel" },
+  { value: "time", label: "Time & numbers" },
+  { value: "actions", label: "Actions" },
+  { value: "describing", label: "Describing" },
+  { value: "home", label: "Home & things" },
+  { value: "body", label: "Body" },
+  { value: "signs", label: "Signs" },
+];
 
 const RATING_INTERVALS: Record<StudyRating, number> = {
   again: 5 * 60 * 1000,
@@ -12,6 +30,28 @@ const FAMILIARITY_SHIFT: Record<StudyRating, number> = {
   again: -1,
   okay: 1,
   known: 2,
+};
+
+const CATEGORY_TAGS: Record<Exclude<StudyCategory, "all">, string[]> = {
+  basics: [
+    "pronoun",
+    "greeting",
+    "particle",
+    "question",
+    "pointer",
+    "connector",
+    "response",
+    "politeness",
+  ],
+  people: ["people", "family", "pronoun"],
+  food: ["food", "drink"],
+  places: ["place", "transport", "money", "technology", "language"],
+  time: ["time", "calendar", "number"],
+  actions: ["verb"],
+  describing: ["adjective", "adverb", "feeling", "quantifier"],
+  home: ["home", "object", "clothes"],
+  body: ["body"],
+  signs: ["sign"],
 };
 
 export function createInitialProgress(words: WordEntry[]): StudyProgress {
@@ -69,6 +109,7 @@ export function getDueWords(
   progress: StudyProgress,
   now = new Date(),
   query = "",
+  category: StudyCategory = "all",
   random = Math.random,
 ): WordEntry[] {
   const normalized = query.trim().toLowerCase();
@@ -78,11 +119,12 @@ export function getDueWords(
       const haystack =
         `${word.thai} ${word.transliteration} ${word.meaning}`.toLowerCase();
       const matchesQuery = !normalized || haystack.includes(normalized);
+      const matchesSelectedCategory = matchesCategory(word, category);
       const record = progress.words[word.id];
       const dueAt = record?.dueAt
         ? new Date(record.dueAt).getTime()
         : Number.NEGATIVE_INFINITY;
-      return matchesQuery && dueAt <= now.getTime();
+      return matchesQuery && matchesSelectedCategory && dueAt <= now.getTime();
     })
     .sort((left, right) => {
       const leftProgress = progress.words[left.id];
@@ -137,18 +179,27 @@ export function getDueWords(
   return shuffledDueWords;
 }
 
-export function getMatchingWords(words: WordEntry[], query = ""): WordEntry[] {
+export function getMatchingWords(
+  words: WordEntry[],
+  query = "",
+  category: StudyCategory = "all",
+): WordEntry[] {
   const normalized = query.trim().toLowerCase();
-
-  if (!normalized) {
-    return words;
-  }
 
   return words.filter((word) => {
     const haystack =
       `${word.thai} ${word.transliteration} ${word.meaning}`.toLowerCase();
-    return haystack.includes(normalized);
+    const matchesQuery = !normalized || haystack.includes(normalized);
+    return matchesQuery && matchesCategory(word, category);
   });
+}
+
+export function matchesCategory(word: WordEntry, category: StudyCategory) {
+  if (category === "all") {
+    return true;
+  }
+
+  return CATEGORY_TAGS[category].some((tag) => word.tags.includes(tag));
 }
 
 export function loadProgress(

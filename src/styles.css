@@ -32,7 +32,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -71,7 +72,8 @@ button {
   gap: 0.5rem;
 }
 
-.search-field input {
+.search-field input,
+.search-field select {
   width: 100%;
   padding: 0.95rem 1rem;
   border: 1px solid var(--edge);

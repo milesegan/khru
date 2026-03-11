@@ -7,8 +7,9 @@ import {
   getMatchingWords,
   loadProgress,
   saveProgress,
+  STUDY_CATEGORIES,
 } from "./lib/study";
-import type { StudyProgress, WordEntry } from "./types";
+import type { StudyCategory, StudyProgress, WordEntry } from "./types";
 
 type AppProps = {
   words?: WordEntry[];
@@ -16,6 +17,7 @@ type AppProps = {
 
 export default function App({ words = defaultWords }: AppProps) {
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<StudyCategory>("all");
   const [revealed, setRevealed] = useState(false);
   const deferredQuery = useDeferredValue(query);
   const [progress, setProgress] = useState<StudyProgress>(() =>
@@ -23,12 +25,16 @@ export default function App({ words = defaultWords }: AppProps) {
   );
 
   const dueWords = useMemo(
-    () => getDueWords(words, progress, new Date(), deferredQuery),
-    [deferredQuery, progress, words],
+    () => getDueWords(words, progress, new Date(), deferredQuery, category),
+    [category, deferredQuery, progress, words],
   );
   const matchingWords = useMemo(
-    () => getMatchingWords(words, deferredQuery),
-    [deferredQuery, words],
+    () => getMatchingWords(words, deferredQuery, category),
+    [category, deferredQuery, words],
+  );
+  const categoryWords = useMemo(
+    () => getMatchingWords(words, "", category),
+    [category, words],
   );
   const currentWord = dueWords[0] ?? null;
   const knownWords = useMemo(() => countKnownWords(progress), [progress]);
@@ -62,6 +68,23 @@ export default function App({ words = defaultWords }: AppProps) {
 
       <section className="study-layout">
         <label className="search-field">
+          <span>Category</span>
+          <select
+            aria-label="Study category"
+            value={category}
+            onChange={(event) =>
+              setCategory(event.target.value as StudyCategory)
+            }
+          >
+            {STUDY_CATEGORIES.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="search-field">
           <span>Search the deck</span>
           <input
             aria-label="Search the deck"
@@ -73,8 +96,8 @@ export default function App({ words = defaultWords }: AppProps) {
 
         <div className="stats">
           <article>
-            <span>Total words</span>
-            <strong data-testid="total-count">{words.length}</strong>
+            <span>Deck size</span>
+            <strong data-testid="total-count">{categoryWords.length}</strong>
           </article>
           <article>
             <span>Ready now</span>

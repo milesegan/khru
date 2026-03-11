@@ -28,13 +28,22 @@ const words: WordEntry[] = [
     difficulty: 1,
     tags: ["place"],
   },
+  {
+    id: "poet",
+    thai: "เปิด",
+    transliteration: "poet",
+    meaning: "open",
+    patternNote: "Test note",
+    difficulty: 1,
+    tags: ["sign"],
+  },
 ];
 
 describe("study helpers", () => {
   it("creates progress for every word", () => {
     const progress = createInitialProgress(words);
 
-    expect(Object.keys(progress.words)).toEqual(["chan", "baan"]);
+    expect(Object.keys(progress.words)).toEqual(["chan", "baan", "poet"]);
     expect(progress.words.chan.familiarity).toBe(0);
   });
 
@@ -50,7 +59,7 @@ describe("study helpers", () => {
       new Date("2026-03-11T10:06:00.000Z"),
     );
 
-    expect(queue.map((word) => word.id)).toEqual(["baan"]);
+    expect(queue.map((word) => word.id)).toEqual(["poet", "baan"]);
   });
 
   it("searches across Thai, transliteration, and meaning", () => {
@@ -67,16 +76,32 @@ describe("study helpers", () => {
     ).toEqual(["chan"]);
   });
 
-  it("randomizes words that share the same priority", () => {
+  it("filters the queue by category", () => {
     const progress = createInitialProgress(words);
+
+    expect(
+      getDueWords(words, progress, new Date(), "", "signs").map(
+        (word) => word.id,
+      ),
+    ).toEqual(["poet"]);
+    expect(
+      getDueWords(words, progress, new Date(), "", "places").map(
+        (word) => word.id,
+      ),
+    ).toEqual(["baan"]);
+  });
+
+  it("randomizes words that share the same priority", () => {
+    const progress = createInitialProgress(words.slice(0, 2));
     const randomValues = [0.0];
     let index = 0;
 
     const queue = getDueWords(
-      words,
+      words.slice(0, 2),
       progress,
       new Date(),
       "",
+      "all",
       () => randomValues[index++] ?? 0,
     );
 
