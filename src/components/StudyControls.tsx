@@ -42,7 +42,7 @@ export function StudyControls({
           aria-label="Search the deck"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="Type Thai, English, or transliteration"
+          placeholder="Type Thai or English"
         />
       </label>
     </>

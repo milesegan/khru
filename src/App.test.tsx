@@ -51,9 +51,7 @@ describe("App", () => {
     expect(screen.getByText("ฉัน")).toBeInTheDocument();
     expect(screen.queryByText("I; me")).not.toBeInTheDocument();
 
-    await user.click(
-      screen.getByRole("button", { name: /reveal reading clues/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /reveal/i }));
 
     expect(screen.getByText("chan")).toBeInTheDocument();
     expect(screen.getByText("I; me")).toBeInTheDocument();
@@ -66,9 +64,7 @@ describe("App", () => {
     const user = userEvent.setup();
     render(<App words={words} />);
 
-    await user.click(
-      screen.getByRole("button", { name: /reveal reading clues/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /reveal/i }));
     await user.click(screen.getByRole("button", { name: /known/i }));
 
     expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();

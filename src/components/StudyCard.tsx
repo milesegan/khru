@@ -18,17 +18,18 @@ export function StudyCard({
 }: StudyCardProps) {
   return (
     <article className="card-panel">
-      <p className="card-label">Current card</p>
       <div className="thai-word">{word.thai}</div>
       {!revealed ? (
         <button className="reveal-button" onClick={onReveal}>
-          Reveal reading clues
+          Reveal
         </button>
       ) : (
         <div className="card-details" aria-live="polite">
-          <p>{word.transliteration}</p>
-          <p>{word.meaning}</p>
-          <p>{word.patternNote}</p>
+          <p className="transliteration">{word.transliteration}</p>
+          <p className="meaning">{word.meaning}</p>
+          {word.patternNote && (
+            <p className="pattern-note">{word.patternNote}</p>
+          )}
           <div className="rating-row">
             <button
               className="rating-button subtle"

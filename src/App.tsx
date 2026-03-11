@@ -1,6 +1,5 @@
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { EmptyStudyState } from "./components/EmptyStudyState";
-import { HeroHeader } from "./components/HeroHeader";
 import { StudyCard } from "./components/StudyCard";
 import { StudyControls } from "./components/StudyControls";
 import { StudyStats } from "./components/StudyStats";
@@ -66,21 +65,23 @@ export default function App({ words = defaultWords }: AppProps) {
 
   return (
     <main className="app-shell">
-      <HeroHeader />
-
-      <section className="study-layout">
-        <StudyControls
-          category={category}
-          query={query}
-          onCategoryChange={setCategory}
-          onQueryChange={setQuery}
-        />
+      <header className="top-bar">
+        <div className="controls-group">
+          <StudyControls
+            category={category}
+            query={query}
+            onCategoryChange={setCategory}
+            onQueryChange={setQuery}
+          />
+        </div>
         <StudyStats
           totalWords={categoryWords.length}
           readyWords={dueWords.length}
           knownWords={knownWords}
         />
+      </header>
 
+      <div className="main-content">
         {currentWord ? (
           <StudyCard
             word={currentWord}
@@ -91,7 +92,7 @@ export default function App({ words = defaultWords }: AppProps) {
         ) : (
           <EmptyStudyState hasMatches={matchingWords.length > 0} />
         )}
-      </section>
+      </div>
     </main>
   );
 }
