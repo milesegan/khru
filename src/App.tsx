@@ -1,4 +1,9 @@
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { EmptyStudyState } from "./components/EmptyStudyState";
+import { HeroHeader } from "./components/HeroHeader";
+import { StudyCard } from "./components/StudyCard";
+import { StudyControls } from "./components/StudyControls";
+import { StudyStats } from "./components/StudyStats";
 import { words as defaultWords } from "./data/words";
 import {
   applyRating,
@@ -7,7 +12,6 @@ import {
   getMatchingWords,
   loadProgress,
   saveProgress,
-  STUDY_CATEGORIES,
 } from "./lib/study";
 import type { StudyCategory, StudyProgress, WordEntry } from "./types";
 
@@ -62,105 +66,30 @@ export default function App({ words = defaultWords }: AppProps) {
 
   return (
     <main className="app-shell">
-      <section className="hero">
-        <p className="eyebrow">Khru Thai Reader</p>
-      </section>
+      <HeroHeader />
 
       <section className="study-layout">
-        <label className="search-field">
-          <span>Category</span>
-          <select
-            aria-label="Study category"
-            value={category}
-            onChange={(event) =>
-              setCategory(event.target.value as StudyCategory)
-            }
-          >
-            {STUDY_CATEGORIES.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="search-field">
-          <span>Search the deck</span>
-          <input
-            aria-label="Search the deck"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Type Thai, English, or transliteration"
-          />
-        </label>
-
-        <div className="stats">
-          <article>
-            <span>Deck size</span>
-            <strong data-testid="total-count">{categoryWords.length}</strong>
-          </article>
-          <article>
-            <span>Ready now</span>
-            <strong data-testid="ready-count">{dueWords.length}</strong>
-          </article>
-          <article>
-            <span>Known</span>
-            <strong data-testid="known-count">{knownWords}</strong>
-          </article>
-        </div>
+        <StudyControls
+          category={category}
+          query={query}
+          onCategoryChange={setCategory}
+          onQueryChange={setQuery}
+        />
+        <StudyStats
+          totalWords={categoryWords.length}
+          readyWords={dueWords.length}
+          knownWords={knownWords}
+        />
 
         {currentWord ? (
-          <article className="card-panel">
-            <p className="card-label">Current card</p>
-            <div className="thai-word">{currentWord.thai}</div>
-            {!revealed ? (
-              <button
-                className="reveal-button"
-                onClick={() => setRevealed(true)}
-              >
-                Reveal reading clues
-              </button>
-            ) : (
-              <div className="card-details" aria-live="polite">
-                <p>{currentWord.transliteration}</p>
-                <p>{currentWord.meaning}</p>
-                <p>{currentWord.patternNote}</p>
-                <div className="rating-row">
-                  <button
-                    className="rating-button subtle"
-                    onClick={() => handleRating("again")}
-                  >
-                    Again
-                  </button>
-                  <button
-                    className="rating-button"
-                    onClick={() => handleRating("okay")}
-                  >
-                    Okay
-                  </button>
-                  <button
-                    className="rating-button strong"
-                    onClick={() => handleRating("known")}
-                  >
-                    Known
-                  </button>
-                </div>
-              </div>
-            )}
-          </article>
+          <StudyCard
+            word={currentWord}
+            revealed={revealed}
+            onReveal={() => setRevealed(true)}
+            onRate={handleRating}
+          />
         ) : (
-          <article className="card-panel empty-state">
-            <p>
-              {matchingWords.length === 0
-                ? "No words match this search yet."
-                : "You are caught up for now."}
-            </p>
-            <p className="empty-detail">
-              {matchingWords.length === 0
-                ? "Try a Thai spelling, an English meaning, or a transliteration clue."
-                : "Come back later or change your search to explore more words."}
-            </p>
-          </article>
+          <EmptyStudyState hasMatches={matchingWords.length > 0} />
         )}
       </section>
     </main>
