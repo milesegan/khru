@@ -89,7 +89,7 @@ export function StudyCard({
         </button>
       ) : (
         <div className="card-details" aria-live="polite">
-          <p className="transliteration">{word.transliteration}</p>
+          <p className="transliteration">{word.transliterationMarked}</p>
           <p className="meaning">{word.meaning}</p>
           {word.patternNote && (
             <p className="pattern-note">{word.patternNote}</p>

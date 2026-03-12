@@ -9,6 +9,7 @@ const words: WordEntry[] = [
     id: "chan",
     thai: "ฉัน",
     transliteration: "chan",
+    transliterationMarked: "chàn",
     meaning: "I; me",
     patternNote: "The final consonant makes an n ending.",
     difficulty: 1,
@@ -18,6 +19,7 @@ const words: WordEntry[] = [
     id: "baan",
     thai: "บ้าน",
     transliteration: "baan",
+    transliterationMarked: "bâan",
     meaning: "house",
     patternNote: "Mai tho marks the falling tone here.",
     difficulty: 1,
@@ -27,6 +29,7 @@ const words: WordEntry[] = [
     id: "poet",
     thai: "เปิด",
     transliteration: "poet",
+    transliterationMarked: "pòet",
     meaning: "open",
     patternNote: "A common sign word with a final t stop.",
     difficulty: 1,
@@ -53,7 +56,7 @@ describe("App", () => {
 
     await user.click(screen.getByRole("button", { name: /reveal/i }));
 
-    expect(screen.getByText("chan")).toBeInTheDocument();
+    expect(screen.getByText("chàn")).toBeInTheDocument();
     expect(screen.getByText("I; me")).toBeInTheDocument();
     expect(
       screen.getByText(/final consonant makes an n ending/i),

@@ -54,6 +54,13 @@ const CATEGORY_TAGS: Record<Exclude<StudyCategory, "all">, string[]> = {
   signs: ["sign"],
 };
 
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+}
+
 export function createInitialProgress(words: WordEntry[]): StudyProgress {
   return {
     words: Object.fromEntries(
@@ -112,13 +119,13 @@ export function getDueWords(
   category: StudyCategory = "all",
   random = Math.random,
 ): WordEntry[] {
-  const normalized = query.trim().toLowerCase();
+  const normalized = normalizeSearchText(query.trim());
 
   const dueWords = words
     .filter((word) => {
-      const haystack =
-        `${word.thai} ${word.transliteration} ${word.meaning}`.toLowerCase();
-      const matchesQuery = !normalized || haystack.includes(normalized);
+      const haystack = `${word.thai} ${word.transliteration} ${word.transliterationMarked} ${word.meaning}`;
+      const matchesQuery =
+        !normalized || normalizeSearchText(haystack).includes(normalized);
       const matchesSelectedCategory = matchesCategory(word, category);
       const record = progress.words[word.id];
       const dueAt = record?.dueAt
@@ -184,12 +191,12 @@ export function getMatchingWords(
   query = "",
   category: StudyCategory = "all",
 ): WordEntry[] {
-  const normalized = query.trim().toLowerCase();
+  const normalized = normalizeSearchText(query.trim());
 
   return words.filter((word) => {
-    const haystack =
-      `${word.thai} ${word.transliteration} ${word.meaning}`.toLowerCase();
-    const matchesQuery = !normalized || haystack.includes(normalized);
+    const haystack = `${word.thai} ${word.transliteration} ${word.transliterationMarked} ${word.meaning}`;
+    const matchesQuery =
+      !normalized || normalizeSearchText(haystack).includes(normalized);
     return matchesQuery && matchesCategory(word, category);
   });
 }

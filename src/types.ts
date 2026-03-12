@@ -17,6 +17,7 @@ export type WordEntry = {
   id: string;
   thai: string;
   transliteration: string;
+  transliterationMarked: string;
   meaning: string;
   patternNote: string;
   difficulty: 1 | 2 | 3 | 4 | 5;

@@ -14,6 +14,7 @@ const words: WordEntry[] = [
     id: "chan",
     thai: "ฉัน",
     transliteration: "chan",
+    transliterationMarked: "chàn",
     meaning: "I; me",
     patternNote: "Test note",
     difficulty: 1,
@@ -23,6 +24,7 @@ const words: WordEntry[] = [
     id: "baan",
     thai: "บ้าน",
     transliteration: "baan",
+    transliterationMarked: "bâan",
     meaning: "house",
     patternNote: "Test note",
     difficulty: 1,
@@ -32,6 +34,7 @@ const words: WordEntry[] = [
     id: "poet",
     thai: "เปิด",
     transliteration: "poet",
+    transliterationMarked: "pòet",
     meaning: "open",
     patternNote: "Test note",
     difficulty: 1,
@@ -70,6 +73,9 @@ describe("study helpers", () => {
     ).toEqual(["baan"]);
     expect(
       getDueWords(words, progress, new Date(), "chan").map((word) => word.id),
+    ).toEqual(["chan"]);
+    expect(
+      getDueWords(words, progress, new Date(), "chàn").map((word) => word.id),
     ).toEqual(["chan"]);
     expect(
       getDueWords(words, progress, new Date(), "ฉัน").map((word) => word.id),
