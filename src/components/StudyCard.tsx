@@ -24,8 +24,6 @@ export function StudyCard({
   const audioSrc = getWordAudioSrc(word.id);
 
   useEffect(() => {
-    setAudioUnavailable(false);
-    setIsPlaying(false);
     const audioElement = audioRef.current;
 
     return () => {
@@ -38,7 +36,7 @@ export function StudyCard({
         audioElement.currentTime = 0;
       }
     };
-  }, [word.id]);
+  }, []);
 
   async function handlePlayAudio() {
     if (!audioRef.current) {

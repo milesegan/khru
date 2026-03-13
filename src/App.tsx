@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { EmptyStudyState } from "./components/EmptyStudyState";
 import { StudyCard } from "./components/StudyCard";
 import { StudyControls } from "./components/StudyControls";
@@ -21,7 +21,6 @@ type AppProps = {
 export default function App({ words = defaultWords }: AppProps) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<StudyCategory>("all");
-  const [revealed, setRevealed] = useState(false);
   const deferredQuery = useDeferredValue(query);
   const [progress, setProgress] = useState<StudyProgress>(() =>
     loadProgress(words, window.localStorage),
@@ -40,11 +39,12 @@ export default function App({ words = defaultWords }: AppProps) {
     [category, words],
   );
   const currentWord = dueWords[0] ?? null;
+  const currentCardKey = currentWord
+    ? `${currentWord.id}:${deferredQuery}`
+    : "";
+  const [revealedCardKey, setRevealedCardKey] = useState("");
   const knownWords = useMemo(() => countKnownWords(progress), [progress]);
-
-  useEffect(() => {
-    setRevealed(false);
-  }, [currentWord?.id, deferredQuery]);
+  const revealed = currentCardKey !== "" && revealedCardKey === currentCardKey;
 
   function handleRating(rating: "again" | "okay" | "known") {
     if (!currentWord) {
@@ -84,9 +84,10 @@ export default function App({ words = defaultWords }: AppProps) {
       <div className="main-content">
         {currentWord ? (
           <StudyCard
+            key={currentCardKey}
             word={currentWord}
             revealed={revealed}
-            onReveal={() => setRevealed(true)}
+            onReveal={() => setRevealedCardKey(currentCardKey)}
             onRate={handleRating}
           />
         ) : (
