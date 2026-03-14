@@ -92,25 +92,25 @@ export function StudyCard({
           {word.patternNote && (
             <p className="pattern-note">{word.patternNote}</p>
           )}
-          <div className="rating-row">
-            <button
-              className="rating-button subtle"
-              onClick={() => onRate("again")}
-            >
-              Again
-            </button>
-            <button className="rating-button" onClick={() => onRate("okay")}>
-              Okay
-            </button>
-            <button
-              className="rating-button strong"
-              onClick={() => onRate("known")}
-            >
-              Known
-            </button>
-          </div>
         </div>
       )}
+      <div className="rating-row">
+        <button
+          className="rating-button subtle"
+          onClick={() => onRate("again")}
+        >
+          Again
+        </button>
+        <button className="rating-button" onClick={() => onRate("okay")}>
+          Okay
+        </button>
+        <button
+          className="rating-button strong"
+          onClick={() => onRate("known")}
+        >
+          Known
+        </button>
+      </div>
     </article>
   );
 }
