@@ -7,6 +7,7 @@ import { words as defaultWords } from "./data/words";
 import {
   applyRating,
   countKnownWords,
+  createInitialProgress,
   getDueWords,
   getMatchingWords,
   loadProgress,
@@ -63,6 +64,13 @@ export default function App({ words = defaultWords }: AppProps) {
     });
   }
 
+  function handleResetProgress() {
+    const nextProgress = createInitialProgress(words);
+    setRevealedCardKey("");
+    saveProgress(nextProgress, window.localStorage);
+    setProgress(nextProgress);
+  }
+
   return (
     <main className="app-shell">
       <header className="top-bar">
@@ -78,6 +86,7 @@ export default function App({ words = defaultWords }: AppProps) {
           totalWords={categoryWords.length}
           readyWords={dueWords.length}
           knownWords={knownWords}
+          onResetProgress={handleResetProgress}
         />
       </header>
 

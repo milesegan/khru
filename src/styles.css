@@ -113,12 +113,49 @@ button {
   gap: 0.15rem;
 }
 
+.stat-value-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .stats strong {
   font-size: 1.25rem;
   font-family: "Fraunces", Georgia, serif;
   line-height: 1;
   font-weight: 500;
   color: var(--ink);
+}
+
+.stats-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-bottom: -3px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  transition:
+    color 0.2s,
+    transform 0.2s;
+}
+
+.stats-icon-button:hover {
+  color: var(--accent);
+}
+
+.stats-icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.stats-icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 .main-content {

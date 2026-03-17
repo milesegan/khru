@@ -1,7 +1,10 @@
+import { LuRotateCcw } from "react-icons/lu";
+
 type StudyStatsProps = {
   totalWords: number;
   readyWords: number;
   knownWords: number;
+  onResetProgress: () => void;
 };
 
 /**
@@ -11,7 +14,20 @@ export function StudyStats({
   totalWords,
   readyWords,
   knownWords,
+  onResetProgress,
 }: StudyStatsProps) {
+  function handleResetClick() {
+    const confirmed = window.confirm(
+      "Clear all known words and reset study progress?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    onResetProgress();
+  }
+
   return (
     <div className="stats">
       <article>
@@ -24,7 +40,17 @@ export function StudyStats({
       </article>
       <article>
         <span>Known</span>
-        <strong data-testid="known-count">{knownWords}</strong>
+        <div className="stat-value-row">
+          <strong data-testid="known-count">{knownWords}</strong>
+          <button
+            type="button"
+            className="stats-icon-button"
+            aria-label="Clear known words and reset study progress"
+            onClick={handleResetClick}
+          >
+            <LuRotateCcw aria-hidden="true" className="stats-icon" />
+          </button>
+        </div>
       </article>
     </div>
   );

@@ -53,7 +53,9 @@ describe("App", () => {
 
     expect(screen.getByText("ฉัน")).toBeInTheDocument();
     expect(screen.queryByText("I; me")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /known/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /^known$/i }),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /reveal/i }));
 
@@ -85,7 +87,7 @@ describe("App", () => {
     const user = userEvent.setup();
     render(<App words={words} />);
 
-    await user.click(screen.getByRole("button", { name: /known/i }));
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
 
     expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
     expect(screen.getByText("บ้าน")).toBeInTheDocument();
@@ -120,5 +122,47 @@ describe("App", () => {
     expect(screen.getByTestId("total-count")).toHaveTextContent("1");
     expect(screen.getByText("เปิด")).toBeInTheDocument();
     expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
+  });
+
+  it("keeps progress when clearing known words is canceled", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+    render(<App words={words} />);
+
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+
+    const resetButton = screen.getByRole("button", {
+      name: /clear known words and reset study progress/i,
+    });
+
+    await user.click(resetButton);
+
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Clear all known words and reset study progress?",
+    );
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+    expect(screen.getByText("บ้าน")).toBeInTheDocument();
+  });
+
+  it("clears study progress after confirmation", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<App words={words} />);
+
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+
+    const resetButton = screen.getByRole("button", {
+      name: /clear known words and reset study progress/i,
+    });
+
+    await user.click(resetButton);
+
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Clear all known words and reset study progress?",
+    );
+    expect(screen.getByTestId("known-count")).toHaveTextContent("0");
+    expect(screen.getByTestId("ready-count")).toHaveTextContent("3");
+    expect(screen.getByText("ฉัน")).toBeInTheDocument();
+    expect(screen.queryByText("บ้าน")).not.toBeInTheDocument();
   });
 });
