@@ -9,13 +9,23 @@ import ts from "typescript";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
-const dataFile = path.join(repoRoot, "src/data/words.ts");
 const outputDir = path.join(repoRoot, "public/audio/th");
 const envFile = path.join(repoRoot, ".env");
 const modelId = "eleven_v3";
 const outputFormat = "opus_48000_96";
 const languageCode = "th";
 const apiBaseUrl = "https://api.elevenlabs.io/v1";
+
+export const DATASET_CONFIG = {
+  words: {
+    filePath: path.join(repoRoot, "src/data/words.ts"),
+    exportName: "words",
+  },
+  conversation: {
+    filePath: path.join(repoRoot, "src/data/conversation.ts"),
+    exportName: "conversation",
+  },
+};
 
 function loadEnvFile(filePath) {
   return fs
@@ -46,11 +56,12 @@ function loadEnvFile(filePath) {
     });
 }
 
-function parseArguments(argv) {
+export function parseArguments(argv) {
   const options = {
     dryRun: false,
     force: false,
     listVoices: false,
+    mode: "all",
     only: [],
     voiceId: process.env.ELEVENLABS_VOICE_ID ?? "",
   };
@@ -68,6 +79,17 @@ function parseArguments(argv) {
 
     if (argument === "--list-voices") {
       options.listVoices = true;
+      continue;
+    }
+
+    if (argument.startsWith("--mode=")) {
+      const mode = argument.slice("--mode=".length).trim();
+
+      if (!isSupportedMode(mode)) {
+        throw new Error(`Unknown mode: ${mode}`);
+      }
+
+      options.mode = mode;
       continue;
     }
 
@@ -100,63 +122,88 @@ function printHelp() {
   console.log(`Generate Thai pronunciation audio with ElevenLabs.
 
 Usage:
-  npm run audio:generate
-  npm run audio:generate -- --dry-run
-  npm run audio:generate -- --only=chan,baan
-  npm run audio:generate -- --voice-id=VOICE_ID
-  npm run audio:list-voices
+  pnpm audio:generate
+  pnpm audio:generate -- --dry-run
+  pnpm audio:generate -- --mode=conversation
+  pnpm audio:generate -- --mode=words -- --only=chan,baan
+  pnpm audio:generate -- --voice-id=VOICE_ID
+  pnpm audio:list-voices
 
 Options:
   --dry-run       Show the work without calling the API
   --force         Regenerate files even when they already exist
-  --only=<ids>    Comma-separated list of word ids to generate
+  --mode=<mode>   words, conversation, or all
+  --only=<ids>    Comma-separated list of study item ids to generate
   --voice-id=<id> Override ELEVENLABS_VOICE_ID for this run
   --list-voices   Print the available voices on the account
   --help          Show this help message
 `);
 }
 
-async function readWords() {
-  const sourceText = await fs.readFile(dataFile, "utf8");
+export function getModesForOption(mode) {
+  return mode === "all" ? ["words", "conversation"] : [mode];
+}
+
+async function readStudyItems(mode) {
+  const { filePath, exportName } = DATASET_CONFIG[mode];
+  const sourceText = await fs.readFile(filePath, "utf8");
   const sourceFile = ts.createSourceFile(
-    dataFile,
+    filePath,
     sourceText,
     ts.ScriptTarget.Latest,
     true,
     ts.ScriptKind.TS,
   );
-  const words = [];
+  const items = [];
 
-  function visit(node) {
+  for (const statement of sourceFile.statements) {
     if (
-      ts.isCallExpression(node) &&
-      ts.isIdentifier(node.expression) &&
-      node.expression.text === "word"
+      !ts.isVariableStatement(statement) ||
+      !statement.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
+      )
     ) {
-      const [idNode, thaiNode] = node.arguments;
-      if (
-        idNode &&
-        thaiNode &&
-        ts.isStringLiteralLike(idNode) &&
-        ts.isStringLiteralLike(thaiNode)
-      ) {
-        words.push({
-          id: idNode.text,
-          thai: thaiNode.text,
-          charCount: [...thaiNode.text].length,
-        });
-      }
+      continue;
     }
 
-    ts.forEachChild(node, visit);
+    for (const declaration of statement.declarationList.declarations) {
+      if (
+        !ts.isIdentifier(declaration.name) ||
+        declaration.name.text !== exportName ||
+        !declaration.initializer ||
+        !ts.isArrayLiteralExpression(declaration.initializer)
+      ) {
+        continue;
+      }
+
+      for (const element of declaration.initializer.elements) {
+        if (!ts.isCallExpression(element)) {
+          continue;
+        }
+
+        const [idNode, thaiNode] = element.arguments;
+        if (
+          idNode &&
+          thaiNode &&
+          ts.isStringLiteralLike(idNode) &&
+          ts.isStringLiteralLike(thaiNode)
+        ) {
+          items.push({
+            mode,
+            id: idNode.text,
+            thai: thaiNode.text,
+            charCount: [...thaiNode.text].length,
+          });
+        }
+      }
+    }
   }
 
-  visit(sourceFile);
-  return words;
+  return items;
 }
 
-function getOutputPath(wordId) {
-  return path.join(outputDir, `${wordId}.opus`);
+export function getOutputPath(mode, itemId) {
+  return path.join(outputDir, mode, `${itemId}.opus`);
 }
 
 async function listVoices(apiKey) {
@@ -209,7 +256,7 @@ async function getErrorMessage(response) {
   return `${response.status} ${response.statusText}`;
 }
 
-async function generateAudio({ apiKey, voiceId, word }) {
+async function generateAudio({ apiKey, voiceId, item }) {
   const response = await fetch(
     `${apiBaseUrl}/text-to-speech/${voiceId}?output_format=${outputFormat}`,
     {
@@ -220,7 +267,7 @@ async function generateAudio({ apiKey, voiceId, word }) {
         "xi-api-key": apiKey,
       },
       body: JSON.stringify({
-        text: word.thai,
+        text: item.thai,
         model_id: modelId,
         language_code: languageCode,
       }),
@@ -232,7 +279,11 @@ async function generateAudio({ apiKey, voiceId, word }) {
   }
 
   const audioBuffer = Buffer.from(await response.arrayBuffer());
-  await fs.writeFile(getOutputPath(word.id), audioBuffer);
+  await fs.writeFile(getOutputPath(item.mode, item.id), audioBuffer);
+}
+
+function isSupportedMode(mode) {
+  return mode === "words" || mode === "conversation" || mode === "all";
 }
 
 async function main() {
@@ -252,31 +303,37 @@ async function main() {
   const voiceId = options.voiceId || process.env.ELEVENLABS_VOICE_ID || "";
   if (!voiceId) {
     throw new Error(
-      "ELEVENLABS_VOICE_ID is required. Set it in .env or pass --voice-id=<id>. Use npm run audio:list-voices to inspect your account voices.",
+      "ELEVENLABS_VOICE_ID is required. Set it in .env or pass --voice-id=<id>. Use pnpm audio:list-voices to inspect your account voices.",
     );
   }
 
-  const words = await readWords();
+  const items = (
+    await Promise.all(getModesForOption(options.mode).map(readStudyItems))
+  ).flat();
   const onlySet =
     options.only.length > 0
       ? new Set(options.only.map((id) => id.trim()))
       : null;
-  const filteredWords = onlySet
-    ? words.filter((word) => onlySet.has(word.id))
-    : words;
+  const filteredItems = onlySet
+    ? items.filter((item) => onlySet.has(item.id))
+    : items;
   const missingIds = onlySet
-    ? [...onlySet].filter((id) => !filteredWords.some((word) => word.id === id))
+    ? [...onlySet].filter((id) => !filteredItems.some((item) => item.id === id))
     : [];
 
   if (missingIds.length > 0) {
-    throw new Error(`Unknown word ids: ${missingIds.join(", ")}`);
+    throw new Error(`Unknown study item ids: ${missingIds.join(", ")}`);
   }
 
-  await fs.mkdir(outputDir, { recursive: true });
+  await Promise.all(
+    getModesForOption(options.mode).map((mode) =>
+      fs.mkdir(path.join(outputDir, mode), { recursive: true }),
+    ),
+  );
 
   const summary = {
-    total: filteredWords.length,
-    totalChars: filteredWords.reduce((sum, word) => sum + word.charCount, 0),
+    total: filteredItems.length,
+    totalChars: filteredItems.reduce((sum, item) => sum + item.charCount, 0),
     generated: 0,
     skipped: 0,
     failed: 0,
@@ -284,13 +341,13 @@ async function main() {
 
   if (options.dryRun) {
     console.log(
-      `Dry run: ${summary.total} files, ${summary.totalChars} Thai characters, model ${modelId}, format ${outputFormat}`,
+      `Dry run: ${summary.total} files, ${summary.totalChars} Thai characters, mode ${options.mode}, model ${modelId}, format ${outputFormat}`,
     );
     return;
   }
 
-  for (const word of filteredWords) {
-    const outputPath = getOutputPath(word.id);
+  for (const item of filteredItems) {
+    const outputPath = getOutputPath(item.mode, item.id);
     const alreadyExists = await fs
       .access(outputPath)
       .then(() => true)
@@ -298,20 +355,20 @@ async function main() {
 
     if (alreadyExists && !options.force) {
       summary.skipped += 1;
-      console.log(`skip ${word.id}`);
+      console.log(`skip ${item.id}`);
       continue;
     }
 
     try {
       console.log(
-        `generate ${word.id} -> ${path.relative(repoRoot, outputPath)}`,
+        `generate ${item.id} -> ${path.relative(repoRoot, outputPath)}`,
       );
-      await generateAudio({ apiKey, voiceId, word });
+      await generateAudio({ apiKey, voiceId, item });
       summary.generated += 1;
     } catch (error) {
       summary.failed += 1;
       console.error(
-        `failed ${word.id}: ${error instanceof Error ? error.message : String(error)}`,
+        `failed ${item.id}: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -325,7 +382,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
-});
+if (process.argv[1] === __filename) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
+}

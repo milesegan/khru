@@ -1,24 +1,49 @@
 import type {
+  ConversationStudyCategory,
   StudyCategory,
+  StudyDecks,
+  StudyEntry,
+  StudyMode,
   StudyProgress,
+  StudyProgressEntry,
   StudyRating,
-  WordEntry,
+  WordStudyCategory,
 } from "../types";
 
-export const STORAGE_KEY = "khru-study-progress";
-export const STUDY_CATEGORIES: { value: StudyCategory; label: string }[] = [
-  { value: "all", label: "All words" },
-  { value: "basics", label: "Basics" },
-  { value: "people", label: "People" },
-  { value: "food", label: "Food & drink" },
-  { value: "places", label: "Places & travel" },
-  { value: "time", label: "Time & numbers" },
-  { value: "actions", label: "Actions" },
-  { value: "describing", label: "Describing" },
-  { value: "home", label: "Home & things" },
-  { value: "body", label: "Body" },
-  { value: "signs", label: "Signs" },
+export const STORAGE_KEY = "khru-study-progress-v2";
+
+export const STUDY_MODE_OPTIONS: { value: StudyMode; label: string }[] = [
+  { value: "words", label: "Words" },
+  { value: "conversation", label: "Conversation" },
 ];
+
+export const STUDY_CATEGORY_OPTIONS: Record<
+  StudyMode,
+  { value: StudyCategory; label: string }[]
+> = {
+  words: [
+    { value: "all", label: "All words" },
+    { value: "basics", label: "Basics" },
+    { value: "people", label: "People" },
+    { value: "food", label: "Food & drink" },
+    { value: "places", label: "Places & travel" },
+    { value: "time", label: "Time & numbers" },
+    { value: "actions", label: "Actions" },
+    { value: "describing", label: "Describing" },
+    { value: "home", label: "Home & things" },
+    { value: "body", label: "Body" },
+    { value: "signs", label: "Signs" },
+  ],
+  conversation: [
+    { value: "all", label: "All sentences" },
+    { value: "greetings", label: "Greetings" },
+    { value: "courtesy", label: "Courtesy" },
+    { value: "introductions", label: "Introductions" },
+    { value: "needs", label: "Needs & requests" },
+    { value: "directions", label: "Directions" },
+    { value: "time", label: "Time & days" },
+  ],
+};
 
 const RATING_INTERVALS: Record<StudyRating, number> = {
   again: 5 * 60 * 1000,
@@ -32,7 +57,10 @@ const FAMILIARITY_SHIFT: Record<StudyRating, number> = {
   known: 2,
 };
 
-const CATEGORY_TAGS: Record<Exclude<StudyCategory, "all">, string[]> = {
+const WORD_CATEGORY_TAGS: Record<
+  Exclude<WordStudyCategory, "all">,
+  string[]
+> = {
   basics: [
     "pronoun",
     "greeting",
@@ -54,6 +82,23 @@ const CATEGORY_TAGS: Record<Exclude<StudyCategory, "all">, string[]> = {
   signs: ["sign"],
 };
 
+const CONVERSATION_CATEGORY_TAGS: Record<
+  Exclude<ConversationStudyCategory, "all">,
+  string[]
+> = {
+  greetings: ["greetings"],
+  courtesy: ["courtesy"],
+  introductions: ["introductions"],
+  needs: ["needs"],
+  directions: ["directions"],
+  time: ["time"],
+};
+
+const CATEGORY_TAGS_BY_MODE = {
+  words: WORD_CATEGORY_TAGS,
+  conversation: CONVERSATION_CATEGORY_TAGS,
+} satisfies Record<StudyMode, Record<string, string[]>>;
+
 function normalizeSearchText(value: string) {
   return value
     .normalize("NFD")
@@ -61,15 +106,14 @@ function normalizeSearchText(value: string) {
     .toLowerCase();
 }
 
-export function createInitialProgress(words: WordEntry[]): StudyProgress {
+export function createInitialProgress(decks: StudyDecks): StudyProgress {
   return {
-    words: Object.fromEntries(
-      words.map((word) => [word.id, createInitialWordProgress()]),
-    ),
+    words: createInitialModeProgress(decks.words),
+    conversation: createInitialModeProgress(decks.conversation),
   };
 }
 
-export function createInitialWordProgress() {
+export function createInitialProgressEntry(): StudyProgressEntry {
   return {
     familiarity: 0,
     exposureCount: 0,
@@ -80,35 +124,33 @@ export function createInitialWordProgress() {
 }
 
 export function normalizeProgress(
-  words: WordEntry[],
+  decks: StudyDecks,
   progress: StudyProgress | null | undefined,
 ): StudyProgress {
-  const fallback = createInitialProgress(words);
+  const fallback = createInitialProgress(decks);
 
   if (!progress) {
     return fallback;
   }
 
   return {
-    words: Object.fromEntries(
-      words.map((word) => [
-        word.id,
-        {
-          ...fallback.words[word.id],
-          ...progress.words?.[word.id],
-        },
-      ]),
+    words: normalizeModeProgress(decks.words, progress.words, fallback.words),
+    conversation: normalizeModeProgress(
+      decks.conversation,
+      progress.conversation,
+      fallback.conversation,
     ),
   };
 }
 
 export function applyRating(
   progress: StudyProgress,
-  wordId: string,
+  mode: StudyMode,
+  itemId: string,
   rating: StudyRating,
   now = new Date(),
 ): StudyProgress {
-  const current = progress.words[wordId];
+  const current = progress[mode][itemId];
 
   if (!current) {
     return progress;
@@ -128,43 +170,45 @@ export function applyRating(
   };
 
   return {
-    words: {
-      ...progress.words,
-      [wordId]: updated,
+    ...progress,
+    [mode]: {
+      ...progress[mode],
+      [itemId]: updated,
     },
   };
 }
 
-export function getDueWords(
-  words: WordEntry[],
+export function getDueStudyItems(
+  items: StudyEntry[],
   progress: StudyProgress,
+  mode: StudyMode,
   now = new Date(),
   query = "",
   category: StudyCategory = "all",
   random = Math.random,
-): WordEntry[] {
+): StudyEntry[] {
   const normalized = normalizeSearchText(query.trim());
 
-  const dueWords = words
-    .filter((word) => {
-      const haystack = `${word.thai} ${word.transliteration} ${word.transliterationMarked} ${word.meaning}`;
+  const dueItems = items
+    .filter((item) => {
+      const haystack = `${item.thai} ${item.transliteration} ${item.transliterationMarked} ${item.meaning}`;
       const matchesQuery =
         !normalized || normalizeSearchText(haystack).includes(normalized);
-      const matchesSelectedCategory = matchesCategory(word, category);
-      const record = progress.words[word.id];
+      const matchesSelectedCategory = matchesCategory(item, mode, category);
+      const record = progress[mode][item.id];
       const dueAt = record?.dueAt
         ? new Date(record.dueAt).getTime()
         : Number.NEGATIVE_INFINITY;
       return (
         matchesQuery &&
         matchesSelectedCategory &&
-        !isKnownWord(progress, word.id) &&
+        !isKnownItem(progress, mode, item.id) &&
         dueAt <= now.getTime()
       );
     })
     .sort((left, right) => {
-      const leftProgress = progress.words[left.id];
-      const rightProgress = progress.words[right.id];
+      const leftProgress = progress[mode][left.id];
+      const rightProgress = progress[mode][right.id];
 
       if (leftProgress.familiarity !== rightProgress.familiarity) {
         return leftProgress.familiarity - rightProgress.familiarity;
@@ -177,34 +221,35 @@ export function getDueWords(
       return left.thai.localeCompare(right.thai);
     });
 
-  return shuffleStudyWords(dueWords, progress, now, random);
+  return shuffleStudyItems(dueItems, progress, mode, now, random);
 }
 
-export function getStudyWords(
-  words: WordEntry[],
+export function getStudyItems(
+  items: StudyEntry[],
   progress: StudyProgress,
+  mode: StudyMode,
   now = new Date(),
   query = "",
   category: StudyCategory = "all",
   random = Math.random,
-): WordEntry[] {
+): StudyEntry[] {
   const normalized = normalizeSearchText(query.trim());
 
-  const studyWords = words
-    .filter((word) => {
-      const haystack = `${word.thai} ${word.transliteration} ${word.transliterationMarked} ${word.meaning}`;
+  const studyItems = items
+    .filter((item) => {
+      const haystack = `${item.thai} ${item.transliteration} ${item.transliterationMarked} ${item.meaning}`;
       const matchesQuery =
         !normalized || normalizeSearchText(haystack).includes(normalized);
 
       return (
         matchesQuery &&
-        matchesCategory(word, category) &&
-        !isKnownWord(progress, word.id)
+        matchesCategory(item, mode, category) &&
+        !isKnownItem(progress, mode, item.id)
       );
     })
     .sort((left, right) => {
-      const leftProgress = progress.words[left.id];
-      const rightProgress = progress.words[right.id];
+      const leftProgress = progress[mode][left.id];
+      const rightProgress = progress[mode][right.id];
       const leftDueAt = getDueAtTime(leftProgress);
       const rightDueAt = getDueAtTime(rightProgress);
       const leftIsDue = leftDueAt <= now.getTime();
@@ -229,47 +274,57 @@ export function getStudyWords(
       return left.thai.localeCompare(right.thai);
     });
 
-  return shuffleStudyWords(studyWords, progress, now, random);
+  return shuffleStudyItems(studyItems, progress, mode, now, random);
 }
 
-export function getMatchingWords(
-  words: WordEntry[],
+export function getMatchingItems(
+  items: StudyEntry[],
+  mode: StudyMode,
   query = "",
   category: StudyCategory = "all",
-): WordEntry[] {
+): StudyEntry[] {
   const normalized = normalizeSearchText(query.trim());
 
-  return words.filter((word) => {
-    const haystack = `${word.thai} ${word.transliteration} ${word.transliterationMarked} ${word.meaning}`;
+  return items.filter((item) => {
+    const haystack = `${item.thai} ${item.transliteration} ${item.transliterationMarked} ${item.meaning}`;
     const matchesQuery =
       !normalized || normalizeSearchText(haystack).includes(normalized);
-    return matchesQuery && matchesCategory(word, category);
+    return matchesQuery && matchesCategory(item, mode, category);
   });
 }
 
-export function matchesCategory(word: WordEntry, category: StudyCategory) {
+export function matchesCategory(
+  item: StudyEntry,
+  mode: StudyMode,
+  category: StudyCategory,
+) {
   if (category === "all") {
     return true;
   }
 
-  return CATEGORY_TAGS[category].some((tag) => word.tags.includes(tag));
+  const categoryTags = (
+    CATEGORY_TAGS_BY_MODE[mode] as Record<string, string[]>
+  )[category];
+  return categoryTags
+    ? categoryTags.some((tag: string) => item.tags.includes(tag))
+    : false;
 }
 
 export function loadProgress(
-  words: WordEntry[],
+  decks: StudyDecks,
   storage: Storage,
 ): StudyProgress {
   const raw = storage.getItem(STORAGE_KEY);
 
   if (!raw) {
-    return createInitialProgress(words);
+    return createInitialProgress(decks);
   }
 
   try {
     const parsed = JSON.parse(raw) as StudyProgress;
-    return normalizeProgress(words, parsed);
+    return normalizeProgress(decks, parsed);
   } catch {
-    return createInitialProgress(words);
+    return createInitialProgress(decks);
   }
 }
 
@@ -277,59 +332,90 @@ export function saveProgress(progress: StudyProgress, storage: Storage) {
   storage.setItem(STORAGE_KEY, JSON.stringify(progress));
 }
 
-export function countKnownWords(progress: StudyProgress) {
-  return Object.values(progress.words).filter(
-    (word) => word.lastRating === "known",
+export function countKnownItems(progress: StudyProgress, mode: StudyMode) {
+  return Object.values(progress[mode]).filter(
+    (item) => item.lastRating === "known",
   ).length;
 }
 
-export function resetProgressForWordIds(
+export function resetProgressForItemIds(
   progress: StudyProgress,
-  wordIds: string[],
+  mode: StudyMode,
+  itemIds: string[],
 ): StudyProgress {
-  if (wordIds.length === 0) {
+  if (itemIds.length === 0) {
     return progress;
   }
 
+  const resetIds = new Set(itemIds);
+
   return {
-    words: Object.fromEntries(
-      Object.entries(progress.words).map(([wordId, wordProgress]) => [
-        wordId,
-        wordIds.includes(wordId) ? createInitialWordProgress() : wordProgress,
+    ...progress,
+    [mode]: Object.fromEntries(
+      Object.entries(progress[mode]).map(([itemId, itemProgress]) => [
+        itemId,
+        resetIds.has(itemId) ? createInitialProgressEntry() : itemProgress,
       ]),
     ),
   };
 }
 
-export function isKnownWord(progress: StudyProgress, wordId: string) {
-  return progress.words[wordId]?.lastRating === "known";
+export function isKnownItem(
+  progress: StudyProgress,
+  mode: StudyMode,
+  itemId: string,
+) {
+  return progress[mode][itemId]?.lastRating === "known";
 }
 
-function getDueAtTime(wordProgress: StudyProgress["words"][string]) {
-  return wordProgress?.dueAt
-    ? new Date(wordProgress.dueAt).getTime()
+function createInitialModeProgress(items: StudyEntry[]) {
+  return Object.fromEntries(
+    items.map((item) => [item.id, createInitialProgressEntry()]),
+  );
+}
+
+function normalizeModeProgress(
+  items: StudyEntry[],
+  progress: Record<string, StudyProgressEntry> | undefined,
+  fallback: Record<string, StudyProgressEntry>,
+) {
+  return Object.fromEntries(
+    items.map((item) => [
+      item.id,
+      {
+        ...fallback[item.id],
+        ...progress?.[item.id],
+      },
+    ]),
+  );
+}
+
+function getDueAtTime(progressEntry: StudyProgressEntry | undefined) {
+  return progressEntry?.dueAt
+    ? new Date(progressEntry.dueAt).getTime()
     : Number.NEGATIVE_INFINITY;
 }
 
-function shuffleStudyWords(
-  words: WordEntry[],
+function shuffleStudyItems(
+  items: StudyEntry[],
   progress: StudyProgress,
+  mode: StudyMode,
   now: Date,
   random: () => number,
 ) {
-  const shuffledWords: WordEntry[] = [];
+  const shuffledItems: StudyEntry[] = [];
   let groupStart = 0;
 
-  while (groupStart < words.length) {
-    const firstWord = words[groupStart];
-    const firstProgress = progress.words[firstWord.id];
+  while (groupStart < items.length) {
+    const firstItem = items[groupStart];
+    const firstProgress = progress[mode][firstItem.id];
     const firstDueAt = getDueAtTime(firstProgress);
     const firstIsDue = firstDueAt <= now.getTime();
     let groupEnd = groupStart + 1;
 
-    while (groupEnd < words.length) {
-      const nextWord = words[groupEnd];
-      const nextProgress = progress.words[nextWord.id];
+    while (groupEnd < items.length) {
+      const nextItem = items[groupEnd];
+      const nextProgress = progress[mode][nextItem.id];
       const nextDueAt = getDueAtTime(nextProgress);
       const nextIsDue = nextDueAt <= now.getTime();
 
@@ -344,7 +430,7 @@ function shuffleStudyWords(
       groupEnd += 1;
     }
 
-    const group = [...words.slice(groupStart, groupEnd)];
+    const group = [...items.slice(groupStart, groupEnd)];
 
     for (let index = group.length - 1; index > 0; index -= 1) {
       const swapIndex = Math.floor(random() * (index + 1));
@@ -353,9 +439,9 @@ function shuffleStudyWords(
       group[swapIndex] = current;
     }
 
-    shuffledWords.push(...group);
+    shuffledItems.push(...group);
     groupStart = groupEnd;
   }
 
-  return shuffledWords;
+  return shuffledItems;
 }

@@ -1,6 +1,6 @@
 # Khru Thai Reader
 
-A minimal responsive web app for native English speakers learning to read common Thai words.
+A minimal responsive web app for native English speakers learning to read common Thai words and short everyday Thai sentences.
 
 ## Stack
 
@@ -13,11 +13,11 @@ A minimal responsive web app for native English speakers learning to read common
 
 ## Features
 
-- Flashcard-based Thai reading practice
-- 343 common Thai words with transliteration, meaning, and reading notes
+- Flashcard-based Thai reading practice with `words` and `conversation` study modes
+- 343 common Thai words plus 36 short everyday Thai sentences
 - Local progress saved in the browser
 - Search by Thai text, transliteration, or English meaning
-- Static Opus pronunciation audio support in the study card
+- Static Opus pronunciation audio support in the study card with per-mode asset folders
 - Responsive UI for desktop and mobile
 
 ## Development
@@ -60,6 +60,7 @@ Generate static Thai pronunciation assets with ElevenLabs:
 cp .env.example .env
 pnpm audio:list-voices
 pnpm audio:generate -- --voice-id=YOUR_THAI_VOICE_ID
+pnpm audio:generate -- --mode=conversation -- --voice-id=YOUR_THAI_VOICE_ID
 ```
 
 The generator uses:
@@ -68,4 +69,13 @@ The generator uses:
 - language code: `th`
 - format: `opus_48000_96`
 
-Generated files are saved to `public/audio/th/<word-id>.opus`.
+Options:
+
+- `--mode=words|conversation|all` selects which deck to generate. The default is `all`.
+- `--only=<id,id>` limits generation to specific study item ids.
+- `--force` regenerates files even if they already exist.
+
+Generated files are saved to:
+
+- `public/audio/th/words/<word-id>.opus`
+- `public/audio/th/conversation/<conversation-id>.opus`

@@ -2,16 +2,16 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
-import type { WordEntry } from "./types";
+import type { StudyEntry } from "./types";
 
-const words: WordEntry[] = [
+const words: StudyEntry[] = [
   {
     id: "chan",
     thai: "ฉัน",
     transliteration: "chan",
     transliterationMarked: "chàn",
     meaning: "I; me",
-    patternNote: "The final consonant makes an n ending.",
+    note: "The final consonant makes an n ending.",
     difficulty: 1,
     tags: ["pronoun"],
   },
@@ -21,7 +21,7 @@ const words: WordEntry[] = [
     transliteration: "baan",
     transliterationMarked: "bâan",
     meaning: "house",
-    patternNote: "Mai tho marks the falling tone here.",
+    note: "Mai tho marks the falling tone here.",
     difficulty: 1,
     tags: ["place"],
   },
@@ -31,9 +31,42 @@ const words: WordEntry[] = [
     transliteration: "poet",
     transliterationMarked: "pòet",
     meaning: "open",
-    patternNote: "A common sign word with a final t stop.",
+    note: "A common sign word with a final t stop.",
     difficulty: 1,
     tags: ["sign"],
+  },
+];
+
+const conversation: StudyEntry[] = [
+  {
+    id: "conv-sawasdee-khrap",
+    thai: "สวัสดีครับ",
+    transliteration: "sawatdi khrap",
+    transliterationMarked: "sawatdi khrap",
+    meaning: "Hello. (male speaker)",
+    note: "ครับ is the polite particle commonly used by male speakers.",
+    difficulty: 1,
+    tags: ["greetings"],
+  },
+  {
+    id: "conv-hong-nam-yu-thi-nai",
+    thai: "ห้องน้ำอยู่ที่ไหน",
+    transliteration: "hong nam yu thi nai",
+    transliterationMarked: "hong nam yu thi nai",
+    meaning: "Where is the bathroom?",
+    note: "อยู่ที่ไหน is the common pattern for asking where something is.",
+    difficulty: 1,
+    tags: ["directions"],
+  },
+  {
+    id: "conv-ton-ni-ki-mong",
+    thai: "ตอนนี้กี่โมง",
+    transliteration: "ton ni ki mong",
+    transliterationMarked: "ton ni ki mong",
+    meaning: "What time is it now?",
+    note: "กี่โมง is the standard way to ask the time.",
+    difficulty: 1,
+    tags: ["time"],
   },
 ];
 
@@ -47,15 +80,12 @@ describe("App", () => {
     vi.restoreAllMocks();
   });
 
-  it("reveals transliteration, meaning, and reading clue", async () => {
+  it("reveals transliteration, meaning, and note for the active card", async () => {
     const user = userEvent.setup();
-    render(<App words={words} />);
+    render(<App words={words} conversation={conversation} />);
 
     expect(screen.getByText("ฉัน")).toBeInTheDocument();
     expect(screen.queryByText("I; me")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /^known$/i }),
-    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /reveal/i }));
 
@@ -66,173 +96,199 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
-  it("plays pronunciation audio from the static opus asset path", async () => {
+  it("uses deck-specific audio paths for words and conversation cards", async () => {
     const user = userEvent.setup();
-    render(<App words={words} />);
+    render(<App words={words} conversation={conversation} />);
 
-    const playButton = screen.getByRole("button", {
-      name: /play pronunciation for ฉัน/i,
-    });
-    const audio = document.querySelector("audio");
+    expect(document.querySelector("audio")).toHaveAttribute(
+      "src",
+      "/audio/th/words/chan.opus",
+    );
 
-    expect(audio).not.toBeNull();
-    expect(audio).toHaveAttribute("src", "/audio/th/chan.opus");
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "conversation",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study category/i }),
+      "greetings",
+    );
 
-    await user.click(playButton);
+    expect(document.querySelector("audio")).toHaveAttribute(
+      "src",
+      "/audio/th/conversation/conv-sawasdee-khrap.opus",
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /play pronunciation for สวัสดีครับ/i,
+      }),
+    );
 
     expect(vi.mocked(HTMLMediaElement.prototype.play)).toHaveBeenCalledTimes(1);
   });
 
-  it("rates the current card and advances to the next one", async () => {
+  it("resets search, category, reveal state, and current card when switching modes", async () => {
     const user = userEvent.setup();
-    render(<App words={words} />);
+    render(<App words={words} conversation={conversation} />);
 
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
-
-    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
-    expect(screen.getByText("บ้าน")).toBeInTheDocument();
-    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
-    expect(screen.getByTestId("ready-count")).toHaveTextContent("2");
-  });
-
-  it("loops back to the remaining study words instead of stopping at the end", async () => {
-    const user = userEvent.setup();
-    render(<App words={words.slice(0, 2)} />);
-
-    expect(screen.getByText("ฉัน")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: /^okay$/i }));
-
-    expect(screen.getByText("บ้าน")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: /^okay$/i }));
-
-    expect(screen.getByText("ฉัน")).toBeInTheDocument();
-    expect(screen.getByTestId("known-count")).toHaveTextContent("0");
-    expect(screen.getByTestId("ready-count")).toHaveTextContent("2");
-  });
-
-  it("filters the deck by search query", async () => {
-    const user = userEvent.setup();
-    render(<App words={words} />);
-
+    await user.click(screen.getByRole("button", { name: /reveal/i }));
     await user.type(
       screen.getByRole("textbox", { name: /search the deck/i }),
-      "house",
+      "open",
     );
-
-    expect(screen.getByText("บ้าน")).toBeInTheDocument();
-    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
-  });
-
-  it("defaults to all words and lets the user pick a category", async () => {
-    const user = userEvent.setup();
-    render(<App words={words} />);
-
-    expect(screen.getByTestId("total-count")).toHaveTextContent("3");
-
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study category/i }),
       "signs",
     );
 
-    expect(screen.getByTestId("total-count")).toHaveTextContent("1");
+    expect(screen.getByDisplayValue("open")).toBeInTheDocument();
     expect(screen.getByText("เปิด")).toBeInTheDocument();
-    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
-  });
-
-  it("keeps progress when clearing known words is canceled", async () => {
-    const user = userEvent.setup();
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
-    render(<App words={words} />);
-
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
-
-    const resetButton = screen.getByRole("button", {
-      name: /clear known words and reset study progress/i,
-    });
-
-    await user.click(resetButton);
-
-    expect(confirmSpy).toHaveBeenCalledWith(
-      "Clear all known words and reset study progress?",
-    );
-    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
-    expect(screen.getByText("บ้าน")).toBeInTheDocument();
-  });
-
-  it("clears study progress after confirmation", async () => {
-    const user = userEvent.setup();
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
-    render(<App words={words} />);
-
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
-
-    const resetButton = screen.getByRole("button", {
-      name: /clear known words and reset study progress/i,
-    });
-
-    await user.click(resetButton);
-
-    expect(confirmSpy).toHaveBeenCalledWith(
-      "Clear all known words and reset study progress?",
-    );
-    expect(screen.getByTestId("known-count")).toHaveTextContent("0");
-    expect(screen.getByTestId("ready-count")).toHaveTextContent("3");
-    expect(screen.getByText("ฉัน")).toBeInTheDocument();
-    expect(screen.queryByText("บ้าน")).not.toBeInTheDocument();
-  });
-
-  it("persists study progress across remounts", async () => {
-    const user = userEvent.setup();
-    const firstRender = render(<App words={words} />);
-
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
-
-    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
-
-    firstRender.unmount();
-    render(<App words={words} />);
-
-    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
-    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
-    expect(screen.getByText("บ้าน")).toBeInTheDocument();
-  });
-
-  it("only clears known words from the selected category", async () => {
-    const user = userEvent.setup();
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
-    render(<App words={words} />);
-
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
-
-    expect(screen.getByTestId("known-count")).toHaveTextContent("2");
 
     await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "conversation",
+    );
+
+    expect(
+      screen.getByRole("textbox", { name: /search the deck/i }),
+    ).toHaveValue("");
+    expect(
       screen.getByRole("combobox", { name: /study category/i }),
-      "places",
+    ).toHaveValue("all");
+    expect(screen.queryByText("เปิด")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/สวัสดีครับ|ห้องน้ำอยู่ที่ไหน|ตอนนี้กี่โมง/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Hello. (male speaker)")).not.toBeInTheDocument();
+  });
+
+  it("filters conversation cards by search query and conversation category", async () => {
+    const user = userEvent.setup();
+    render(<App words={words} conversation={conversation} />);
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "conversation",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study category/i }),
+      "directions",
     );
 
-    const resetButton = screen.getByRole("button", {
-      name: /clear known words and reset study progress/i,
-    });
+    expect(screen.getByTestId("total-count")).toHaveTextContent("1");
+    expect(screen.getByText("ห้องน้ำอยู่ที่ไหน")).toBeInTheDocument();
 
-    await user.click(resetButton);
-
-    expect(confirmSpy).toHaveBeenCalledWith(
-      "Clear known words and reset study progress for Places & travel?",
+    await user.clear(screen.getByRole("textbox", { name: /search the deck/i }));
+    await user.type(
+      screen.getByRole("textbox", { name: /search the deck/i }),
+      "time",
     );
-    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
-    expect(screen.getByTestId("ready-count")).toHaveTextContent("1");
-    expect(screen.getByText("บ้าน")).toBeInTheDocument();
+
+    expect(screen.getByTestId("ready-count")).toHaveTextContent("0");
+    expect(
+      screen.getByText("No sentences match this search yet."),
+    ).toBeInTheDocument();
 
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study category/i }),
       "all",
     );
 
-    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
+    expect(screen.getByTestId("total-count")).toHaveTextContent("3");
+    expect(screen.getByTestId("ready-count")).toHaveTextContent("1");
+    expect(screen.getByText("ตอนนี้กี่โมง")).toBeInTheDocument();
+  });
+
+  it("keeps progress isolated between study modes", async () => {
+    const user = userEvent.setup();
+    render(<App words={words} conversation={conversation} />);
+
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "conversation",
+    );
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("0");
+
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "words",
+    );
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
     expect(screen.getByText("บ้าน")).toBeInTheDocument();
+  });
+
+  it("resets only the active mode and active category counts", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<App words={words} conversation={conversation} />);
+
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "conversation",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study category/i }),
+      "directions",
+    );
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+
+    const resetButton = screen.getByRole("button", {
+      name: /clear known words and reset study progress/i,
+    });
+
+    await user.click(resetButton);
+
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Clear known sentences and reset study progress for Directions?",
+    );
+    expect(screen.getByTestId("known-count")).toHaveTextContent("0");
+    expect(screen.getByTestId("ready-count")).toHaveTextContent("1");
+    expect(screen.getByText("ห้องน้ำอยู่ที่ไหน")).toBeInTheDocument();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "words",
+    );
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+  });
+
+  it("persists per-mode progress across remounts", async () => {
+    const user = userEvent.setup();
+    const firstRender = render(
+      <App words={words} conversation={conversation} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "conversation",
+    );
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+
+    firstRender.unmount();
+    render(<App words={words} conversation={conversation} />);
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "conversation",
+    );
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+    expect(screen.getByText("สวัสดีครับ")).toBeInTheDocument();
   });
 });

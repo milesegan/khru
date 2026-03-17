@@ -1,6 +1,8 @@
 export type StudyRating = "again" | "okay" | "known";
 
-export type StudyCategory =
+export type StudyMode = "words" | "conversation";
+
+export type WordStudyCategory =
   | "all"
   | "basics"
   | "people"
@@ -13,18 +15,29 @@ export type StudyCategory =
   | "body"
   | "signs";
 
-export type WordEntry = {
+export type ConversationStudyCategory =
+  | "all"
+  | "greetings"
+  | "courtesy"
+  | "introductions"
+  | "needs"
+  | "directions"
+  | "time";
+
+export type StudyCategory = WordStudyCategory | ConversationStudyCategory;
+
+export type StudyEntry = {
   id: string;
   thai: string;
   transliteration: string;
   transliterationMarked: string;
   meaning: string;
-  patternNote: string;
+  note: string;
   difficulty: 1 | 2 | 3 | 4 | 5;
   tags: string[];
 };
 
-export type WordProgress = {
+export type StudyProgressEntry = {
   familiarity: number;
   exposureCount: number;
   lastRating: StudyRating | null;
@@ -32,6 +45,9 @@ export type WordProgress = {
   dueAt: string | null;
 };
 
-export type StudyProgress = {
-  words: Record<string, WordProgress>;
-};
+export type StudyDecks = Record<StudyMode, StudyEntry[]>;
+
+export type StudyProgress = Record<
+  StudyMode,
+  Record<string, StudyProgressEntry>
+>;

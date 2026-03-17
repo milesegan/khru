@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { getWordAudioSrc } from "./audio";
+import { getStudyAudioSrc } from "./audio";
 
-describe("getWordAudioSrc", () => {
-  it("maps a word id to its static opus asset path", () => {
-    expect(getWordAudioSrc("chan")).toBe("/audio/th/chan.opus");
+describe("getStudyAudioSrc", () => {
+  it("maps a word id to its deck-specific static opus asset path", () => {
+    expect(getStudyAudioSrc("words", "chan")).toBe("/audio/th/words/chan.opus");
+  });
+
+  it("maps a conversation id to its deck-specific static opus asset path", () => {
+    expect(getStudyAudioSrc("conversation", "conv-sawasdee-khrap")).toBe(
+      "/audio/th/conversation/conv-sawasdee-khrap.opus",
+    );
   });
 });

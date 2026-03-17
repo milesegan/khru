@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { getWordAudioSrc } from "../lib/audio";
-import type { StudyRating, WordEntry } from "../types";
+import { getStudyAudioSrc } from "../lib/audio";
+import type { StudyEntry, StudyMode, StudyRating } from "../types";
 
 type StudyCardProps = {
-  word: WordEntry;
+  item: StudyEntry;
+  mode: StudyMode;
   revealed: boolean;
   onReveal: () => void;
   onRate: (rating: StudyRating) => void;
 };
 
 /**
- * Displays the active flashcard and the reveal/rating actions for that word.
+ * Displays the active flashcard and the reveal/rating actions for that item.
  */
 export function StudyCard({
-  word,
+  item,
+  mode,
   revealed,
   onReveal,
   onRate,
@@ -24,7 +26,7 @@ export function StudyCard({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioUnavailable, setAudioUnavailable] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioSrc = getWordAudioSrc(word.id);
+  const audioSrc = getStudyAudioSrc(mode, item.id);
 
   useEffect(() => {
     const audioElement = audioRef.current;
@@ -59,7 +61,7 @@ export function StudyCard({
   return (
     <article className="flex w-full max-w-3xl flex-col items-center gap-6 text-center">
       <div className="text-[clamp(3rem,12vw,8rem)] font-light leading-[1.1] text-ink">
-        {word.thai}
+        {item.thai}
       </div>
       <div className="flex flex-col items-center gap-3">
         <button
@@ -67,7 +69,7 @@ export function StudyCard({
           type="button"
           onClick={handlePlayAudio}
           disabled={audioUnavailable}
-          aria-label={`Play pronunciation for ${word.thai}`}
+          aria-label={`Play pronunciation for ${item.thai}`}
         >
           {audioUnavailable
             ? "Audio unavailable"
@@ -99,14 +101,14 @@ export function StudyCard({
           aria-live="polite"
         >
           <p className="m-0 text-xl tracking-[0.05em] text-muted">
-            {word.transliterationMarked}
+            {item.transliterationMarked}
           </p>
           <p className="m-0 font-serif text-[1.75rem] font-medium text-ink">
-            {word.meaning}
+            {item.meaning}
           </p>
-          {word.patternNote && (
+          {item.note && (
             <p className="m-0 max-w-[40ch] text-base leading-6 text-muted">
-              {word.patternNote}
+              {item.note}
             </p>
           )}
         </div>

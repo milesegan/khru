@@ -1,4 +1,4 @@
-import type { WordEntry } from "../types";
+import type { StudyEntry } from "../types";
 
 type WordArgs =
   | [
@@ -6,7 +6,7 @@ type WordArgs =
       thai: string,
       transliteration: string,
       meaning: string,
-      patternNote: string,
+      note: string,
       difficulty: 1 | 2 | 3 | 4 | 5,
       tags: string[],
     ]
@@ -16,12 +16,12 @@ type WordArgs =
       transliteration: string,
       transliterationMarked: string,
       meaning: string,
-      patternNote: string,
+      note: string,
       difficulty: 1 | 2 | 3 | 4 | 5,
       tags: string[],
     ];
 
-const word = (...args: WordArgs): WordEntry => {
+const word = (...args: WordArgs): StudyEntry => {
   const [id, thai, transliteration, fourth, fifth, sixth, seventh, eighth] =
     args;
   const hasMarkedTransliteration = Array.isArray(eighth);
@@ -33,7 +33,7 @@ const word = (...args: WordArgs): WordEntry => {
       transliteration,
       transliterationMarked: fourth,
       meaning: fifth,
-      patternNote: sixth as string,
+      note: sixth as string,
       difficulty: seventh as 1 | 2 | 3 | 4 | 5,
       tags: eighth,
     };
@@ -45,13 +45,13 @@ const word = (...args: WordArgs): WordEntry => {
     transliteration,
     transliterationMarked: transliteration,
     meaning: fourth,
-    patternNote: fifth,
+    note: fifth,
     difficulty: sixth as 1 | 2 | 3 | 4 | 5,
     tags: seventh as string[],
   };
 };
 
-export const words: WordEntry[] = [
+export const words: StudyEntry[] = [
   word(
     "chan",
     "ฉัน",

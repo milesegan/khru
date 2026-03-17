@@ -1,9 +1,12 @@
-import { STUDY_CATEGORIES } from "../lib/study";
-import type { StudyCategory } from "../types";
+import { STUDY_MODE_OPTIONS } from "../lib/study";
+import type { StudyCategory, StudyMode } from "../types";
 
 type StudyControlsProps = {
+  mode: StudyMode;
   category: StudyCategory;
+  categoryOptions: { value: StudyCategory; label: string }[];
   query: string;
+  onModeChange: (mode: StudyMode) => void;
   onCategoryChange: (category: StudyCategory) => void;
   onQueryChange: (query: string) => void;
 };
@@ -12,8 +15,11 @@ type StudyControlsProps = {
  * Collects the filtering controls that shape which words appear in the study queue.
  */
 export function StudyControls({
+  mode,
   category,
+  categoryOptions,
   query,
+  onModeChange,
   onCategoryChange,
   onQueryChange,
 }: StudyControlsProps) {
@@ -25,6 +31,22 @@ export function StudyControls({
   return (
     <>
       <label className={labelClassName}>
+        <span>Mode</span>
+        <select
+          className={`${inputClassName} cursor-pointer appearance-none`}
+          aria-label="Study mode"
+          value={mode}
+          onChange={(event) => onModeChange(event.target.value as StudyMode)}
+        >
+          {STUDY_MODE_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className={labelClassName}>
         <span>Category</span>
         <select
           className={`${inputClassName} cursor-pointer appearance-none`}
@@ -34,7 +56,7 @@ export function StudyControls({
             onCategoryChange(event.target.value as StudyCategory)
           }
         >
-          {STUDY_CATEGORIES.map((option) => (
+          {categoryOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
