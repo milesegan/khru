@@ -72,9 +72,9 @@ export default function App({ words = defaultWords }: AppProps) {
   }
 
   return (
-    <main className="app-shell">
-      <header className="top-bar">
-        <div className="controls-group">
+    <main className="mx-auto flex w-[min(1120px,calc(100%-2rem))] flex-col gap-8 py-6">
+      <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-4 md:max-w-[32rem] md:flex-1 md:flex-row md:items-end md:gap-8">
           <StudyControls
             category={category}
             query={query}
@@ -90,7 +90,7 @@ export default function App({ words = defaultWords }: AppProps) {
         />
       </header>
 
-      <div className="main-content">
+      <div className="flex min-h-[50vh] flex-1 items-center justify-center">
         {currentWord ? (
           <StudyCard
             key={currentCardKey}
