@@ -1,8 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   applyRating,
+  countKnownWords,
   createInitialProgress,
   getDueWords,
+  getStudyWords,
+  isKnownWord,
   loadProgress,
   saveProgress,
   STORAGE_KEY,
@@ -112,6 +115,46 @@ describe("study helpers", () => {
     );
 
     expect(queue.map((word) => word.id)).toEqual(["baan", "chan"]);
+  });
+
+  it("keeps future unknown words in the rotation after due words run out", () => {
+    const now = new Date("2026-03-11T10:00:00.000Z");
+    const progress = applyRating(
+      createInitialProgress(words.slice(0, 2)),
+      "chan",
+      "okay",
+      now,
+    );
+
+    const queue = getStudyWords(
+      words.slice(0, 2),
+      progress,
+      now,
+      "",
+      "all",
+      () => 0.999,
+    );
+
+    expect(queue.map((word) => word.id)).toEqual(["baan", "chan"]);
+  });
+
+  it("does not treat repeated okay ratings as known", () => {
+    const now = new Date("2026-03-11T10:00:00.000Z");
+    const afterFirstOkay = applyRating(
+      createInitialProgress(words),
+      "chan",
+      "okay",
+      now,
+    );
+    const afterSecondOkay = applyRating(
+      afterFirstOkay,
+      "chan",
+      "okay",
+      new Date("2026-03-11T22:00:00.000Z"),
+    );
+
+    expect(isKnownWord(afterSecondOkay, "chan")).toBe(false);
+    expect(countKnownWords(afterSecondOkay)).toBe(0);
   });
 
   it("falls back to fresh progress when storage data is corrupt", () => {

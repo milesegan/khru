@@ -95,6 +95,23 @@ describe("App", () => {
     expect(screen.getByTestId("ready-count")).toHaveTextContent("2");
   });
 
+  it("loops back to the remaining study words instead of stopping at the end", async () => {
+    const user = userEvent.setup();
+    render(<App words={words.slice(0, 2)} />);
+
+    expect(screen.getByText("ฉัน")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /^okay$/i }));
+
+    expect(screen.getByText("บ้าน")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /^okay$/i }));
+
+    expect(screen.getByText("ฉัน")).toBeInTheDocument();
+    expect(screen.getByTestId("known-count")).toHaveTextContent("0");
+    expect(screen.getByTestId("ready-count")).toHaveTextContent("2");
+  });
+
   it("filters the deck by search query", async () => {
     const user = userEvent.setup();
     render(<App words={words} />);
@@ -164,6 +181,22 @@ describe("App", () => {
     expect(screen.getByTestId("ready-count")).toHaveTextContent("3");
     expect(screen.getByText("ฉัน")).toBeInTheDocument();
     expect(screen.queryByText("บ้าน")).not.toBeInTheDocument();
+  });
+
+  it("persists study progress across remounts", async () => {
+    const user = userEvent.setup();
+    const firstRender = render(<App words={words} />);
+
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+
+    firstRender.unmount();
+    render(<App words={words} />);
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
+    expect(screen.getByText("บ้าน")).toBeInTheDocument();
   });
 
   it("only clears known words from the selected category", async () => {

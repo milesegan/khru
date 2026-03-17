@@ -1,4 +1,5 @@
-import { useDeferredValue, useMemo, useState } from "react";
+import { Provider, createStore, useAtom, useSetAtom } from "jotai";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { EmptyStudyState } from "./components/EmptyStudyState";
 import { StudyCard } from "./components/StudyCard";
 import { StudyControls } from "./components/StudyControls";
@@ -7,30 +8,44 @@ import { words as defaultWords } from "./data/words";
 import {
   applyRating,
   countKnownWords,
-  createInitialProgress,
-  resetProgressForWordIds,
-  getDueWords,
   getMatchingWords,
-  loadProgress,
-  saveProgress,
+  getStudyWords,
+  resetProgressForWordIds,
   STUDY_CATEGORIES,
 } from "./lib/study";
-import type { StudyCategory, StudyProgress, WordEntry } from "./types";
+import {
+  categoryAtom,
+  currentWordIdAtom,
+  getInitialProgress,
+  progressAtom,
+  queryAtom,
+  revealedCardKeyAtom,
+  wordsAtom,
+} from "./state/study";
+import type { WordEntry } from "./types";
 
 type AppProps = {
   words?: WordEntry[];
 };
 
-export default function App({ words = defaultWords }: AppProps) {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<StudyCategory>("all");
-  const deferredQuery = useDeferredValue(query);
-  const [progress, setProgress] = useState<StudyProgress>(() =>
-    loadProgress(words, window.localStorage),
-  );
+type StudyViewProps = {
+  words: WordEntry[];
+};
 
-  const dueWords = useMemo(
-    () => getDueWords(words, progress, new Date(), deferredQuery, category),
+type StudyStateHydratorProps = {
+  words: WordEntry[];
+};
+
+function StudyView({ words }: StudyViewProps) {
+  const [query, setQuery] = useAtom(queryAtom);
+  const [category, setCategory] = useAtom(categoryAtom);
+  const [progress, setProgress] = useAtom(progressAtom);
+  const [revealedCardKey, setRevealedCardKey] = useAtom(revealedCardKeyAtom);
+  const [currentWordId, setCurrentWordId] = useAtom(currentWordIdAtom);
+  const deferredQuery = useDeferredValue(query);
+
+  const studyWords = useMemo(
+    () => getStudyWords(words, progress, new Date(), deferredQuery, category),
     [category, deferredQuery, progress, words],
   );
   const matchingWords = useMemo(
@@ -41,11 +56,18 @@ export default function App({ words = defaultWords }: AppProps) {
     () => getMatchingWords(words, "", category),
     [category, words],
   );
-  const currentWord = dueWords[0] ?? null;
+  const currentWord = useMemo(() => {
+    if (studyWords.length === 0) {
+      return null;
+    }
+
+    return (
+      studyWords.find((word) => word.id === currentWordId) ?? studyWords[0]
+    );
+  }, [currentWordId, studyWords]);
   const currentCardKey = currentWord
     ? `${currentWord.id}:${deferredQuery}`
     : "";
-  const [revealedCardKey, setRevealedCardKey] = useState("");
   const knownWords = useMemo(() => countKnownWords(progress), [progress]);
   const revealed = currentCardKey !== "" && revealedCardKey === currentCardKey;
   const resetWordIds = useMemo(
@@ -60,33 +82,60 @@ export default function App({ words = defaultWords }: AppProps) {
       ? "Clear all known words and reset study progress?"
       : `Clear known words and reset study progress for ${selectedCategoryLabel}?`;
 
+  useEffect(() => {
+    const nextWordId = currentWord?.id ?? "";
+
+    if (nextWordId !== currentWordId) {
+      setCurrentWordId(nextWordId);
+    }
+  }, [currentWord?.id, currentWordId, setCurrentWordId]);
+
   function handleRating(rating: "again" | "okay" | "known") {
     if (!currentWord) {
       return;
     }
 
-    setProgress((currentProgress) => {
-      const nextProgress = applyRating(
-        currentProgress,
-        currentWord.id,
-        rating,
-        new Date(),
-      );
-      saveProgress(nextProgress, window.localStorage);
-      return nextProgress;
-    });
+    const currentWordIndex = studyWords.findIndex(
+      (word) => word.id === currentWord.id,
+    );
+    const nextVisibleWordId =
+      studyWords[(currentWordIndex + 1) % studyWords.length]?.id ?? "";
+    const now = new Date();
+    const nextProgress = applyRating(progress, currentWord.id, rating, now);
+    const nextStudyWords = getStudyWords(
+      words,
+      nextProgress,
+      now,
+      deferredQuery,
+      category,
+    );
+    const nextWordId = nextStudyWords.some(
+      (word) => word.id === nextVisibleWordId,
+    )
+      ? nextVisibleWordId
+      : (nextStudyWords[0]?.id ?? "");
+
+    setProgress(nextProgress);
+    setCurrentWordId(nextWordId);
+    setRevealedCardKey("");
   }
 
   function handleResetProgress() {
-    setProgress((currentProgress) => {
-      const nextProgress =
-        category === "all"
-          ? createInitialProgress(words)
-          : resetProgressForWordIds(currentProgress, resetWordIds);
-      setRevealedCardKey("");
-      saveProgress(nextProgress, window.localStorage);
-      return nextProgress;
-    });
+    const nextProgress =
+      category === "all"
+        ? getInitialProgress(words)
+        : resetProgressForWordIds(progress, resetWordIds);
+    const nextStudyWords = getStudyWords(
+      words,
+      nextProgress,
+      new Date(),
+      deferredQuery,
+      category,
+    );
+
+    setRevealedCardKey("");
+    setProgress(nextProgress);
+    setCurrentWordId(nextStudyWords[0]?.id ?? "");
   }
 
   return (
@@ -102,7 +151,7 @@ export default function App({ words = defaultWords }: AppProps) {
         </div>
         <StudyStats
           totalWords={categoryWords.length}
-          readyWords={dueWords.length}
+          readyWords={studyWords.length}
           knownWords={knownWords}
           resetLabel={resetLabel}
           onResetProgress={handleResetProgress}
@@ -123,5 +172,33 @@ export default function App({ words = defaultWords }: AppProps) {
         )}
       </div>
     </main>
+  );
+}
+
+function StudyStateHydrator({ words }: StudyStateHydratorProps) {
+  const setWords = useSetAtom(wordsAtom);
+
+  useEffect(() => {
+    setWords(words);
+  }, [setWords, words]);
+
+  return <StudyView words={words} />;
+}
+
+export default function App({ words = defaultWords }: AppProps) {
+  const [store] = useState(() => {
+    const studyStore = createStore();
+    studyStore.set(wordsAtom, words);
+    return studyStore;
+  });
+
+  useEffect(() => {
+    store.set(wordsAtom, words);
+  }, [store, words]);
+
+  return (
+    <Provider store={store}>
+      <StudyStateHydrator words={words} />
+    </Provider>
   );
 }

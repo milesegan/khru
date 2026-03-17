@@ -79,6 +79,29 @@ export function createInitialWordProgress() {
   };
 }
 
+export function normalizeProgress(
+  words: WordEntry[],
+  progress: StudyProgress | null | undefined,
+): StudyProgress {
+  const fallback = createInitialProgress(words);
+
+  if (!progress) {
+    return fallback;
+  }
+
+  return {
+    words: Object.fromEntries(
+      words.map((word) => [
+        word.id,
+        {
+          ...fallback.words[word.id],
+          ...progress.words?.[word.id],
+        },
+      ]),
+    ),
+  };
+}
+
 export function applyRating(
   progress: StudyProgress,
   wordId: string,
@@ -132,7 +155,12 @@ export function getDueWords(
       const dueAt = record?.dueAt
         ? new Date(record.dueAt).getTime()
         : Number.NEGATIVE_INFINITY;
-      return matchesQuery && matchesSelectedCategory && dueAt <= now.getTime();
+      return (
+        matchesQuery &&
+        matchesSelectedCategory &&
+        !isKnownWord(progress, word.id) &&
+        dueAt <= now.getTime()
+      );
     })
     .sort((left, right) => {
       const leftProgress = progress.words[left.id];
@@ -149,42 +177,59 @@ export function getDueWords(
       return left.thai.localeCompare(right.thai);
     });
 
-  const shuffledDueWords: WordEntry[] = [];
-  let groupStart = 0;
+  return shuffleStudyWords(dueWords, progress, now, random);
+}
 
-  while (groupStart < dueWords.length) {
-    const firstWord = dueWords[groupStart];
-    const firstProgress = progress.words[firstWord.id];
-    let groupEnd = groupStart + 1;
+export function getStudyWords(
+  words: WordEntry[],
+  progress: StudyProgress,
+  now = new Date(),
+  query = "",
+  category: StudyCategory = "all",
+  random = Math.random,
+): WordEntry[] {
+  const normalized = normalizeSearchText(query.trim());
 
-    while (groupEnd < dueWords.length) {
-      const nextWord = dueWords[groupEnd];
-      const nextProgress = progress.words[nextWord.id];
+  const studyWords = words
+    .filter((word) => {
+      const haystack = `${word.thai} ${word.transliteration} ${word.transliterationMarked} ${word.meaning}`;
+      const matchesQuery =
+        !normalized || normalizeSearchText(haystack).includes(normalized);
 
-      if (
-        nextProgress.familiarity !== firstProgress.familiarity ||
-        nextProgress.exposureCount !== firstProgress.exposureCount
-      ) {
-        break;
+      return (
+        matchesQuery &&
+        matchesCategory(word, category) &&
+        !isKnownWord(progress, word.id)
+      );
+    })
+    .sort((left, right) => {
+      const leftProgress = progress.words[left.id];
+      const rightProgress = progress.words[right.id];
+      const leftDueAt = getDueAtTime(leftProgress);
+      const rightDueAt = getDueAtTime(rightProgress);
+      const leftIsDue = leftDueAt <= now.getTime();
+      const rightIsDue = rightDueAt <= now.getTime();
+
+      if (leftIsDue !== rightIsDue) {
+        return leftIsDue ? -1 : 1;
       }
 
-      groupEnd += 1;
-    }
+      if (leftProgress.familiarity !== rightProgress.familiarity) {
+        return leftProgress.familiarity - rightProgress.familiarity;
+      }
 
-    const group = [...dueWords.slice(groupStart, groupEnd)];
+      if (leftProgress.exposureCount !== rightProgress.exposureCount) {
+        return leftProgress.exposureCount - rightProgress.exposureCount;
+      }
 
-    for (let index = group.length - 1; index > 0; index -= 1) {
-      const swapIndex = Math.floor(random() * (index + 1));
-      const current = group[index];
-      group[index] = group[swapIndex];
-      group[swapIndex] = current;
-    }
+      if (leftDueAt !== rightDueAt) {
+        return leftDueAt - rightDueAt;
+      }
 
-    shuffledDueWords.push(...group);
-    groupStart = groupEnd;
-  }
+      return left.thai.localeCompare(right.thai);
+    });
 
-  return shuffledDueWords;
+  return shuffleStudyWords(studyWords, progress, now, random);
 }
 
 export function getMatchingWords(
@@ -222,19 +267,7 @@ export function loadProgress(
 
   try {
     const parsed = JSON.parse(raw) as StudyProgress;
-    const fallback = createInitialProgress(words);
-
-    return {
-      words: Object.fromEntries(
-        words.map((word) => [
-          word.id,
-          {
-            ...fallback.words[word.id],
-            ...parsed.words?.[word.id],
-          },
-        ]),
-      ),
-    };
+    return normalizeProgress(words, parsed);
   } catch {
     return createInitialProgress(words);
   }
@@ -245,8 +278,9 @@ export function saveProgress(progress: StudyProgress, storage: Storage) {
 }
 
 export function countKnownWords(progress: StudyProgress) {
-  return Object.values(progress.words).filter((word) => word.familiarity >= 2)
-    .length;
+  return Object.values(progress.words).filter(
+    (word) => word.lastRating === "known",
+  ).length;
 }
 
 export function resetProgressForWordIds(
@@ -265,4 +299,63 @@ export function resetProgressForWordIds(
       ]),
     ),
   };
+}
+
+export function isKnownWord(progress: StudyProgress, wordId: string) {
+  return progress.words[wordId]?.lastRating === "known";
+}
+
+function getDueAtTime(wordProgress: StudyProgress["words"][string]) {
+  return wordProgress?.dueAt
+    ? new Date(wordProgress.dueAt).getTime()
+    : Number.NEGATIVE_INFINITY;
+}
+
+function shuffleStudyWords(
+  words: WordEntry[],
+  progress: StudyProgress,
+  now: Date,
+  random: () => number,
+) {
+  const shuffledWords: WordEntry[] = [];
+  let groupStart = 0;
+
+  while (groupStart < words.length) {
+    const firstWord = words[groupStart];
+    const firstProgress = progress.words[firstWord.id];
+    const firstDueAt = getDueAtTime(firstProgress);
+    const firstIsDue = firstDueAt <= now.getTime();
+    let groupEnd = groupStart + 1;
+
+    while (groupEnd < words.length) {
+      const nextWord = words[groupEnd];
+      const nextProgress = progress.words[nextWord.id];
+      const nextDueAt = getDueAtTime(nextProgress);
+      const nextIsDue = nextDueAt <= now.getTime();
+
+      if (
+        nextIsDue !== firstIsDue ||
+        nextProgress.familiarity !== firstProgress.familiarity ||
+        nextProgress.exposureCount !== firstProgress.exposureCount
+      ) {
+        break;
+      }
+
+      groupEnd += 1;
+    }
+
+    const group = [...words.slice(groupStart, groupEnd)];
+
+    for (let index = group.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(random() * (index + 1));
+      const current = group[index];
+      group[index] = group[swapIndex];
+      group[swapIndex] = current;
+    }
+
+    shuffledWords.push(...group);
+    groupStart = groupEnd;
+  }
+
+  return shuffledWords;
 }
