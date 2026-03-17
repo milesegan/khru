@@ -4,7 +4,7 @@
 export function HeroHeader() {
   return (
     <section className="hero">
-      <p className="eyebrow">Khru Thai Reader</p>
+      <p className="eyebrow">Khru Thai Tutor</p>
     </section>
   );
 }
