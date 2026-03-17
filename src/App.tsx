@@ -8,10 +8,12 @@ import {
   applyRating,
   countKnownWords,
   createInitialProgress,
+  resetProgressForWordIds,
   getDueWords,
   getMatchingWords,
   loadProgress,
   saveProgress,
+  STUDY_CATEGORIES,
 } from "./lib/study";
 import type { StudyCategory, StudyProgress, WordEntry } from "./types";
 
@@ -46,6 +48,17 @@ export default function App({ words = defaultWords }: AppProps) {
   const [revealedCardKey, setRevealedCardKey] = useState("");
   const knownWords = useMemo(() => countKnownWords(progress), [progress]);
   const revealed = currentCardKey !== "" && revealedCardKey === currentCardKey;
+  const resetWordIds = useMemo(
+    () => categoryWords.map((word) => word.id),
+    [categoryWords],
+  );
+  const selectedCategoryLabel =
+    STUDY_CATEGORIES.find((option) => option.value === category)?.label ??
+    "All words";
+  const resetLabel =
+    category === "all"
+      ? "Clear all known words and reset study progress?"
+      : `Clear known words and reset study progress for ${selectedCategoryLabel}?`;
 
   function handleRating(rating: "again" | "okay" | "known") {
     if (!currentWord) {
@@ -65,10 +78,15 @@ export default function App({ words = defaultWords }: AppProps) {
   }
 
   function handleResetProgress() {
-    const nextProgress = createInitialProgress(words);
-    setRevealedCardKey("");
-    saveProgress(nextProgress, window.localStorage);
-    setProgress(nextProgress);
+    setProgress((currentProgress) => {
+      const nextProgress =
+        category === "all"
+          ? createInitialProgress(words)
+          : resetProgressForWordIds(currentProgress, resetWordIds);
+      setRevealedCardKey("");
+      saveProgress(nextProgress, window.localStorage);
+      return nextProgress;
+    });
   }
 
   return (
@@ -86,6 +104,7 @@ export default function App({ words = defaultWords }: AppProps) {
           totalWords={categoryWords.length}
           readyWords={dueWords.length}
           knownWords={knownWords}
+          resetLabel={resetLabel}
           onResetProgress={handleResetProgress}
         />
       </header>

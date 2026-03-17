@@ -165,4 +165,41 @@ describe("App", () => {
     expect(screen.getByText("ฉัน")).toBeInTheDocument();
     expect(screen.queryByText("บ้าน")).not.toBeInTheDocument();
   });
+
+  it("only clears known words from the selected category", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<App words={words} />);
+
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+    await user.click(screen.getByRole("button", { name: /^known$/i }));
+
+    expect(screen.getByTestId("known-count")).toHaveTextContent("2");
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study category/i }),
+      "places",
+    );
+
+    const resetButton = screen.getByRole("button", {
+      name: /clear known words and reset study progress/i,
+    });
+
+    await user.click(resetButton);
+
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Clear known words and reset study progress for Places & travel?",
+    );
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+    expect(screen.getByTestId("ready-count")).toHaveTextContent("1");
+    expect(screen.getByText("บ้าน")).toBeInTheDocument();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study category/i }),
+      "all",
+    );
+
+    expect(screen.queryByText("ฉัน")).not.toBeInTheDocument();
+    expect(screen.getByText("บ้าน")).toBeInTheDocument();
+  });
 });

@@ -64,17 +64,18 @@ function normalizeSearchText(value: string) {
 export function createInitialProgress(words: WordEntry[]): StudyProgress {
   return {
     words: Object.fromEntries(
-      words.map((word) => [
-        word.id,
-        {
-          familiarity: 0,
-          exposureCount: 0,
-          lastRating: null,
-          lastReviewedAt: null,
-          dueAt: null,
-        },
-      ]),
+      words.map((word) => [word.id, createInitialWordProgress()]),
     ),
+  };
+}
+
+export function createInitialWordProgress() {
+  return {
+    familiarity: 0,
+    exposureCount: 0,
+    lastRating: null,
+    lastReviewedAt: null,
+    dueAt: null,
   };
 }
 
@@ -246,4 +247,22 @@ export function saveProgress(progress: StudyProgress, storage: Storage) {
 export function countKnownWords(progress: StudyProgress) {
   return Object.values(progress.words).filter((word) => word.familiarity >= 2)
     .length;
+}
+
+export function resetProgressForWordIds(
+  progress: StudyProgress,
+  wordIds: string[],
+): StudyProgress {
+  if (wordIds.length === 0) {
+    return progress;
+  }
+
+  return {
+    words: Object.fromEntries(
+      Object.entries(progress.words).map(([wordId, wordProgress]) => [
+        wordId,
+        wordIds.includes(wordId) ? createInitialWordProgress() : wordProgress,
+      ]),
+    ),
+  };
 }
