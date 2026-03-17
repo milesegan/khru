@@ -2,20 +2,20 @@
 
 ## Tooling
 
-- Use `npm` for package management in this repo.
+- Use `pnpm` for package management in this repo.
 - Before committing, make sure the repo is clean under formatting, linting, tests, and build checks.
 
 ## Required Checks
 
-- Run `npm run format:check`.
-- Run `npm run lint`.
-- Run `npm run test:run`.
-- Run `npm run build`.
+- Run `pnpm run format:check`.
+- Run `pnpm run lint`.
+- Run `pnpm run test:run`.
+- Run `pnpm run build`.
 
 ## Auto-fix Commands
 
-- Use `npm run format` to apply Prettier formatting.
-- Use `npm run lint:fix` to apply safe ESLint fixes.
+- Use `pnpm run format` to apply Prettier formatting.
+- Use `pnpm run lint:fix` to apply safe ESLint fixes.
 
 ## Commit Standard
 
