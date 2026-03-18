@@ -291,4 +291,31 @@ describe("App", () => {
     expect(screen.getByTestId("known-count")).toHaveTextContent("1");
     expect(screen.getByText("สวัสดีครับ")).toBeInTheDocument();
   });
+
+  it("persists the selected mode and category across remounts", async () => {
+    const user = userEvent.setup();
+    const firstRender = render(
+      <App words={words} conversation={conversation} />,
+    );
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study mode/i }),
+      "conversation",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /study category/i }),
+      "directions",
+    );
+
+    firstRender.unmount();
+    render(<App words={words} conversation={conversation} />);
+
+    expect(screen.getByRole("combobox", { name: /study mode/i })).toHaveValue(
+      "conversation",
+    );
+    expect(
+      screen.getByRole("combobox", { name: /study category/i }),
+    ).toHaveValue("directions");
+    expect(screen.getByText("ห้องน้ำอยู่ที่ไหน")).toBeInTheDocument();
+  });
 });
