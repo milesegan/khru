@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient
+      id="bg"
+      x1="10"
+      y1="8"
+      x2="54"
+      y2="56"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0" stop-color="#fff4d6" />
+      <stop offset="1" stop-color="#f5c86b" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#bg)" />
+  <text
+    x="32"
+    y="51"
+    fill="#b45309"
+    font-size="50"
+    font-family="'Noto Sans Thai', 'Thonburi', sans-serif"
+    font-weight="500"
+    text-anchor="middle"
+  >
+    ก
+  </text>
+</svg>
