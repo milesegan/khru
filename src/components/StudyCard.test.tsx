@@ -20,6 +20,7 @@ describe("StudyCard", () => {
         mode="conversation"
         revealed={true}
         onReveal={vi.fn()}
+        onPlayRewardAudio={vi.fn()}
         onRate={vi.fn()}
       />,
     );
@@ -42,10 +43,6 @@ describe("StudyCard", () => {
       "src",
       "/audio/th/conversation/conv-sawasdee-khrap.opus",
     );
-    expect(document.querySelectorAll("audio")[1]).toHaveAttribute(
-      "src",
-      "/audio/ui/reward-known.opus",
-    );
   });
 
   it("hides the known action after the card is revealed", () => {
@@ -64,6 +61,7 @@ describe("StudyCard", () => {
         mode="words"
         revealed={true}
         onReveal={vi.fn()}
+        onPlayRewardAudio={vi.fn()}
         onRate={vi.fn()}
       />,
     );
@@ -89,6 +87,7 @@ describe("StudyCard", () => {
         mode="words"
         revealed={false}
         onReveal={vi.fn()}
+        onPlayRewardAudio={vi.fn()}
         onRate={vi.fn()}
       />,
     );
@@ -102,6 +101,7 @@ describe("StudyCard", () => {
   it("celebrates known ratings before advancing", async () => {
     const user = userEvent.setup();
     const onRate = vi.fn();
+    const onPlayRewardAudio = vi.fn();
 
     render(
       <StudyCard
@@ -118,13 +118,14 @@ describe("StudyCard", () => {
         mode="words"
         revealed={false}
         onReveal={vi.fn()}
+        onPlayRewardAudio={onPlayRewardAudio}
         onRate={onRate}
       />,
     );
 
     await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
 
-    expect(vi.mocked(HTMLMediaElement.prototype.play)).toHaveBeenCalledTimes(1);
+    expect(onPlayRewardAudio).toHaveBeenCalledTimes(1);
     expect(onRate).not.toHaveBeenCalled();
     expect(screen.getByTestId("study-card-thai")).toHaveClass(
       "animate-known-word-pulse",

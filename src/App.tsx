@@ -1,5 +1,5 @@
 import { Provider, createStore, useAtom, useSetAtom } from "jotai";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EmptyStudyState } from "./components/EmptyStudyState";
 import { StudyCard } from "./components/StudyCard";
 import { StudyControls } from "./components/StudyControls";
@@ -24,6 +24,7 @@ import {
   studyDecksAtom,
 } from "./state/study";
 import type { StudyDecks, StudyEntry, StudyMode } from "./types";
+import { getRewardAudioSrc } from "./lib/audio";
 
 type AppProps = {
   words?: StudyEntry[];
@@ -44,6 +45,7 @@ function StudyView({ decks }: StudyViewProps) {
   const [progress, setProgress] = useAtom(progressAtom);
   const [revealedCardKey, setRevealedCardKey] = useAtom(revealedCardKeyAtom);
   const [currentItemId, setCurrentItemId] = useAtom(currentItemIdAtom);
+  const rewardAudioRef = useRef<HTMLAudioElement | null>(null);
   const activeDeck = decks[mode];
   const categoryOptions = STUDY_CATEGORY_OPTIONS[mode];
 
@@ -86,6 +88,23 @@ function StudyView({ decks }: StudyViewProps) {
     category === "all"
       ? `Clear all known ${itemLabel} and reset study progress?`
       : `Clear known ${itemLabel} and reset study progress for ${selectedCategoryLabel}?`;
+
+  useEffect(() => {
+    const rewardAudioElement = rewardAudioRef.current;
+
+    return () => {
+      if (!rewardAudioElement) {
+        return;
+      }
+
+      try {
+        rewardAudioElement.pause();
+      } catch {
+        // jsdom does not implement HTMLMediaElement playback controls.
+      }
+      rewardAudioElement.currentTime = 0;
+    };
+  }, []);
 
   useEffect(() => {
     const nextItemId = currentItem?.id ?? "";
@@ -167,6 +186,19 @@ function StudyView({ decks }: StudyViewProps) {
     setCurrentItemId(nextStudyItems[0]?.id ?? "");
   }
 
+  function handlePlayRewardAudio() {
+    if (!rewardAudioRef.current) {
+      return;
+    }
+
+    try {
+      rewardAudioRef.current.currentTime = 0;
+      void rewardAudioRef.current.play();
+    } catch {
+      // Reward audio is decorative; playback failure should not block rating.
+    }
+  }
+
   return (
     <main className="mx-auto grid min-h-dvh w-[min(1120px,calc(100%-2rem))] grid-rows-[auto_minmax(0,1fr)_auto] gap-8 py-6">
       <header className="grid gap-6">
@@ -189,6 +221,7 @@ function StudyView({ decks }: StudyViewProps) {
             mode={mode}
             revealed={revealed}
             onReveal={() => setRevealedCardKey(currentCardKey)}
+            onPlayRewardAudio={handlePlayRewardAudio}
             onRate={handleRating}
           />
         ) : (
@@ -204,6 +237,12 @@ function StudyView({ decks }: StudyViewProps) {
           onResetProgress={handleResetProgress}
         />
       </footer>
+      <audio
+        ref={rewardAudioRef}
+        preload="auto"
+        src={getRewardAudioSrc()}
+        aria-hidden="true"
+      />
     </main>
   );
 }

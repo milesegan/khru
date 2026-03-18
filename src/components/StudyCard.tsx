@@ -7,7 +7,7 @@ import {
   LuVolume2,
   LuVolumeX,
 } from "react-icons/lu";
-import { getRewardAudioSrc, getStudyAudioSrc } from "../lib/audio";
+import { getStudyAudioSrc } from "../lib/audio";
 import type { StudyEntry, StudyMode, StudyRating } from "../types";
 
 export const KNOWN_FEEDBACK_DURATION_MS = 460;
@@ -17,6 +17,7 @@ type StudyCardProps = {
   mode: StudyMode;
   revealed: boolean;
   onReveal: () => void;
+  onPlayRewardAudio: () => void;
   onRate: (rating: StudyRating) => void;
 };
 
@@ -63,6 +64,7 @@ export function StudyCard({
   mode,
   revealed,
   onReveal,
+  onPlayRewardAudio,
   onRate,
 }: StudyCardProps) {
   const actionButtonClassName =
@@ -75,17 +77,14 @@ export function StudyCard({
       : "text-[clamp(4rem,15vw,9rem)]";
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const rewardAudioRef = useRef<HTMLAudioElement | null>(null);
   const knownTimeoutRef = useRef<number | null>(null);
   const [audioUnavailable, setAudioUnavailable] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isKnownCelebrating, setIsKnownCelebrating] = useState(false);
   const audioSrc = getStudyAudioSrc(mode, item.id);
-  const rewardAudioSrc = getRewardAudioSrc();
 
   useEffect(() => {
     const audioElement = audioRef.current;
-    const rewardAudioElement = rewardAudioRef.current;
 
     return () => {
       if (knownTimeoutRef.current !== null) {
@@ -99,15 +98,6 @@ export function StudyCard({
           // jsdom does not implement HTMLMediaElement playback controls.
         }
         audioElement.currentTime = 0;
-      }
-
-      if (rewardAudioElement) {
-        try {
-          rewardAudioElement.pause();
-        } catch {
-          // jsdom does not implement HTMLMediaElement playback controls.
-        }
-        rewardAudioElement.currentTime = 0;
       }
     };
   }, []);
@@ -127,26 +117,13 @@ export function StudyCard({
     }
   }
 
-  async function handlePlayRewardAudio() {
-    if (!rewardAudioRef.current) {
-      return;
-    }
-
-    try {
-      rewardAudioRef.current.currentTime = 0;
-      await rewardAudioRef.current.play();
-    } catch {
-      // Reward audio is decorative; playback failure should not block the rating.
-    }
-  }
-
   function handleKnown() {
     if (isKnownCelebrating) {
       return;
     }
 
     setIsKnownCelebrating(true);
-    void handlePlayRewardAudio();
+    onPlayRewardAudio();
     knownTimeoutRef.current = window.setTimeout(() => {
       knownTimeoutRef.current = null;
       onRate("known");
@@ -181,7 +158,6 @@ export function StudyCard({
           setAudioUnavailable(true);
         }}
       />
-      <audio ref={rewardAudioRef} preload="auto" src={rewardAudioSrc} />
       {revealed && (
         <div
           className={`flex flex-col items-center gap-2 ${

@@ -105,6 +105,10 @@ describe("App", () => {
       "src",
       "/audio/th/words/chan.opus",
     );
+    expect(document.querySelectorAll("audio")[1]).toHaveAttribute(
+      "src",
+      "/audio/ui/reward-known.opus",
+    );
 
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study mode/i }),
@@ -213,6 +217,35 @@ describe("App", () => {
 
     expect(screen.getByTestId("known-count")).toHaveTextContent("1");
     expect(screen.getByText("บ้าน")).toBeInTheDocument();
+  });
+
+  it("does not stop the reward sound when the card advances after known", async () => {
+    const user = userEvent.setup();
+    render(<App words={words} conversation={conversation} />);
+    const [studyAudio, rewardAudio] = Array.from(
+      document.querySelectorAll("audio"),
+    );
+    const studyPause = vi.fn();
+    const rewardPause = vi.fn();
+
+    Object.defineProperty(studyAudio, "pause", {
+      configurable: true,
+      value: studyPause,
+    });
+    Object.defineProperty(rewardAudio, "pause", {
+      configurable: true,
+      value: rewardPause,
+    });
+
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+
+    await waitFor(() => expect(screen.getByText("บ้าน")).toBeInTheDocument(), {
+      timeout: KNOWN_FEEDBACK_DURATION_MS + 300,
+    });
+
+    expect(vi.mocked(HTMLMediaElement.prototype.play)).toHaveBeenCalledTimes(1);
+    expect(studyPause).toHaveBeenCalledTimes(1);
+    expect(rewardPause).not.toHaveBeenCalled();
   });
 
   it("resets only the active mode and active category counts", async () => {
