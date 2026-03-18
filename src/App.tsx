@@ -1,5 +1,5 @@
 import { Provider, createStore, useAtom, useSetAtom } from "jotai";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EmptyStudyState } from "./components/EmptyStudyState";
 import { StudyCard } from "./components/StudyCard";
 import { StudyControls } from "./components/StudyControls";
@@ -20,7 +20,6 @@ import {
   getInitialProgress,
   modeAtom,
   progressAtom,
-  queryAtom,
   revealedCardKeyAtom,
   studyDecksAtom,
 } from "./state/study";
@@ -41,30 +40,20 @@ type StudyStateHydratorProps = {
 
 function StudyView({ decks }: StudyViewProps) {
   const [mode, setMode] = useAtom(modeAtom);
-  const [query, setQuery] = useAtom(queryAtom);
   const [category, setCategory] = useAtom(categoryAtom);
   const [progress, setProgress] = useAtom(progressAtom);
   const [revealedCardKey, setRevealedCardKey] = useAtom(revealedCardKeyAtom);
   const [currentItemId, setCurrentItemId] = useAtom(currentItemIdAtom);
-  const deferredQuery = useDeferredValue(query);
   const activeDeck = decks[mode];
   const categoryOptions = STUDY_CATEGORY_OPTIONS[mode];
 
   const studyItems = useMemo(
-    () =>
-      getStudyItems(
-        activeDeck,
-        progress,
-        mode,
-        new Date(),
-        deferredQuery,
-        category,
-      ),
-    [activeDeck, category, deferredQuery, mode, progress],
+    () => getStudyItems(activeDeck, progress, mode, new Date(), "", category),
+    [activeDeck, category, mode, progress],
   );
   const matchingItems = useMemo(
-    () => getMatchingItems(activeDeck, mode, deferredQuery, category),
-    [activeDeck, category, deferredQuery, mode],
+    () => getMatchingItems(activeDeck, mode, "", category),
+    [activeDeck, category, mode],
   );
   const categoryItems = useMemo(
     () => getMatchingItems(activeDeck, mode, "", category),
@@ -79,9 +68,7 @@ function StudyView({ decks }: StudyViewProps) {
       studyItems.find((item) => item.id === currentItemId) ?? studyItems[0]
     );
   }, [currentItemId, studyItems]);
-  const currentCardKey = currentItem
-    ? `${mode}:${currentItem.id}:${query}`
-    : "";
+  const currentCardKey = currentItem ? `${mode}:${currentItem.id}` : "";
   const knownItems = useMemo(
     () => countKnownItems(progress, mode),
     [mode, progress],
@@ -131,7 +118,7 @@ function StudyView({ decks }: StudyViewProps) {
       nextProgress,
       mode,
       now,
-      deferredQuery,
+      "",
       category,
     );
     const nextItemId = nextStudyItems.some(
@@ -156,7 +143,6 @@ function StudyView({ decks }: StudyViewProps) {
     );
 
     setMode(nextMode);
-    setQuery("");
     setCategory("all");
     setRevealedCardKey("");
     setCurrentItemId(nextStudyItems[0]?.id ?? "");
@@ -172,7 +158,7 @@ function StudyView({ decks }: StudyViewProps) {
       nextProgress,
       mode,
       new Date(),
-      deferredQuery,
+      "",
       category,
     );
 
@@ -182,29 +168,20 @@ function StudyView({ decks }: StudyViewProps) {
   }
 
   return (
-    <main className="mx-auto flex w-[min(1120px,calc(100%-2rem))] flex-col gap-8 py-6">
-      <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div className="flex flex-col gap-4 md:max-w-[48rem] md:flex-1 md:flex-row md:items-end md:gap-8">
+    <main className="mx-auto grid min-h-dvh w-[min(1120px,calc(100%-2rem))] grid-rows-[auto_minmax(0,1fr)_auto] gap-8 py-6">
+      <header className="grid gap-6">
+        <div className="grid w-full grid-cols-2 items-end gap-4 md:max-w-[32rem] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-8">
           <StudyControls
             mode={mode}
             category={category}
             categoryOptions={categoryOptions}
-            query={query}
             onModeChange={handleModeChange}
             onCategoryChange={setCategory}
-            onQueryChange={setQuery}
           />
         </div>
-        <StudyStats
-          totalWords={categoryItems.length}
-          readyWords={studyItems.length}
-          knownWords={knownItems}
-          resetLabel={resetLabel}
-          onResetProgress={handleResetProgress}
-        />
       </header>
 
-      <div className="flex min-h-[50vh] flex-1 items-center justify-center">
+      <div className="grid place-items-center">
         {currentItem ? (
           <StudyCard
             key={currentCardKey}
@@ -218,6 +195,15 @@ function StudyView({ decks }: StudyViewProps) {
           <EmptyStudyState mode={mode} hasMatches={matchingItems.length > 0} />
         )}
       </div>
+
+      <footer className="grid justify-center">
+        <StudyStats
+          totalWords={categoryItems.length}
+          knownWords={knownItems}
+          resetLabel={resetLabel}
+          onResetProgress={handleResetProgress}
+        />
+      </footer>
     </main>
   );
 }

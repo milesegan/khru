@@ -5,10 +5,8 @@ type StudyControlsProps = {
   mode: StudyMode;
   category: StudyCategory;
   categoryOptions: { value: StudyCategory; label: string }[];
-  query: string;
   onModeChange: (mode: StudyMode) => void;
   onCategoryChange: (category: StudyCategory) => void;
-  onQueryChange: (query: string) => void;
 };
 
 /**
@@ -18,13 +16,11 @@ export function StudyControls({
   mode,
   category,
   categoryOptions,
-  query,
   onModeChange,
   onCategoryChange,
-  onQueryChange,
 }: StudyControlsProps) {
   const labelClassName =
-    "flex flex-1 flex-col gap-1 text-[0.65rem] uppercase tracking-[0.18em] text-muted";
+    "grid min-w-0 gap-1 text-[0.65rem] uppercase tracking-[0.18em] text-muted";
   const inputClassName =
     "w-full rounded-none border-0 border-b-2 border-edge bg-transparent px-0 py-1 text-base normal-case tracking-normal text-ink transition-colors duration-200 outline-none focus:border-accent";
 
@@ -62,17 +58,6 @@ export function StudyControls({
             </option>
           ))}
         </select>
-      </label>
-
-      <label className={labelClassName}>
-        <span>Search the deck</span>
-        <input
-          className={inputClassName}
-          aria-label="Search the deck"
-          value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="Type Thai or English"
-        />
       </label>
     </>
   );

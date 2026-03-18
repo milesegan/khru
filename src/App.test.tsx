@@ -128,21 +128,16 @@ describe("App", () => {
     expect(vi.mocked(HTMLMediaElement.prototype.play)).toHaveBeenCalledTimes(1);
   });
 
-  it("resets search, category, reveal state, and current card when switching modes", async () => {
+  it("resets category, reveal state, and current card when switching modes", async () => {
     const user = userEvent.setup();
     render(<App words={words} conversation={conversation} />);
 
     await user.click(screen.getByRole("button", { name: /reveal/i }));
-    await user.type(
-      screen.getByRole("textbox", { name: /search the deck/i }),
-      "open",
-    );
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study category/i }),
       "signs",
     );
 
-    expect(screen.getByDisplayValue("open")).toBeInTheDocument();
     expect(screen.getByText("เปิด")).toBeInTheDocument();
 
     await user.selectOptions(
@@ -150,9 +145,6 @@ describe("App", () => {
       "conversation",
     );
 
-    expect(
-      screen.getByRole("textbox", { name: /search the deck/i }),
-    ).toHaveValue("");
     expect(
       screen.getByRole("combobox", { name: /study category/i }),
     ).toHaveValue("all");
@@ -163,7 +155,7 @@ describe("App", () => {
     expect(screen.queryByText("Hello. (male speaker)")).not.toBeInTheDocument();
   });
 
-  it("filters conversation cards by search query and conversation category", async () => {
+  it("filters conversation cards by category", async () => {
     const user = userEvent.setup();
     render(<App words={words} conversation={conversation} />);
 
@@ -179,25 +171,15 @@ describe("App", () => {
     expect(screen.getByTestId("total-count")).toHaveTextContent("1");
     expect(screen.getByText("ห้องน้ำอยู่ที่ไหน")).toBeInTheDocument();
 
-    await user.clear(screen.getByRole("textbox", { name: /search the deck/i }));
-    await user.type(
-      screen.getByRole("textbox", { name: /search the deck/i }),
-      "time",
-    );
-
-    expect(screen.getByTestId("ready-count")).toHaveTextContent("0");
-    expect(
-      screen.getByText("No sentences match this search yet."),
-    ).toBeInTheDocument();
-
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study category/i }),
       "all",
     );
 
     expect(screen.getByTestId("total-count")).toHaveTextContent("3");
-    expect(screen.getByTestId("ready-count")).toHaveTextContent("1");
-    expect(screen.getByText("ตอนนี้กี่โมง")).toBeInTheDocument();
+    expect(
+      screen.getByText(/สวัสดีครับ|ห้องน้ำอยู่ที่ไหน|ตอนนี้กี่โมง/),
+    ).toBeInTheDocument();
   });
 
   it("keeps progress isolated between study modes", async () => {
@@ -254,7 +236,6 @@ describe("App", () => {
       "Clear known sentences and reset study progress for Directions?",
     );
     expect(screen.getByTestId("known-count")).toHaveTextContent("0");
-    expect(screen.getByTestId("ready-count")).toHaveTextContent("1");
     expect(screen.getByText("ห้องน้ำอยู่ที่ไหน")).toBeInTheDocument();
 
     await user.selectOptions(

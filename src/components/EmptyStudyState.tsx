@@ -16,12 +16,12 @@ export function EmptyStudyState({ hasMatches, mode }: EmptyStudyStateProps) {
       <p className="m-0 text-xl">
         {hasMatches
           ? "You are caught up for now."
-          : `No ${itemLabel} match this search yet.`}
+          : `No ${itemLabel} in this category yet.`}
       </p>
       <p className="mt-2 text-base">
         {hasMatches
-          ? `Come back later or change your search to explore more ${itemLabel}.`
-          : "Try a Thai spelling, an English meaning, or a transliteration clue."}
+          ? `Come back later or switch categories to explore more ${itemLabel}.`
+          : "Try another category or study mode to keep going."}
       </p>
     </article>
   );

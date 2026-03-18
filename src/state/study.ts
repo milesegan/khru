@@ -56,7 +56,6 @@ export const studyDecksAtom = atom<StudyDecks>({
   words: [],
   conversation: [],
 });
-export const queryAtom = atom("");
 export const currentItemIdAtom = atom("");
 export const revealedCardKeyAtom = atom("");
 
