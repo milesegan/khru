@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
+import { KNOWN_FEEDBACK_DURATION_MS } from "./components/StudyCard";
 import type { StudyEntry } from "./types";
 
 const words: StudyEntry[] = [
@@ -186,9 +187,11 @@ describe("App", () => {
     const user = userEvent.setup();
     render(<App words={words} conversation={conversation} />);
 
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
-
-    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(
+      () => expect(screen.getByTestId("known-count")).toHaveTextContent("1"),
+      { timeout: KNOWN_FEEDBACK_DURATION_MS + 300 },
+    );
 
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study mode/i }),
@@ -197,9 +200,11 @@ describe("App", () => {
 
     expect(screen.getByTestId("known-count")).toHaveTextContent("0");
 
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
-
-    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(
+      () => expect(screen.getByTestId("known-count")).toHaveTextContent("1"),
+      { timeout: KNOWN_FEEDBACK_DURATION_MS + 300 },
+    );
 
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study mode/i }),
@@ -215,7 +220,11 @@ describe("App", () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<App words={words} conversation={conversation} />);
 
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(
+      () => expect(screen.getByTestId("known-count")).toHaveTextContent("1"),
+      { timeout: KNOWN_FEEDBACK_DURATION_MS + 300 },
+    );
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study mode/i }),
       "conversation",
@@ -224,7 +233,11 @@ describe("App", () => {
       screen.getByRole("combobox", { name: /study category/i }),
       "directions",
     );
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(
+      () => expect(screen.getByTestId("known-count")).toHaveTextContent("1"),
+      { timeout: KNOWN_FEEDBACK_DURATION_MS + 300 },
+    );
 
     const resetButton = screen.getByRole("button", {
       name: /clear known words and reset study progress/i,
@@ -252,12 +265,20 @@ describe("App", () => {
       <App words={words} conversation={conversation} />,
     );
 
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(
+      () => expect(screen.getByTestId("known-count")).toHaveTextContent("1"),
+      { timeout: KNOWN_FEEDBACK_DURATION_MS + 300 },
+    );
     await user.selectOptions(
       screen.getByRole("combobox", { name: /study mode/i }),
       "conversation",
     );
-    await user.click(screen.getByRole("button", { name: /^known$/i }));
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(
+      () => expect(screen.getByTestId("known-count")).toHaveTextContent("1"),
+      { timeout: KNOWN_FEEDBACK_DURATION_MS + 300 },
+    );
 
     firstRender.unmount();
     render(<App words={words} conversation={conversation} />);

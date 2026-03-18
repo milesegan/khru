@@ -53,6 +53,7 @@ Object.defineProperty(HTMLMediaElement.prototype, "pause", {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.mocked(HTMLMediaElement.prototype.play).mockClear();
   vi.mocked(HTMLMediaElement.prototype.pause).mockClear();
   cleanup();

@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { StudyCard } from "./StudyCard";
+import { KNOWN_FEEDBACK_DURATION_MS, StudyCard } from "./StudyCard";
 
 describe("StudyCard", () => {
   it("renders the active card details and primary actions", () => {
@@ -33,11 +34,56 @@ describe("StudyCard", () => {
         name: "Play pronunciation for สวัสดีครับ",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Known" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Mark as mastered" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
     expect(document.querySelector("audio")).toHaveAttribute(
       "src",
       "/audio/th/conversation/conv-sawasdee-khrap.opus",
     );
+    expect(document.querySelectorAll("audio")[1]).toHaveAttribute(
+      "src",
+      "/audio/ui/reward-known.opus",
+    );
+  });
+
+  it("celebrates known ratings before advancing", async () => {
+    const user = userEvent.setup();
+    const onRate = vi.fn();
+
+    render(
+      <StudyCard
+        item={{
+          id: "chan",
+          thai: "ฉัน",
+          transliteration: "chan",
+          transliterationMarked: "chàn",
+          meaning: "I; me",
+          note: "The final consonant makes an n ending.",
+          difficulty: 1,
+          tags: ["pronoun"],
+        }}
+        mode="words"
+        revealed={true}
+        onReveal={vi.fn()}
+        onRate={onRate}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+
+    expect(vi.mocked(HTMLMediaElement.prototype.play)).toHaveBeenCalledTimes(1);
+    expect(onRate).not.toHaveBeenCalled();
+    expect(screen.getByTestId("study-card-thai")).toHaveClass(
+      "animate-known-word-pulse",
+    );
+    expect(screen.getByText("ฉัน").parentElement).toHaveClass(
+      "text-emerald-600",
+    );
+
+    await waitFor(() => expect(onRate).toHaveBeenCalledWith("known"), {
+      timeout: KNOWN_FEEDBACK_DURATION_MS + 300,
+    });
   });
 });

@@ -1,14 +1,16 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   LuArrowRight,
-  LuCheck,
   LuEye,
+  LuMedal,
   LuRefreshCw,
   LuVolume2,
   LuVolumeX,
 } from "react-icons/lu";
-import { getStudyAudioSrc } from "../lib/audio";
+import { getRewardAudioSrc, getStudyAudioSrc } from "../lib/audio";
 import type { StudyEntry, StudyMode, StudyRating } from "../types";
+
+export const KNOWN_FEEDBACK_DURATION_MS = 460;
 
 type StudyCardProps = {
   item: StudyEntry;
@@ -64,7 +66,7 @@ export function StudyCard({
   onRate,
 }: StudyCardProps) {
   const actionButtonClassName =
-    "inline-grid h-[4.25rem] w-[4.25rem] place-items-center rounded-full border text-ink transition-all duration-200 md:h-[4.85rem] md:w-[4.85rem]";
+    "inline-grid h-[4.25rem] w-[4.25rem] place-items-center rounded-full border text-ink transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70 md:h-[4.85rem] md:w-[4.85rem]";
   const lightActionButtonClassName = `${actionButtonClassName} border-edge bg-[color-mix(in_srgb,_oklch(98%_0.02_75)_82%,_white)] hover:border-accent hover:bg-[color-mix(in_srgb,_oklch(83%_0.06_55)_55%,_white)]`;
   const darkActionButtonClassName = `${actionButtonClassName} border-ink bg-ink text-paper hover:border-black hover:bg-black hover:text-white`;
   const thaiTextClassName =
@@ -73,14 +75,23 @@ export function StudyCard({
       : "text-[clamp(4rem,15vw,9rem)]";
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const rewardAudioRef = useRef<HTMLAudioElement | null>(null);
+  const knownTimeoutRef = useRef<number | null>(null);
   const [audioUnavailable, setAudioUnavailable] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isKnownCelebrating, setIsKnownCelebrating] = useState(false);
   const audioSrc = getStudyAudioSrc(mode, item.id);
+  const rewardAudioSrc = getRewardAudioSrc();
 
   useEffect(() => {
     const audioElement = audioRef.current;
+    const rewardAudioElement = rewardAudioRef.current;
 
     return () => {
+      if (knownTimeoutRef.current !== null) {
+        window.clearTimeout(knownTimeoutRef.current);
+      }
+
       if (audioElement) {
         try {
           audioElement.pause();
@@ -88,6 +99,15 @@ export function StudyCard({
           // jsdom does not implement HTMLMediaElement playback controls.
         }
         audioElement.currentTime = 0;
+      }
+
+      if (rewardAudioElement) {
+        try {
+          rewardAudioElement.pause();
+        } catch {
+          // jsdom does not implement HTMLMediaElement playback controls.
+        }
+        rewardAudioElement.currentTime = 0;
       }
     };
   }, []);
@@ -107,10 +127,49 @@ export function StudyCard({
     }
   }
 
+  async function handlePlayRewardAudio() {
+    if (!rewardAudioRef.current) {
+      return;
+    }
+
+    try {
+      rewardAudioRef.current.currentTime = 0;
+      await rewardAudioRef.current.play();
+    } catch {
+      // Reward audio is decorative; playback failure should not block the rating.
+    }
+  }
+
+  function handleKnown() {
+    if (isKnownCelebrating) {
+      return;
+    }
+
+    setIsKnownCelebrating(true);
+    void handlePlayRewardAudio();
+    knownTimeoutRef.current = window.setTimeout(() => {
+      knownTimeoutRef.current = null;
+      onRate("known");
+    }, KNOWN_FEEDBACK_DURATION_MS);
+  }
+
   return (
     <article className="flex w-full max-w-3xl flex-col items-center gap-4 text-center md:gap-5">
-      <div className={`${thaiTextClassName} font-light leading-[1.1] text-ink`}>
-        {item.thai}
+      <div
+        className={`${thaiTextClassName} font-light leading-[1.1] ${
+          isKnownCelebrating ? "text-emerald-600" : "text-ink"
+        }`}
+      >
+        <span
+          data-testid="study-card-thai"
+          className={`inline-block origin-center will-change-transform ${
+            isKnownCelebrating
+              ? "animate-known-word-pulse motion-reduce:animate-none"
+              : ""
+          }`}
+        >
+          {item.thai}
+        </span>
       </div>
       <audio
         ref={audioRef}
@@ -122,19 +181,36 @@ export function StudyCard({
           setAudioUnavailable(true);
         }}
       />
+      <audio ref={rewardAudioRef} preload="auto" src={rewardAudioSrc} />
       {revealed && (
         <div
-          className="flex animate-fade-in flex-col items-center gap-2"
+          className={`flex flex-col items-center gap-2 ${
+            isKnownCelebrating
+              ? "animate-known-support-pulse text-emerald-700 motion-reduce:animate-none"
+              : "animate-fade-in"
+          }`}
           aria-live="polite"
         >
-          <p className="m-0 text-xl tracking-[0.05em] text-muted">
+          <p
+            className={`m-0 text-xl tracking-[0.05em] ${
+              isKnownCelebrating ? "text-emerald-700" : "text-muted"
+            }`}
+          >
             {item.transliterationMarked}
           </p>
-          <p className="m-0 font-serif text-[1.75rem] font-medium text-ink">
+          <p
+            className={`m-0 font-serif text-[1.75rem] font-medium ${
+              isKnownCelebrating ? "text-emerald-800" : "text-ink"
+            }`}
+          >
             {item.meaning}
           </p>
           {item.note && (
-            <p className="m-0 max-w-[40ch] text-base leading-6 text-muted">
+            <p
+              className={`m-0 max-w-[40ch] text-base leading-6 ${
+                isKnownCelebrating ? "text-emerald-700" : "text-muted"
+              }`}
+            >
               {item.note}
             </p>
           )}
@@ -156,7 +232,7 @@ export function StudyCard({
                 ? "Replay audio"
                 : "Play audio"
           }
-          className={`${lightActionButtonClassName} text-[1.5rem] transition-[border-color,transform,background] hover:translate-y-[-2px] disabled:cursor-not-allowed disabled:bg-[color-mix(in_srgb,_oklch(94%_0.03_70)_70%,_white)] disabled:text-muted disabled:hover:translate-y-0 disabled:hover:border-edge md:text-[1.65rem]`}
+          className={`${lightActionButtonClassName} text-[1.5rem] transition-[border-color,transform,background] hover:translate-y-[-2px] disabled:bg-[color-mix(in_srgb,_oklch(94%_0.03_70)_70%,_white)] disabled:text-muted disabled:hover:translate-y-0 disabled:hover:border-edge md:text-[1.65rem]`}
           icon={
             audioUnavailable ? (
               <LuVolumeX aria-hidden="true" />
@@ -167,7 +243,7 @@ export function StudyCard({
             )
           }
           onClick={handlePlayAudio}
-          disabled={audioUnavailable}
+          disabled={audioUnavailable || isKnownCelebrating}
         />
         {!revealed && (
           <ActionIconButton
@@ -176,14 +252,20 @@ export function StudyCard({
             className={`${lightActionButtonClassName} text-[1.5rem] hover:translate-y-[-2px] active:translate-y-0 md:text-[1.65rem]`}
             icon={<LuEye aria-hidden="true" />}
             onClick={onReveal}
+            disabled={isKnownCelebrating}
           />
         )}
         <ActionIconButton
-          ariaLabel="Known"
-          tooltip="Known"
-          className={`${lightActionButtonClassName} text-[1.55rem] md:text-[1.7rem]`}
-          icon={<LuCheck aria-hidden="true" />}
-          onClick={() => onRate("known")}
+          ariaLabel="Mark as mastered"
+          tooltip="Mastered"
+          className={`${lightActionButtonClassName} text-[1.55rem] md:text-[1.7rem] ${
+            isKnownCelebrating
+              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+              : ""
+          }`}
+          icon={<LuMedal aria-hidden="true" />}
+          onClick={handleKnown}
+          disabled={isKnownCelebrating}
         />
         <ActionIconButton
           ariaLabel="Next"
@@ -191,6 +273,7 @@ export function StudyCard({
           className={`${darkActionButtonClassName} text-[1.6rem] md:text-[1.75rem]`}
           icon={<LuArrowRight aria-hidden="true" />}
           onClick={() => onRate("okay")}
+          disabled={isKnownCelebrating}
         />
       </div>
     </article>

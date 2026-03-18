@@ -16,6 +16,19 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    },
+    {
+      "source": "/audio/ui/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "audio/ogg; codecs=opus"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }

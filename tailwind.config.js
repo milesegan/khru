@@ -27,9 +27,57 @@ export default {
             transform: "translateY(0)",
           },
         },
+        "known-word-pulse": {
+          "0%": {
+            transform: "scale(1)",
+            filter: "drop-shadow(0 0 0 rgba(34, 197, 94, 0))",
+          },
+          "18%": {
+            transform: "scale(1.18)",
+            filter: "drop-shadow(0 0 18px rgba(110, 231, 183, 0.36))",
+          },
+          "36%": {
+            transform: "scale(1.06)",
+            filter: "drop-shadow(0 0 10px rgba(34, 197, 94, 0.22))",
+          },
+          "58%": {
+            transform: "scale(1.24)",
+            filter: "drop-shadow(0 0 28px rgba(110, 231, 183, 0.44))",
+          },
+          "78%": {
+            transform: "scale(1.1)",
+            filter: "drop-shadow(0 0 12px rgba(34, 197, 94, 0.2))",
+          },
+          "100%": {
+            transform: "scale(1)",
+            filter: "drop-shadow(0 0 0 rgba(34, 197, 94, 0))",
+          },
+        },
+        "known-support-pulse": {
+          "0%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+          "28%": {
+            transform: "scale(1.035)",
+            opacity: "1",
+          },
+          "54%": {
+            transform: "scale(1.015)",
+            opacity: "0.94",
+          },
+          "100%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.4s ease-out forwards",
+        "known-word-pulse":
+          "known-word-pulse 0.46s cubic-bezier(0.16, 1, 0.3, 1)",
+        "known-support-pulse":
+          "known-support-pulse 0.46s cubic-bezier(0.25, 1, 0.5, 1)",
       },
     },
   },
