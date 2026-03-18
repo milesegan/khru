@@ -248,6 +248,31 @@ describe("App", () => {
     expect(rewardPause).not.toHaveBeenCalled();
   });
 
+  it("uses fresh reward playback instances for rapid consecutive known taps", async () => {
+    const user = userEvent.setup();
+    render(<App words={words} conversation={conversation} />);
+    const rewardAudioTemplate = document.querySelectorAll("audio")[1];
+    const rewardTemplatePlay = vi.fn().mockResolvedValue(undefined);
+
+    Object.defineProperty(rewardAudioTemplate, "play", {
+      configurable: true,
+      value: rewardTemplatePlay,
+    });
+
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(() => expect(screen.getByText("บ้าน")).toBeInTheDocument(), {
+      timeout: KNOWN_FEEDBACK_DURATION_MS + 300,
+    });
+
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(() => expect(screen.getByText("เปิด")).toBeInTheDocument(), {
+      timeout: KNOWN_FEEDBACK_DURATION_MS + 300,
+    });
+
+    expect(rewardTemplatePlay).not.toHaveBeenCalled();
+    expect(vi.mocked(HTMLMediaElement.prototype.play)).toHaveBeenCalledTimes(2);
+  });
+
   it("resets only the active mode and active category counts", async () => {
     const user = userEvent.setup();
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);

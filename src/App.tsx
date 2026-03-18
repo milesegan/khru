@@ -45,7 +45,8 @@ function StudyView({ decks }: StudyViewProps) {
   const [progress, setProgress] = useAtom(progressAtom);
   const [revealedCardKey, setRevealedCardKey] = useAtom(revealedCardKeyAtom);
   const [currentItemId, setCurrentItemId] = useAtom(currentItemIdAtom);
-  const rewardAudioRef = useRef<HTMLAudioElement | null>(null);
+  const rewardAudioTemplateRef = useRef<HTMLAudioElement | null>(null);
+  const activeRewardAudioRef = useRef(new Set<HTMLAudioElement>());
   const activeDeck = decks[mode];
   const categoryOptions = STUDY_CATEGORY_OPTIONS[mode];
 
@@ -90,19 +91,24 @@ function StudyView({ decks }: StudyViewProps) {
       : `Clear known ${itemLabel} and reset study progress for ${selectedCategoryLabel}?`;
 
   useEffect(() => {
-    const rewardAudioElement = rewardAudioRef.current;
+    const activeRewardAudio = activeRewardAudioRef.current;
+    const rewardAudioTemplate = rewardAudioTemplateRef.current;
 
     return () => {
-      if (!rewardAudioElement) {
-        return;
+      for (const rewardAudioElement of activeRewardAudio) {
+        try {
+          rewardAudioElement.pause();
+        } catch {
+          // jsdom does not implement HTMLMediaElement playback controls.
+        }
+        rewardAudioElement.currentTime = 0;
       }
 
-      try {
-        rewardAudioElement.pause();
-      } catch {
-        // jsdom does not implement HTMLMediaElement playback controls.
+      activeRewardAudio.clear();
+
+      if (rewardAudioTemplate) {
+        rewardAudioTemplate.currentTime = 0;
       }
-      rewardAudioElement.currentTime = 0;
     };
   }, []);
 
@@ -187,16 +193,28 @@ function StudyView({ decks }: StudyViewProps) {
   }
 
   function handlePlayRewardAudio() {
-    if (!rewardAudioRef.current) {
+    if (!rewardAudioTemplateRef.current) {
       return;
     }
 
-    try {
-      rewardAudioRef.current.currentTime = 0;
-      void rewardAudioRef.current.play();
-    } catch {
-      // Reward audio is decorative; playback failure should not block rating.
-    }
+    // Safari can intermittently drop rapid replays on a reused HTMLAudioElement.
+    const rewardAudioPlayback = rewardAudioTemplateRef.current.cloneNode(
+      true,
+    ) as HTMLAudioElement;
+    activeRewardAudioRef.current.add(rewardAudioPlayback);
+
+    const cleanupRewardPlayback = () => {
+      activeRewardAudioRef.current.delete(rewardAudioPlayback);
+      rewardAudioPlayback.removeEventListener("ended", cleanupRewardPlayback);
+      rewardAudioPlayback.removeEventListener("error", cleanupRewardPlayback);
+    };
+
+    rewardAudioPlayback.addEventListener("ended", cleanupRewardPlayback);
+    rewardAudioPlayback.addEventListener("error", cleanupRewardPlayback);
+
+    void rewardAudioPlayback.play().catch(() => {
+      cleanupRewardPlayback();
+    });
   }
 
   return (
@@ -238,7 +256,7 @@ function StudyView({ decks }: StudyViewProps) {
         />
       </footer>
       <audio
-        ref={rewardAudioRef}
+        ref={rewardAudioTemplateRef}
         preload="auto"
         src={getRewardAudioSrc()}
         aria-hidden="true"
