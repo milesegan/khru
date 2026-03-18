@@ -255,18 +255,20 @@ export function StudyCard({
             disabled={isKnownCelebrating}
           />
         )}
-        <ActionIconButton
-          ariaLabel="Mark as mastered"
-          tooltip="Mastered"
-          className={`${lightActionButtonClassName} text-[1.55rem] md:text-[1.7rem] ${
-            isKnownCelebrating
-              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-              : ""
-          }`}
-          icon={<LuMedal aria-hidden="true" />}
-          onClick={handleKnown}
-          disabled={isKnownCelebrating}
-        />
+        {!revealed && (
+          <ActionIconButton
+            ariaLabel="Mark as mastered"
+            tooltip="Mastered"
+            className={`${lightActionButtonClassName} text-[1.55rem] md:text-[1.7rem] ${
+              isKnownCelebrating
+                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                : ""
+            }`}
+            icon={<LuMedal aria-hidden="true" />}
+            onClick={handleKnown}
+            disabled={isKnownCelebrating}
+          />
+        )}
         <ActionIconButton
           ariaLabel="Next"
           tooltip="Next"

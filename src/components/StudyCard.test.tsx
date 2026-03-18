@@ -35,8 +35,8 @@ describe("StudyCard", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Mark as mastered" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: "Mark as mastered" }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
     expect(document.querySelector("audio")).toHaveAttribute(
       "src",
@@ -46,6 +46,57 @@ describe("StudyCard", () => {
       "src",
       "/audio/ui/reward-known.opus",
     );
+  });
+
+  it("hides the known action after the card is revealed", () => {
+    render(
+      <StudyCard
+        item={{
+          id: "chan",
+          thai: "ฉัน",
+          transliteration: "chan",
+          transliterationMarked: "chàn",
+          meaning: "I; me",
+          note: "The final consonant makes an n ending.",
+          difficulty: 1,
+          tags: ["pronoun"],
+        }}
+        mode="words"
+        revealed={true}
+        onReveal={vi.fn()}
+        onRate={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /mark as mastered/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the known action before reveal", () => {
+    render(
+      <StudyCard
+        item={{
+          id: "chan",
+          thai: "ฉัน",
+          transliteration: "chan",
+          transliterationMarked: "chàn",
+          meaning: "I; me",
+          note: "The final consonant makes an n ending.",
+          difficulty: 1,
+          tags: ["pronoun"],
+        }}
+        mode="words"
+        revealed={false}
+        onReveal={vi.fn()}
+        onRate={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /reveal/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /mark as mastered/i }),
+    ).toBeInTheDocument();
   });
 
   it("celebrates known ratings before advancing", async () => {
@@ -65,7 +116,7 @@ describe("StudyCard", () => {
           tags: ["pronoun"],
         }}
         mode="words"
-        revealed={true}
+        revealed={false}
         onReveal={vi.fn()}
         onRate={onRate}
       />,
