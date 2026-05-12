@@ -37,3 +37,32 @@
     cursor: pointer;
   }
 }
+
+@layer components {
+  .conversation-thai-line {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    column-gap: 0.1em;
+    row-gap: 0.06em;
+  }
+
+  .conversation-thai-word {
+    position: relative;
+    padding-left: 0.14em;
+  }
+
+  .conversation-thai-word::before {
+    position: absolute;
+    top: 0.16em;
+    bottom: 0.18em;
+    left: 0;
+    width: 1px;
+    min-height: 0.72em;
+    border-radius: 999px;
+    background: currentcolor;
+    opacity: 0.18;
+    content: "";
+  }
+}

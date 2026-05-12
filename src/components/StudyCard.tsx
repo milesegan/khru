@@ -30,6 +30,33 @@ type ActionIconButtonProps = {
   onClick: () => void;
 };
 
+type IntlSegmenter = new (
+  locale: string,
+  options: { granularity: "word" },
+) => {
+  segment: (
+    input: string,
+  ) => Iterable<{ segment: string; isWordLike?: boolean }>;
+};
+
+function getThaiWordParts(text: string) {
+  const Segmenter = (Intl as typeof Intl & { Segmenter?: IntlSegmenter })
+    .Segmenter;
+
+  if (!Segmenter) {
+    return [text];
+  }
+
+  const words = Array.from(
+    new Segmenter("th", { granularity: "word" }).segment(text),
+  )
+    .filter((segment) => segment.isWordLike !== false)
+    .map((segment) => segment.segment.trim())
+    .filter(Boolean);
+
+  return words.length > 0 ? words : [text];
+}
+
 function ActionIconButton({
   ariaLabel,
   className,
@@ -75,6 +102,8 @@ export function StudyCard({
     mode === "conversation"
       ? "text-[clamp(2.9rem,11vw,5.4rem)] md:text-[clamp(3.75rem,12vw,8.5rem)]"
       : "text-[clamp(4rem,15vw,9rem)]";
+  const thaiWordParts =
+    mode === "conversation" ? getThaiWordParts(item.thai) : [item.thai];
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const knownTimeoutRef = useRef<number | null>(null);
@@ -137,15 +166,30 @@ export function StudyCard({
           isKnownCelebrating ? "text-emerald-600" : "text-ink"
         }`}
       >
+        {mode === "conversation" && (
+          <span className="sr-only">{item.thai}</span>
+        )}
         <span
           data-testid="study-card-thai"
-          className={`inline-block origin-center will-change-transform ${
+          className={`origin-center will-change-transform ${
+            mode === "conversation" ? "conversation-thai-line" : "inline-block"
+          } ${
             isKnownCelebrating
               ? "animate-known-word-pulse motion-reduce:animate-none"
               : ""
           }`}
+          aria-hidden={mode === "conversation" ? "true" : undefined}
         >
-          {item.thai}
+          {mode === "conversation"
+            ? thaiWordParts.map((wordPart, index) => (
+                <span
+                  key={`${wordPart}-${index}`}
+                  className={index > 0 ? "conversation-thai-word" : undefined}
+                >
+                  {wordPart}
+                </span>
+              ))
+            : item.thai}
         </span>
       </div>
       <audio

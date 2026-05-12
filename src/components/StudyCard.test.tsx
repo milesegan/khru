@@ -45,6 +45,36 @@ describe("StudyCard", () => {
     );
   });
 
+  it("adds subtle word-boundary dividers for conversation cards", () => {
+    render(
+      <StudyCard
+        item={{
+          id: "conv-ton-ni-ki-mong",
+          thai: "ตอนนี้กี่โมง",
+          transliteration: "ton ni ki mong",
+          transliterationMarked: "ton ni ki mong",
+          meaning: "What time is it now?",
+          note: "กี่โมง is the standard way to ask the time.",
+          difficulty: 1,
+          tags: ["time"],
+        }}
+        mode="conversation"
+        revealed={false}
+        onReveal={vi.fn()}
+        onPlayRewardAudio={vi.fn()}
+        onRate={vi.fn()}
+      />,
+    );
+
+    const thaiText = screen.getByTestId("study-card-thai");
+
+    expect(thaiText).toHaveClass("conversation-thai-line");
+    expect(thaiText).toHaveTextContent("ตอนนี้กี่โมง");
+    expect(thaiText.querySelectorAll(".conversation-thai-word")).toHaveLength(
+      3,
+    );
+  });
+
   it("hides the known action after the card is revealed", () => {
     render(
       <StudyCard
