@@ -67,8 +67,10 @@ describe("StudyCard", () => {
     );
 
     const thaiText = screen.getByTestId("study-card-thai");
+    const thaiTextContainer = thaiText.parentElement;
 
     expect(thaiText).toHaveClass("conversation-thai-line");
+    expect(thaiTextContainer).toHaveClass("leading-[1.32]");
     expect(thaiText).toHaveTextContent("ตอนนี้กี่โมง");
     expect(thaiText.querySelectorAll(".conversation-thai-word")).toHaveLength(
       3,

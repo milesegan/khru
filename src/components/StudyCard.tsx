@@ -102,6 +102,8 @@ export function StudyCard({
     mode === "conversation"
       ? "text-[clamp(2.9rem,11vw,5.4rem)] md:text-[clamp(3.75rem,12vw,8.5rem)]"
       : "text-[clamp(4rem,15vw,9rem)]";
+  const thaiTextLeadingClassName =
+    mode === "conversation" ? "leading-[1.32]" : "leading-[1.1]";
   const thaiWordParts =
     mode === "conversation" ? getThaiWordParts(item.thai) : [item.thai];
 
@@ -162,7 +164,7 @@ export function StudyCard({
   return (
     <article className="flex w-full max-w-3xl flex-col items-center gap-4 text-center md:gap-5">
       <div
-        className={`${thaiTextClassName} font-light leading-[1.1] ${
+        className={`${thaiTextClassName} ${thaiTextLeadingClassName} font-light ${
           isKnownCelebrating ? "text-emerald-600" : "text-ink"
         }`}
       >
