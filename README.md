@@ -14,7 +14,7 @@ A minimal responsive web app for native English speakers learning to read common
 ## Features
 
 - Flashcard-based Thai reading practice with `words` and `conversation` study modes
-- 343 common Thai words plus 36 short everyday Thai sentences
+- 343 common Thai words plus 100 short everyday Thai sentences
 - Local progress saved in the browser
 - Search by Thai text, transliteration, or English meaning
 - Static Opus pronunciation audio support in the study card with per-mode asset folders
@@ -59,8 +59,8 @@ Generate static Thai pronunciation assets with ElevenLabs:
 ```bash
 cp .env.example .env
 pnpm audio:list-voices
-pnpm audio:generate -- --voice-id=YOUR_THAI_VOICE_ID
-pnpm audio:generate -- --mode=conversation -- --voice-id=YOUR_THAI_VOICE_ID
+pnpm audio:generate --voice-id=YOUR_THAI_VOICE_ID
+pnpm audio:generate --mode=conversation --voice-id=YOUR_THAI_VOICE_ID
 ```
 
 The generator uses:
