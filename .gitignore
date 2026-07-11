@@ -3,6 +3,7 @@ dist/
 coverage/
 *.tsbuildinfo
 .vercel
+.claude/
 .env
 .env.*
 !.env.example
