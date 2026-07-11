@@ -1,6 +1,7 @@
 import { Provider, createStore, useAtom, useSetAtom } from "jotai";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EmptyStudyState } from "./components/EmptyStudyState";
+import { HeroHeader } from "./components/HeroHeader";
 import { StudyCard } from "./components/StudyCard";
 import { StudyControls } from "./components/StudyControls";
 import { StudyStats } from "./components/StudyStats";
@@ -219,7 +220,8 @@ function StudyView({ decks }: StudyViewProps) {
 
   return (
     <main className="mx-auto grid min-h-dvh w-[min(1120px,calc(100%-2rem))] grid-rows-[auto_minmax(0,1fr)_auto] gap-8 py-6">
-      <header className="grid gap-6">
+      <header className="grid gap-5">
+        <HeroHeader />
         <div className="grid w-full grid-cols-2 items-end gap-4 md:max-w-[32rem] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-8">
           <StudyControls
             mode={mode}

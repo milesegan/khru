@@ -1,9 +1,9 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
-  LuArrowRight,
+  LuCheck,
   LuEye,
-  LuMedal,
-  LuRefreshCw,
+  LuRotateCcw,
+  LuStar,
   LuVolume2,
   LuVolumeX,
 } from "react-icons/lu";
@@ -23,9 +23,9 @@ type StudyCardProps = {
 
 type ActionIconButtonProps = {
   ariaLabel: string;
+  label: string;
   className: string;
   icon: ReactNode;
-  tooltip: string;
   disabled?: boolean;
   onClick: () => void;
 };
@@ -59,14 +59,14 @@ function getThaiWordParts(text: string) {
 
 function ActionIconButton({
   ariaLabel,
+  label,
   className,
   icon,
-  tooltip,
   disabled = false,
   onClick,
 }: ActionIconButtonProps) {
   return (
-    <div className="group relative">
+    <div className="flex flex-col items-center gap-2">
       <button
         type="button"
         className={className}
@@ -76,8 +76,11 @@ function ActionIconButton({
       >
         {icon}
       </button>
-      <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-3 hidden -translate-x-1/2 whitespace-nowrap rounded-full border border-edge bg-[color-mix(in_srgb,_oklch(98%_0.02_75)_92%,_white)] px-3 py-1 text-[0.72rem] font-medium tracking-[0.08em] text-ink opacity-0 shadow-[0_10px_30px_rgba(90,70,30,0.08)] transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 md:block">
-        {tooltip}
+      <span
+        aria-hidden="true"
+        className="text-[0.6rem] font-medium uppercase tracking-[0.16em] text-muted"
+      >
+        {label}
       </span>
     </div>
   );
@@ -95,9 +98,9 @@ export function StudyCard({
   onRate,
 }: StudyCardProps) {
   const actionButtonClassName =
-    "inline-grid h-[4.25rem] w-[4.25rem] place-items-center rounded-full border text-ink transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70 md:h-[4.85rem] md:w-[4.85rem]";
-  const lightActionButtonClassName = `${actionButtonClassName} border-edge bg-[color-mix(in_srgb,_oklch(98%_0.02_75)_82%,_white)] hover:border-accent hover:bg-[color-mix(in_srgb,_oklch(83%_0.06_55)_55%,_white)]`;
-  const darkActionButtonClassName = `${actionButtonClassName} border-ink bg-ink text-paper hover:border-black hover:bg-black hover:text-white`;
+    "inline-grid h-[4.25rem] w-[4.25rem] place-items-center rounded-full border text-ink transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70 md:h-[4.6rem] md:w-[4.6rem]";
+  const lightActionButtonClassName = `${actionButtonClassName} border-edge bg-[color-mix(in_srgb,_oklch(98%_0.02_75)_82%,_white)] hover:-translate-y-0.5 hover:border-accent hover:bg-[color-mix(in_srgb,_oklch(83%_0.06_55)_55%,_white)]`;
+  const darkActionButtonClassName = `${actionButtonClassName} border-ink bg-ink text-paper hover:-translate-y-0.5 hover:border-black hover:bg-black hover:text-white`;
   const thaiTextClassName =
     mode === "conversation"
       ? "text-[clamp(2.9rem,11vw,5.4rem)] md:text-[clamp(3.75rem,12vw,8.5rem)]"
@@ -134,7 +137,7 @@ export function StudyCard({
   }, []);
 
   async function handlePlayAudio() {
-    if (!audioRef.current) {
+    if (!audioRef.current || audioUnavailable) {
       return;
     }
 
@@ -160,6 +163,103 @@ export function StudyCard({
       onRate("known");
     }, KNOWN_FEEDBACK_DURATION_MS);
   }
+
+  // Keyboard drill shortcuts: space reveals, then 1/2/3 self-grade the card.
+  // A ref holds the latest closure so the window listener subscribes only once.
+  const keyHandlerRef = useRef<(event: KeyboardEvent) => void>(() => {});
+
+  useEffect(() => {
+    keyHandlerRef.current = (event: KeyboardEvent) => {
+      if (
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        isKnownCelebrating
+      ) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (target && ["SELECT", "INPUT", "TEXTAREA"].includes(target.tagName)) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+
+      if (key === "p") {
+        event.preventDefault();
+        void handlePlayAudio();
+        return;
+      }
+
+      if (!revealed) {
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          onReveal();
+        }
+        return;
+      }
+
+      if (key === "1") {
+        event.preventDefault();
+        onRate("again");
+      } else if (key === "2" || event.key === " " || event.key === "Enter") {
+        event.preventDefault();
+        onRate("okay");
+      } else if (key === "3") {
+        event.preventDefault();
+        handleKnown();
+      }
+    };
+  });
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => keyHandlerRef.current(event);
+    window.addEventListener("keydown", listener);
+    return () => window.removeEventListener("keydown", listener);
+  }, []);
+
+  const audioAriaLabel = audioUnavailable
+    ? `Audio unavailable for ${item.thai}`
+    : isPlaying
+      ? `Replay pronunciation for ${item.thai}`
+      : `Play pronunciation for ${item.thai}`;
+  const audioLabel = audioUnavailable
+    ? "No audio"
+    : isPlaying
+      ? "Replay"
+      : "Listen";
+  const audioIcon = audioUnavailable ? (
+    <LuVolumeX aria-hidden="true" />
+  ) : (
+    <LuVolume2 aria-hidden="true" />
+  );
+
+  const audioButton = (
+    <ActionIconButton
+      ariaLabel={audioAriaLabel}
+      label={audioLabel}
+      className={`${lightActionButtonClassName} text-[1.5rem] disabled:bg-[color-mix(in_srgb,_oklch(94%_0.03_70)_70%,_white)] disabled:text-muted disabled:hover:translate-y-0 disabled:hover:border-edge md:text-[1.6rem]`}
+      icon={audioIcon}
+      onClick={() => void handlePlayAudio()}
+      disabled={audioUnavailable || isKnownCelebrating}
+    />
+  );
+
+  const knownButton = (
+    <ActionIconButton
+      ariaLabel="Mark as mastered"
+      label="Known"
+      className={`${lightActionButtonClassName} text-[1.45rem] md:text-[1.55rem] ${
+        isKnownCelebrating
+          ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+          : ""
+      }`}
+      icon={<LuStar aria-hidden="true" />}
+      onClick={handleKnown}
+      disabled={isKnownCelebrating}
+    />
+  );
 
   return (
     <article className="flex w-full max-w-3xl flex-col items-center gap-4 text-center md:gap-5">
@@ -239,66 +339,41 @@ export function StudyCard({
         </div>
       )}
       <div className="grid grid-flow-col justify-center gap-3 pt-2 md:gap-4 md:pt-3">
-        <ActionIconButton
-          ariaLabel={
-            audioUnavailable
-              ? `Audio unavailable for ${item.thai}`
-              : isPlaying
-                ? `Replay pronunciation for ${item.thai}`
-                : `Play pronunciation for ${item.thai}`
-          }
-          tooltip={
-            audioUnavailable
-              ? "Audio unavailable"
-              : isPlaying
-                ? "Replay audio"
-                : "Play audio"
-          }
-          className={`${lightActionButtonClassName} text-[1.5rem] transition-[border-color,transform,background] hover:translate-y-[-2px] disabled:bg-[color-mix(in_srgb,_oklch(94%_0.03_70)_70%,_white)] disabled:text-muted disabled:hover:translate-y-0 disabled:hover:border-edge md:text-[1.65rem]`}
-          icon={
-            audioUnavailable ? (
-              <LuVolumeX aria-hidden="true" />
-            ) : isPlaying ? (
-              <LuRefreshCw aria-hidden="true" />
-            ) : (
-              <LuVolume2 aria-hidden="true" />
-            )
-          }
-          onClick={handlePlayAudio}
-          disabled={audioUnavailable || isKnownCelebrating}
-        />
-        {!revealed && (
-          <ActionIconButton
-            ariaLabel="Reveal"
-            tooltip="Reveal"
-            className={`${lightActionButtonClassName} text-[1.5rem] hover:translate-y-[-2px] active:translate-y-0 md:text-[1.65rem]`}
-            icon={<LuEye aria-hidden="true" />}
-            onClick={onReveal}
-            disabled={isKnownCelebrating}
-          />
+        {revealed ? (
+          <>
+            {audioButton}
+            <ActionIconButton
+              ariaLabel="Rate as again"
+              label="Again"
+              className={`${lightActionButtonClassName} text-[1.45rem] md:text-[1.55rem]`}
+              icon={<LuRotateCcw aria-hidden="true" />}
+              onClick={() => onRate("again")}
+              disabled={isKnownCelebrating}
+            />
+            <ActionIconButton
+              ariaLabel="Rate as okay"
+              label="Got it"
+              className={`${darkActionButtonClassName} text-[1.6rem] md:text-[1.7rem]`}
+              icon={<LuCheck aria-hidden="true" />}
+              onClick={() => onRate("okay")}
+              disabled={isKnownCelebrating}
+            />
+            {knownButton}
+          </>
+        ) : (
+          <>
+            {audioButton}
+            <ActionIconButton
+              ariaLabel="Reveal"
+              label="Reveal"
+              className={`${darkActionButtonClassName} text-[1.6rem] md:text-[1.7rem]`}
+              icon={<LuEye aria-hidden="true" />}
+              onClick={onReveal}
+              disabled={isKnownCelebrating}
+            />
+            {knownButton}
+          </>
         )}
-        {!revealed && (
-          <ActionIconButton
-            ariaLabel="Mark as mastered"
-            tooltip="Mastered"
-            className={`${lightActionButtonClassName} text-[1.55rem] md:text-[1.7rem] ${
-              isKnownCelebrating
-                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                : ""
-            }`}
-            icon={<LuMedal aria-hidden="true" />}
-            onClick={handleKnown}
-            disabled={isKnownCelebrating}
-          />
-        )}
-        <ActionIconButton
-          ariaLabel="Next"
-          tooltip="Next"
-          className={`${darkActionButtonClassName} text-[1.6rem] md:text-[1.75rem]`}
-          icon={<LuArrowRight aria-hidden="true" />}
-          onClick={() => onRate("okay")}
-          disabled={isKnownCelebrating}
-        />
       </div>
     </article>
   );

@@ -1,3 +1,4 @@
+import { LuChevronDown } from "react-icons/lu";
 import { STUDY_MODE_OPTIONS } from "../lib/study";
 import type { StudyCategory, StudyMode } from "../types";
 
@@ -22,42 +23,50 @@ export function StudyControls({
   const labelClassName =
     "grid min-w-0 gap-1 text-[0.65rem] uppercase tracking-[0.18em] text-muted";
   const inputClassName =
-    "w-full rounded-none border-0 border-b-2 border-edge bg-transparent px-0 py-1 text-base normal-case tracking-normal text-ink transition-colors duration-200 outline-none focus:border-accent";
+    "w-full cursor-pointer appearance-none rounded-none border-0 border-b-2 border-edge bg-transparent px-0 py-1 pr-6 text-base normal-case tracking-normal text-ink transition-colors duration-200 outline-none focus:border-accent";
+  const chevronClassName =
+    "pointer-events-none absolute right-0 bottom-2 h-4 w-4 text-muted";
 
   return (
     <>
       <label className={labelClassName}>
         <span>Mode</span>
-        <select
-          className={`${inputClassName} cursor-pointer appearance-none`}
-          aria-label="Study mode"
-          value={mode}
-          onChange={(event) => onModeChange(event.target.value as StudyMode)}
-        >
-          {STUDY_MODE_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            className={inputClassName}
+            aria-label="Study mode"
+            value={mode}
+            onChange={(event) => onModeChange(event.target.value as StudyMode)}
+          >
+            {STUDY_MODE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <LuChevronDown aria-hidden="true" className={chevronClassName} />
+        </div>
       </label>
 
       <label className={labelClassName}>
         <span>Category</span>
-        <select
-          className={`${inputClassName} cursor-pointer appearance-none`}
-          aria-label="Study category"
-          value={category}
-          onChange={(event) =>
-            onCategoryChange(event.target.value as StudyCategory)
-          }
-        >
-          {categoryOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            className={inputClassName}
+            aria-label="Study category"
+            value={category}
+            onChange={(event) =>
+              onCategoryChange(event.target.value as StudyCategory)
+            }
+          >
+            {categoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <LuChevronDown aria-hidden="true" className={chevronClassName} />
+        </div>
       </label>
     </>
   );

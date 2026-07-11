@@ -13,8 +13,13 @@ export default {
         edge: "oklch(78% 0.03 60)",
       },
       fontFamily: {
-        sans: ['"Atkinson Hyperlegible Next"', '"Segoe UI"', "sans-serif"],
-        serif: ['"Fraunces"', "Georgia", "serif"],
+        sans: [
+          '"Atkinson Hyperlegible Next"',
+          '"Sarabun"',
+          '"Segoe UI"',
+          "sans-serif",
+        ],
+        serif: ['"Fraunces"', '"Sarabun"', "Georgia", "serif"],
       },
       keyframes: {
         "fade-in": {

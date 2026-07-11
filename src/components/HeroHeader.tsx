@@ -1,10 +1,10 @@
 /**
- * Renders the compact app header shown above the study controls.
+ * Renders the minimal app wordmark shown above the study controls.
  */
 export function HeroHeader() {
   return (
-    <section className="hero">
-      <p className="eyebrow">Khru Thai Tutor</p>
-    </section>
+    <p className="m-0 text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-muted">
+      Khru Thai Tutor
+    </p>
   );
 }

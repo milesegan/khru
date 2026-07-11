@@ -36,9 +36,14 @@ describe("StudyCard", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Mark as mastered" }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
+      screen.getByRole("button", { name: "Rate as again" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Rate as okay" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Mark as mastered" }),
+    ).toBeInTheDocument();
     expect(document.querySelector("audio")).toHaveAttribute(
       "src",
       "/audio/th/conversation/conv-sawasdee-khrap.opus",
@@ -77,7 +82,9 @@ describe("StudyCard", () => {
     );
   });
 
-  it("hides the known action after the card is revealed", () => {
+  it("shows the full grading actions after the card is revealed", () => {
+    const onRate = vi.fn();
+
     render(
       <StudyCard
         item={{
@@ -94,13 +101,51 @@ describe("StudyCard", () => {
         revealed={true}
         onReveal={vi.fn()}
         onPlayRewardAudio={vi.fn()}
-        onRate={vi.fn()}
+        onRate={onRate}
       />,
     );
 
     expect(
-      screen.queryByRole("button", { name: /mark as mastered/i }),
+      screen.getByRole("button", { name: /rate as again/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /rate as okay/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /mark as mastered/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /reveal/i }),
     ).not.toBeInTheDocument();
+  });
+
+  it("emits the again rating when the again action is used", async () => {
+    const user = userEvent.setup();
+    const onRate = vi.fn();
+
+    render(
+      <StudyCard
+        item={{
+          id: "chan",
+          thai: "ฉัน",
+          transliteration: "chan",
+          transliterationMarked: "chàn",
+          meaning: "I; me",
+          note: "The final consonant makes an n ending.",
+          difficulty: 1,
+          tags: ["pronoun"],
+        }}
+        mode="words"
+        revealed={true}
+        onReveal={vi.fn()}
+        onPlayRewardAudio={vi.fn()}
+        onRate={onRate}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /rate as again/i }));
+
+    expect(onRate).toHaveBeenCalledWith("again");
   });
 
   it("shows the known action before reveal", () => {
@@ -128,6 +173,61 @@ describe("StudyCard", () => {
     expect(
       screen.getByRole("button", { name: /mark as mastered/i }),
     ).toBeInTheDocument();
+  });
+
+  it("supports keyboard drilling: space reveals, digits self-grade", async () => {
+    const user = userEvent.setup();
+    const onReveal = vi.fn();
+    const onRate = vi.fn();
+
+    const { rerender } = render(
+      <StudyCard
+        item={{
+          id: "chan",
+          thai: "ฉัน",
+          transliteration: "chan",
+          transliterationMarked: "chàn",
+          meaning: "I; me",
+          note: "The final consonant makes an n ending.",
+          difficulty: 1,
+          tags: ["pronoun"],
+        }}
+        mode="words"
+        revealed={false}
+        onReveal={onReveal}
+        onPlayRewardAudio={vi.fn()}
+        onRate={onRate}
+      />,
+    );
+
+    await user.keyboard(" ");
+    expect(onReveal).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <StudyCard
+        item={{
+          id: "chan",
+          thai: "ฉัน",
+          transliteration: "chan",
+          transliterationMarked: "chàn",
+          meaning: "I; me",
+          note: "The final consonant makes an n ending.",
+          difficulty: 1,
+          tags: ["pronoun"],
+        }}
+        mode="words"
+        revealed={true}
+        onReveal={onReveal}
+        onPlayRewardAudio={vi.fn()}
+        onRate={onRate}
+      />,
+    );
+
+    await user.keyboard("1");
+    expect(onRate).toHaveBeenLastCalledWith("again");
+
+    await user.keyboard("2");
+    expect(onRate).toHaveBeenLastCalledWith("okay");
   });
 
   it("celebrates known ratings before advancing", async () => {

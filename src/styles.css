@@ -23,8 +23,13 @@
     font-weight: 400;
     color: theme("colors.ink");
     background:
-      radial-gradient(circle at top left, oklch(92% 0.06 80), transparent 28%),
-      linear-gradient(180deg, oklch(98% 0.02 80), oklch(95% 0.03 70));
+      radial-gradient(
+        130% 85% at 50% -20%,
+        oklch(94% 0.05 82),
+        transparent 60%
+      ),
+      linear-gradient(180deg, oklch(98% 0.02 82), oklch(96% 0.028 68));
+    background-attachment: fixed;
   }
 
   button,
