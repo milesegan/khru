@@ -17,6 +17,7 @@ export type WordStudyCategory =
 
 export type ConversationStudyCategory =
   | "all"
+  | "practice"
   | "greetings"
   | "courtesy"
   | "introductions"

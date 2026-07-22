@@ -35,7 +35,8 @@ export const STUDY_CATEGORY_OPTIONS: Record<
     { value: "signs", label: "Signs" },
   ],
   conversation: [
-    { value: "all", label: "All sentences" },
+    { value: "all", label: "All cards" },
+    { value: "practice", label: "Compounds & phrases" },
     { value: "greetings", label: "Greetings" },
     { value: "courtesy", label: "Courtesy" },
     { value: "introductions", label: "Introductions" },
@@ -86,6 +87,7 @@ const CONVERSATION_CATEGORY_TAGS: Record<
   Exclude<ConversationStudyCategory, "all">,
   string[]
 > = {
+  practice: ["practice"],
   greetings: ["greetings"],
   courtesy: ["courtesy"],
   introductions: ["introductions"],

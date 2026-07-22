@@ -20,4 +20,30 @@ describe("study datasets", () => {
 
     expect(getDuplicateIds(allIds)).toEqual([]);
   });
+
+  it("classifies the image vocabulary by entry structure", () => {
+    const wordIds = new Set(words.map((item) => item.id));
+    const conversationIds = new Set(conversation.map((item) => item.id));
+
+    expect([...wordIds]).toEqual(
+      expect.arrayContaining([
+        "hru-hraa",
+        "wa-we",
+        "luk-lik",
+        "noi-naa",
+        "yum-yim",
+        "yuk-yik",
+      ]),
+    );
+    expect([...conversationIds]).toEqual(
+      expect.arrayContaining([
+        "conv-mo-du",
+        "conv-pai-nai",
+        "conv-no-mai",
+        "conv-khao-lam",
+        "conv-muean-kan",
+        "conv-mu-yong",
+      ]),
+    );
+  });
 });

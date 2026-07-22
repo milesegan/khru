@@ -14,7 +14,7 @@ A minimal responsive web app for native English speakers learning to read common
 ## Features
 
 - Flashcard-based Thai reading practice with `words` and `conversation` study modes
-- 343 common Thai words plus 100 short everyday Thai sentences
+- 349 individual Thai words plus 152 conversation, compound, and phrase cards
 - Local progress saved in the browser
 - Search by Thai text, transliteration, or English meaning
 - Static Opus pronunciation audio support in the study card with per-mode asset folders
