@@ -56,12 +56,13 @@ const KNOWN_TONES: [string, string][] = [
 ];
 
 /**
- * Entries the rules cannot align, so they never reach the drift check. All of
- * them still lack tone marks; none is an entry whose marks failed to verify.
+ * Every entry now derives, so nothing is exempt. Kept as an assertion rather
+ * than deleted: if a reading stops aligning, it must fail here instead of
+ * quietly dropping out of the drift check below.
  */
 const EXEMPT_FROM_DRIFT: Record<string, number> = {
-  words: 5,
-  conversation: 10,
+  words: 0,
+  conversation: 0,
 };
 
 describe("thai-tone", () => {
@@ -113,8 +114,8 @@ describe("thai-tone", () => {
   });
 
   it("returns null when syllable counts disagree", () => {
-    // ผลไม้ is phǒn-lá-mái: ล is read twice, so the rules cannot align it.
-    expect(markTransliteration("ผลไม้", "phon-la-mai")).toBeNull();
+    // เด็ก is one syllable, so a two-token reading cannot be aligned to it.
+    expect(markTransliteration("เด็ก", "dek dek")).toBeNull();
   });
 
   it.each([

@@ -259,9 +259,55 @@ const DIACRITICS = {
   rising: "\u030c",
 };
 
-/** Syllables whose spoken tone does not follow the written rules. */
+/**
+ * Readings whose tones the rules above cannot derive, because a consonant is
+ * read twice (ผลไม้ = phǒn-lá-mái) or a compound boundary defeats the
+ * segmenter. Tones here are taken from Wiktionary's IPA rather than from this
+ * module, so they are reference data, not a second opinion from the same rules.
+ */
 export const IRREGULARS = {
   "\u0e01\u0e47": ["falling"], // ก็ — written short/dead, spoken long and falling
+  กรุณา: ["low", "high", "mid"],
+  ผลไม้: ["rising", "high", "high"],
+  โทรศัพท์: ["mid", "high", "low"],
+  มหาวิทยาลัย: ["high", "rising", "high", "high", "mid", "mid"],
+  วันพฤหัสบดี: ["mid", "high", "high", "low", "low", "mid", "mid"],
+  ราตรีสวัสดิ์: ["mid", "mid", "low", "low"],
+  ข้ามถนน: ["falling", "low", "rising"],
+  อาหารอร่อย: ["mid", "rising", "low", "low"],
+  ฉันมาจากอเมริกา: ["rising", "mid", "low", "low", "mid", "high", "mid"],
+  ฉันทำงานที่โรงพยาบาล: [
+    "rising",
+    "mid",
+    "mid",
+    "falling",
+    "mid",
+    "high",
+    "mid",
+    "mid",
+  ],
+  ขอชาร์จโทรศัพท์ได้ไหม: [
+    "rising",
+    "falling",
+    "mid",
+    "high",
+    "low",
+    "falling",
+    "rising",
+  ],
+  อยู่ตรงข้ามตลาด: ["low", "mid", "falling", "low", "low"],
+  วันนี้วันพฤหัสบดี: [
+    "mid",
+    "high",
+    "mid",
+    "high",
+    "high",
+    "low",
+    "low",
+    "mid",
+    "mid",
+  ],
+  เมื่อวานอากาศร้อน: ["falling", "mid", "mid", "low", "high"],
 };
 
 /** Place a tone diacritic on the first vowel letter of a romanised syllable. */

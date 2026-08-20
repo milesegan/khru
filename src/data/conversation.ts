@@ -67,7 +67,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ratri-sawat",
     "ราตรีสวัสดิ์",
-    "ratri sawat",
+    "ra-tri sà-wàt",
     "Good night.",
     "This is a more formal night-time goodbye.",
     2,
@@ -319,7 +319,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-ma-chak-amerika",
     "ฉันมาจากอเมริกา",
-    "chan ma chak Amerika",
+    "chǎn ma chàk À-me-rí-ka",
     "I am from America.",
     "มาจาก is the common pattern for saying where you are from.",
     2,
@@ -355,7 +355,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-tham-ngan-thi-rong-phaya-ban",
     "ฉันทำงานที่โรงพยาบาล",
-    "chan tham ngan thi rong phaya ban",
+    "chǎn tham ngan thî rong phá-ya ban",
     "I work at a hospital.",
     "ที่ marks the place where the work happens.",
     3,
@@ -553,7 +553,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ahaan-aroi",
     "อาหารอร่อย",
-    "ahaan aroi",
+    "a-hǎan à-ròi",
     "The food is delicious.",
     "อร่อย is the everyday word for delicious.",
     1,
@@ -580,7 +580,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kho-charge-thorasap-dai-mai",
     "ขอชาร์จโทรศัพท์ได้ไหม",
-    "kho charge thorasap dai mai",
+    "khǒ châat tho-rá-sàp dâi mǎi",
     "Can I charge my phone?",
     "โทรศัพท์ means phone.",
     3,
@@ -661,7 +661,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kham-thanon",
     "ข้ามถนน",
-    "kham thanon",
+    "khâm thà-nǒn",
     "Cross the road.",
     "ถนน means road or street.",
     2,
@@ -679,7 +679,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-yu-trong-kham-talat",
     "อยู่ตรงข้ามตลาด",
-    "yu trong kham talat",
+    "yù trong khâm tà-làt",
     "It is opposite the market.",
     "ตรงข้าม means opposite or across from.",
     3,
@@ -706,7 +706,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-sathani-bts-yu-thi-nai",
     "สถานีบีทีเอสอยู่ที่ไหน",
-    "sathani BTS yu thi nai",
+    "sà-thǎ-ni bi-thi-èt yù thî nǎi",
     "Where is the BTS station?",
     "สถานี means station.",
     3,
@@ -787,7 +787,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wan-ni-wan-phareuhat",
     "วันนี้วันพฤหัสบดี",
-    "wan ni wan phareuhat",
+    "wan ní wan phá-réu-hàt-sà-bo-dii",
     "Today is Thursday.",
     "Thai weekday names are often long, so this is useful reading practice.",
     2,
@@ -868,7 +868,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-muea-wan-akhat-ron",
     "เมื่อวานอากาศร้อน",
-    "muea wan akhat ron",
+    "mûea wan a-khàt rón",
     "Yesterday was hot.",
     "เมื่อวาน means yesterday.",
     2,

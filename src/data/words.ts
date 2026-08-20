@@ -365,7 +365,7 @@ export const words: StudyEntry[] = [
   word(
     "phleez",
     "กรุณา",
-    "ka-ru-naa",
+    "kà-rú-naa",
     "please",
     "This polite word is read in three even beats.",
     3,
@@ -769,7 +769,7 @@ export const words: StudyEntry[] = [
   word(
     "wan-phareuhat",
     "วันพฤหัสบดี",
-    "wan pha-reu-hat-sa-bo-dii",
+    "wan phá-réu-hàt-sà-bo-dii",
     "Thursday",
     "This long weekday is best learned as several small chunks.",
     5,
@@ -845,7 +845,7 @@ export const words: StudyEntry[] = [
   word(
     "mahawitthayalai",
     "มหาวิทยาลัย",
-    "ma-haa-wit-tha-yaa-lai",
+    "má-hǎa-wít-thá-yaa-lai",
     "university",
     "This long word is best read one chunk at a time.",
     5,
@@ -1848,7 +1848,7 @@ export const words: StudyEntry[] = [
   word(
     "pholamai",
     "ผลไม้",
-    "phon-la-mai",
+    "phǒn-lá-mái",
     "fruit",
     "Read this as three chunks, ending with ไม้.",
     2,
@@ -2140,7 +2140,7 @@ export const words: StudyEntry[] = [
   word(
     "thorasap",
     "โทรศัพท์",
-    "tho-ra-sap",
+    "tho-rá-sàp",
     "telephone",
     "This borrowed word is easiest in three chunks.",
     3,
