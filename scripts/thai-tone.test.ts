@@ -55,6 +55,15 @@ const KNOWN_TONES: [string, string][] = [
   ["เบา", "mid"],
 ];
 
+/**
+ * Entries the rules cannot align, so they never reach the drift check. All of
+ * them still lack tone marks; none is an entry whose marks failed to verify.
+ */
+const EXEMPT_FROM_DRIFT: Record<string, number> = {
+  words: 5,
+  conversation: 39,
+};
+
 describe("thai-tone", () => {
   it.each(KNOWN_TONES)("derives the tone of %s as %s", (thai, expected) => {
     const spans = segmentSyllables(thai);
@@ -111,7 +120,17 @@ describe("thai-tone", () => {
   it.each([
     ["words", words],
     ["conversation", conversation],
-  ])("matches every tone mark in the %s deck", (_name, deck) => {
+  ])("matches every tone mark in the %s deck", (name, deck) => {
+    // markTransliteration returns null for readings the rules cannot align,
+    // and those entries drop out of the drift check below. Pin how many are
+    // exempt: without a floor, a segmentation regression would turn marked
+    // entries into nulls and make this test pass by checking less.
+    const exempt = deck.filter(
+      (entry) =>
+        markTransliteration(entry.thai, entry.transliterationMarked) === null,
+    );
+    expect(exempt.length).toBe(EXEMPT_FROM_DRIFT[name]);
+
     const drifted = deck
       .map((entry) => ({
         entry,
