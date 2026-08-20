@@ -193,7 +193,7 @@ export function getDueStudyItems(
 
   const dueItems = items
     .filter((item) => {
-      const haystack = `${item.thai} ${item.transliteration} ${item.transliterationMarked} ${item.meaning}`;
+      const haystack = `${item.thai} ${item.transliteration} ${item.meaning}`;
       const matchesQuery =
         !normalized || normalizeSearchText(haystack).includes(normalized);
       const matchesSelectedCategory = matchesCategory(item, mode, category);
@@ -239,7 +239,7 @@ export function getStudyItems(
 
   const studyItems = items
     .filter((item) => {
-      const haystack = `${item.thai} ${item.transliteration} ${item.transliterationMarked} ${item.meaning}`;
+      const haystack = `${item.thai} ${item.transliteration} ${item.meaning}`;
       const matchesQuery =
         !normalized || normalizeSearchText(haystack).includes(normalized);
 
@@ -288,7 +288,7 @@ export function getMatchingItems(
   const normalized = normalizeSearchText(query.trim());
 
   return items.filter((item) => {
-    const haystack = `${item.thai} ${item.transliteration} ${item.transliterationMarked} ${item.meaning}`;
+    const haystack = `${item.thai} ${item.transliteration} ${item.meaning}`;
     const matchesQuery =
       !normalized || normalizeSearchText(haystack).includes(normalized);
     return matchesQuery && matchesCategory(item, mode, category);

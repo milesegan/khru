@@ -19,8 +19,7 @@ const decks: StudyDecks = {
     {
       id: "chan",
       thai: "ฉัน",
-      transliteration: "chan",
-      transliterationMarked: "chàn",
+      transliteration: "chàn",
       meaning: "I; me",
       note: "Test note",
       difficulty: 1,
@@ -29,8 +28,7 @@ const decks: StudyDecks = {
     {
       id: "baan",
       thai: "บ้าน",
-      transliteration: "baan",
-      transliterationMarked: "bâan",
+      transliteration: "bâan",
       meaning: "house",
       note: "Test note",
       difficulty: 1,
@@ -39,8 +37,7 @@ const decks: StudyDecks = {
     {
       id: "poet",
       thai: "เปิด",
-      transliteration: "poet",
-      transliterationMarked: "pòet",
+      transliteration: "pòet",
       meaning: "open",
       note: "Test note",
       difficulty: 1,
@@ -52,7 +49,6 @@ const decks: StudyDecks = {
       id: "conv-sawasdee",
       thai: "สวัสดีครับ",
       transliteration: "sawatdi khrap",
-      transliterationMarked: "sawatdi khrap",
       meaning: "Hello.",
       note: "Test note",
       difficulty: 1,
@@ -62,7 +58,6 @@ const decks: StudyDecks = {
       id: "conv-ton-ni-ki-mong",
       thai: "ตอนนี้กี่โมง",
       transliteration: "ton ni ki mong",
-      transliterationMarked: "ton ni ki mong",
       meaning: "What time is it now?",
       note: "Test note",
       difficulty: 1,
@@ -100,7 +95,7 @@ describe("study helpers", () => {
     expect(queue.map((item) => item.id)).toEqual(["poet", "baan"]);
   });
 
-  it("searches across Thai, transliteration, marked transliteration, and meaning", () => {
+  it("searches across Thai, transliteration, and meaning", () => {
     const progress = createInitialProgress(decks);
 
     expect(
@@ -123,6 +118,13 @@ describe("study helpers", () => {
     ).toEqual(["conv-ton-ni-ki-mong"]);
     expect(
       getDueStudyItems(decks.words, progress, "words", new Date(), "chàn").map(
+        (item) => item.id,
+      ),
+    ).toEqual(["chan"]);
+    // The stored reading carries tone marks, so an unaccented query has to
+    // match it: that is what lets a single marked field serve search too.
+    expect(
+      getDueStudyItems(decks.words, progress, "words", new Date(), "chan").map(
         (item) => item.id,
       ),
     ).toEqual(["chan"]);

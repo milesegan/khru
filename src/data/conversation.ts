@@ -1,55 +1,22 @@
 import type { StudyEntry } from "../types";
 
-type ConversationArgs =
-  | [
-      id: string,
-      thai: string,
-      transliteration: string,
-      meaning: string,
-      note: string,
-      difficulty: 1 | 2 | 3 | 4 | 5,
-      tags: string[],
-    ]
-  | [
-      id: string,
-      thai: string,
-      transliteration: string,
-      transliterationMarked: string,
-      meaning: string,
-      note: string,
-      difficulty: 1 | 2 | 3 | 4 | 5,
-      tags: string[],
-    ];
-
-const sentence = (...args: ConversationArgs): StudyEntry => {
-  const [id, thai, transliteration, fourth, fifth, sixth, seventh, eighth] =
-    args;
-  const hasMarkedTransliteration = Array.isArray(eighth);
-
-  if (hasMarkedTransliteration) {
-    return {
-      id,
-      thai,
-      transliteration,
-      transliterationMarked: fourth,
-      meaning: fifth,
-      note: sixth as string,
-      difficulty: seventh as 1 | 2 | 3 | 4 | 5,
-      tags: eighth,
-    };
-  }
-
-  return {
-    id,
-    thai,
-    transliteration,
-    transliterationMarked: transliteration,
-    meaning: fourth,
-    note: fifth,
-    difficulty: sixth as 1 | 2 | 3 | 4 | 5,
-    tags: seventh as string[],
-  };
-};
+const sentence = (
+  id: string,
+  thai: string,
+  transliteration: string,
+  meaning: string,
+  note: string,
+  difficulty: 1 | 2 | 3 | 4 | 5,
+  tags: string[],
+): StudyEntry => ({
+  id,
+  thai,
+  transliteration,
+  meaning,
+  note,
+  difficulty,
+  tags,
+});
 
 export const conversation: StudyEntry[] = [
   sentence(
@@ -91,7 +58,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-laeo-phop-kan-mai",
     "แล้วพบกันใหม่",
-    "laeo phop kan mai",
     "láeo phóp kan mài",
     "See you again.",
     "ใหม่ means new, and in this phrase it gives the sense of again.",
@@ -128,7 +94,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mai-dai-joe-kan-nan",
     "ไม่ได้เจอกันนาน",
-    "mai dai joe kan nan",
     "mâi dâi joe kan nan",
     "Long time no see.",
     "ไม่ได้เจอกัน means have not met each other.",
@@ -138,7 +103,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chuang-ni-pen-yang-rai-bang",
     "ช่วงนี้เป็นอย่างไรบ้าง",
-    "chuang ni pen yang rai bang",
     "chûang ní pen yàng rai bâng",
     "How have you been lately?",
     "ช่วงนี้ means lately or these days.",
@@ -157,7 +121,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-joe-kan-phrung-ni",
     "เจอกันพรุ่งนี้",
-    "joe kan phrung ni",
     "joe kan phrûng ní",
     "See you tomorrow.",
     "เจอกัน is a common spoken way to say see you.",
@@ -167,7 +130,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-la-kon",
     "ลาก่อน",
-    "la kon",
     "la kòn",
     "Goodbye.",
     "This is a direct goodbye and can sound more final than แล้วพบกันใหม่.",
@@ -177,7 +139,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khoi-khui-kan-na",
     "ค่อยคุยกันนะ",
-    "khoi khui kan na",
     "khôi khui kan ná",
     "Talk to you later.",
     "นะ softens the sentence and makes it warmer.",
@@ -187,7 +148,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khop-khun",
     "ขอบคุณ",
-    "khop khun",
     "khòp khun",
     "Thank you.",
     "This is the core everyday phrase for thanks.",
@@ -197,7 +157,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khop-khun-mak",
     "ขอบคุณมาก",
-    "khop khun mak",
     "khòp khun mâk",
     "Thank you very much.",
     "มาก adds the idea of very much.",
@@ -207,7 +166,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mai-pen-rai",
     "ไม่เป็นไร",
-    "mai pen rai",
     "mâi pen rai",
     "It is okay. / You're welcome.",
     "This common phrase softens problems and can answer an apology or thanks.",
@@ -217,7 +175,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kho-thot",
     "ขอโทษ",
-    "kho thot",
     "khǒ thôt",
     "I am sorry. / Excuse me.",
     "Use this for apology or to politely get someone's attention.",
@@ -227,7 +184,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-karuna-phut-cha-cha",
     "กรุณาพูดช้าๆ",
-    "karuna phut cha cha",
     "kàruna phut châ chá",
     "Please speak slowly.",
     "กรุณา is a formal way to say please in requests.",
@@ -237,7 +193,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chuai-phut-ik-khrang-dai-mai",
     "ช่วยพูดอีกครั้งได้ไหม",
-    "chuai phut ik khrang dai mai",
     "chûai phût ìk khráng dâi mǎi",
     "Can you say it again?",
     "ได้ไหม softens the sentence into a polite request.",
@@ -247,7 +202,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-choen-khao-ma",
     "เชิญเข้ามา",
-    "choen khao ma",
     "choen khâo ma",
     "Please come in.",
     "เชิญ is a polite word used when inviting someone to do something.",
@@ -257,7 +211,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-choen-nang",
     "เชิญนั่ง",
-    "choen nang",
     "choen nâng",
     "Please sit.",
     "This is a short polite invitation.",
@@ -267,7 +220,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mai-mi-pan-ha",
     "ไม่มีปัญหา",
-    "mai mi pan ha",
     "mâi mi pan hǎ",
     "No problem.",
     "ไม่มี means there is not or do not have.",
@@ -277,7 +229,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kho-thot-na",
     "ขอโทษนะ",
-    "kho thot na",
     "khǒ thôt ná",
     "Excuse me.",
     "นะ makes the apology or attention-getter sound softer.",
@@ -287,7 +238,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ro-sak-khru",
     "รอสักครู่",
-    "ro sak khru",
     "ro sàk khrû",
     "Please wait a moment.",
     "สักครู่ means a short moment and sounds polite.",
@@ -297,7 +247,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khop-khun-thi-chuai",
     "ขอบคุณที่ช่วย",
-    "khop khun thi chuai",
     "khòp khun thî chûai",
     "Thank you for helping.",
     "ที่ connects the thanks to the action being thanked.",
@@ -307,7 +256,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khun-jai-di-mak",
     "คุณใจดีมาก",
-    "khun jai di mak",
     "khun jai di mâk",
     "You are very kind.",
     "ใจดี literally combines heart and good.",
@@ -317,7 +265,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kho-tham-noi-dai-mai",
     "ขอถามหน่อยได้ไหม",
-    "kho tham noi dai mai",
     "khǒ thǎm nòi dâi mǎi",
     "May I ask a question?",
     "ขอ begins a polite request for permission.",
@@ -327,7 +274,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chuai-khian-hai-noi-dai-mai",
     "ช่วยเขียนให้หน่อยได้ไหม",
-    "chuai khian hai noi dai mai",
     "chûai khǐan hâi nòi dâi mǎi",
     "Could you write it down for me?",
     "ให้ marks that the action is done for someone.",
@@ -337,7 +283,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-yin-di-mak",
     "ยินดีมาก",
-    "yin di mak",
     "yin di mâk",
     "My pleasure.",
     "ยินดี can answer thanks or express that you are pleased.",
@@ -347,7 +292,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-phom-chue-tom",
     "ผมชื่อทอม",
-    "phom chue Tom",
     "phǒm chûe Tom",
     "My name is Tom. (male speaker)",
     "ชื่อ means name and comes directly before the name itself.",
@@ -393,7 +337,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-yin-di-thi-dai-ruu-chak",
     "ยินดีที่ได้รู้จัก",
-    "yin di thi dai ruu chak",
     "yin di thî dâi ruu chàk",
     "Nice to meet you.",
     "ได้รู้จัก literally means to get to know someone.",
@@ -403,7 +346,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-pen-nak-rian",
     "ฉันเป็นนักเรียน",
-    "chan pen nak rian",
     "chǎn pen nák rian",
     "I am a student.",
     "เป็น links the subject to an identity or role.",
@@ -431,7 +373,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ni-khue-phuean-khong-chan",
     "นี่คือเพื่อนของฉัน",
-    "ni khue phuean khong chan",
     "nî khue phûean khǒng chǎn",
     "This is my friend.",
     "นี่คือ is a clear way to introduce a person or thing.",
@@ -441,7 +382,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khao-pen-nong-chai-khong-chan",
     "เขาเป็นน้องชายของฉัน",
-    "khao pen nong chai khong chan",
     "khǎo pen nóng chai khǒng chǎn",
     "He is my younger brother.",
     "น้องชาย means younger brother.",
@@ -451,7 +391,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khao-pen-phi-sao-khong-chan",
     "เขาเป็นพี่สาวของฉัน",
-    "khao pen phi sao khong chan",
     "khǎo pen phî sǎo khǒng chǎn",
     "She is my older sister.",
     "พี่สาว means older sister.",
@@ -479,7 +418,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-yang-phut-thai-mai-keng",
     "ฉันยังพูดไทยไม่เก่ง",
-    "chan yang phut thai mai keng",
     "chǎn yang phût thai mâi kèng",
     "I do not speak Thai well yet.",
     "ยัง adds the sense of not yet.",
@@ -498,7 +436,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-hiu",
     "ฉันหิว",
-    "chan hiu",
     "chǎn hìu",
     "I am hungry.",
     "หิว is used for hunger and works as the full predicate here.",
@@ -508,7 +445,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-hiu-nam",
     "ฉันหิวน้ำ",
-    "chan hiu nam",
     "chǎn hìu nám",
     "I am thirsty.",
     "หิวน้ำ literally means hungry for water.",
@@ -518,7 +454,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-nguang",
     "ฉันง่วง",
-    "chan nguang",
     "chǎn ngûang",
     "I am sleepy.",
     "ง่วง is the common adjective for feeling sleepy.",
@@ -528,7 +463,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-yak-pai-hong-nam",
     "ฉันอยากไปห้องน้ำ",
-    "chan yak pai hong nam",
     "chǎn yàk pai hông nám",
     "I want to go to the bathroom.",
     "อยาก marks a want or desire before the verb phrase.",
@@ -538,7 +472,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kho-nam-noi-dai-mai",
     "ขอน้ำหน่อยได้ไหม",
-    "kho nam noi dai mai",
     "khǒ nám nòi dâi mǎi",
     "Can I have some water?",
     "หน่อย softens the request and makes it sound more natural.",
@@ -548,7 +481,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chuai-chan-noi-dai-mai",
     "ช่วยฉันหน่อยได้ไหม",
-    "chuai chan noi dai mai",
     "chûai chǎn nòi dâi mǎi",
     "Can you help me?",
     "หน่อย softens the request and makes it sound more natural.",
@@ -567,7 +499,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-mai-khao-jai",
     "ฉันไม่เข้าใจ",
-    "chan mai khao jai",
     "chǎn mâi khâo jai",
     "I do not understand.",
     "เข้าใจ means understand.",
@@ -577,7 +508,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-long-thang",
     "ฉันหลงทาง",
-    "chan long thang",
     "chǎn lǒng thang",
     "I am lost.",
     "หลงทาง is the common phrase for losing your way.",
@@ -605,7 +535,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-mai-kin-nuea",
     "ฉันไม่กินเนื้อ",
-    "chan mai kin nuea",
     "chǎn mâi kin núea",
     "I do not eat meat.",
     "ไม่ goes before the verb to make it negative.",
@@ -633,7 +562,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khit-ngoen-duai",
     "คิดเงินด้วย",
-    "khit ngoen duai",
     "khít ngoen dûai",
     "Check, please.",
     "ด้วย adds please or with to many everyday requests.",
@@ -661,7 +589,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-im-laeo",
     "ฉันอิ่มแล้ว",
-    "chan im laeo",
     "chǎn ìm láeo",
     "I am full now.",
     "แล้ว marks that the state has already happened.",
@@ -671,7 +598,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-hong-nam-yu-thi-nai",
     "ห้องน้ำอยู่ที่ไหน",
-    "hong nam yu thi nai",
     "hông nám yù thî nǎi",
     "Where is the bathroom?",
     "อยู่ที่ไหน is the common pattern for asking where something is.",
@@ -690,7 +616,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-man-glai-mai",
     "มันไกลไหม",
-    "man glai mai",
     "man glai mǎi",
     "Is it far?",
     "ไหม turns this short distance statement into a question.",
@@ -700,7 +625,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-man-klai-mai",
     "มันใกล้ไหม",
-    "man klai mai",
     "man klâi mǎi",
     "Is it near?",
     "ใกล้ means near or close by.",
@@ -710,7 +634,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-liao-sai-thi-ni",
     "เลี้ยวซ้ายที่นี่",
-    "liao sai thi ni",
     "líao sái thî nî",
     "Turn left here.",
     "ที่นี่ means here and points to the immediate location.",
@@ -729,7 +652,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-liao-khwa",
     "เลี้ยวขวา",
-    "liao khwa",
     "líao khwǎ",
     "Turn right.",
     "ขวา means right side.",
@@ -748,7 +670,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-yu-thang-sai",
     "อยู่ทางซ้าย",
-    "yu thang sai",
     "yù thang sái",
     "It is on the left.",
     "ทางซ้าย means on the left side.",
@@ -776,7 +697,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-doen-pai-dai-mai",
     "เดินไปได้ไหม",
-    "doen pai dai mai",
     "doen pai dâi mǎi",
     "Can I walk there?",
     "เดินไป means go by walking.",
@@ -813,7 +733,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-jot-thi-ni-dai-mai",
     "จอดที่นี่ได้ไหม",
-    "jot thi ni dai mai",
     "jòt thî nî dâi mǎi",
     "Can you stop here?",
     "จอด means stop or park a vehicle.",
@@ -823,7 +742,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kha-doi-san-thao-rai",
     "ค่าโดยสารเท่าไหร่",
-    "kha doi san thao rai",
     "khâ doi sǎn thâo rài",
     "How much is the fare?",
     "ค่าโดยสาร is the fare for transport.",
@@ -833,7 +751,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-pha-pai-rong-raem-dai-mai",
     "พาไปโรงแรมได้ไหม",
-    "pha pai rong raem dai mai",
     "pha pai rong raem dâi mǎi",
     "Can you take me to the hotel?",
     "พาไป means take someone to a place.",
@@ -843,7 +760,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ton-ni-ki-mong",
     "ตอนนี้กี่โมง",
-    "ton ni ki mong",
     "ton ní kì mong",
     "What time is it now?",
     "กี่โมง is the standard way to ask the time.",
@@ -880,7 +796,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-rot-fai-ok-ki-mong",
     "รถไฟออกกี่โมง",
-    "rot fai ok ki mong",
     "rót fai òk kì mong",
     "What time does the train leave?",
     "ออก means depart or leave in travel contexts.",
@@ -890,7 +805,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-wang-ton-bai",
     "ฉันว่างตอนบ่าย",
-    "chan wang ton bai",
     "chǎn wâng ton bài",
     "I am free in the afternoon.",
     "ตอนบ่าย means in the afternoon.",
@@ -900,7 +814,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-poet-ki-mong",
     "เปิดกี่โมง",
-    "poet ki mong",
     "pòet kì mong",
     "What time do you open?",
     "เปิด means open.",
@@ -910,7 +823,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-pit-ki-mong",
     "ปิดกี่โมง",
-    "pit ki mong",
     "pìt kì mong",
     "What time do you close?",
     "ปิด means close.",
@@ -920,7 +832,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-sai-laeo",
     "ฉันสายแล้ว",
-    "chan sai laeo",
     "chǎn sǎi láeo",
     "I am late.",
     "สาย means late when talking about time.",
@@ -930,7 +841,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-ma-rew",
     "ฉันมาเร็ว",
-    "chan ma rew",
     "chǎn ma rew",
     "I came early.",
     "เร็ว can mean early or fast depending on context.",
@@ -949,7 +859,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wan-ni-wan-suk",
     "วันนี้วันศุกร์",
-    "wan ni wan suk",
     "wan ní wan sùk",
     "Today is Friday.",
     "วันศุกร์ is Friday.",
@@ -995,7 +904,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-klap-ma-mai-thi-lang",
     "กลับมาใหม่ทีหลัง",
-    "klap ma mai thi lang",
     "klàp ma mài thi lǎng",
     "Come back later.",
     "ทีหลัง means later or afterward.",
@@ -1005,7 +913,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ran-pit-wan-ni",
     "ร้านปิดวันนี้",
-    "ran pit wan ni",
     "rán pìt wan ní",
     "The shop is closed today.",
     "ร้าน means shop or store.",
@@ -1015,7 +922,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mo-du",
     "หมอดู",
-    "mo du",
     "mǒ du",
     "fortune-teller",
     "Read it as two chunks: หมอ and ดู.",
@@ -1025,7 +931,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-naa-lang",
     "หน้าหลัง",
-    "naa lang",
     "nâa lǎng",
     "front and back; before and after",
     "Read it as หน้า plus หลัง.",
@@ -1035,7 +940,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wang-wai",
     "หวังไว้",
-    "wang wai",
     "wǎng wái",
     "hope for; expect",
     "The leading ห in หวัง helps determine the tone.",
@@ -1045,7 +949,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kao-mai",
     "เก่าใหม่",
-    "kao mai",
     "kào mài",
     "old and new",
     "Both chunks carry tone marks and contrast two adjectives.",
@@ -1055,7 +958,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-pai-nai",
     "ไปไหน",
-    "pai nai",
     "pai nǎi",
     "where are you going?",
     "Read ไป first, then ไหน with its silent leading ห.",
@@ -1065,7 +967,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chai-rue",
     "ใช่หรือ",
-    "chai rue",
     "châi rǔe",
     "is that right?; really?",
     "หรือ turns the statement into a yes-or-no question.",
@@ -1075,7 +976,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mue-nai",
     "มือไหน",
-    "mue nai",
     "mue nǎi",
     "which hand?",
     "Read it as มือ plus the question word ไหน.",
@@ -1085,7 +985,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-no-mai",
     "หน่อไม้",
-    "no mai",
     "nò mái",
     "bamboo shoot",
     "The silent leading ห shapes the tone of หน่อ.",
@@ -1095,7 +994,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-fai-mai",
     "ไฟไหม้",
-    "fai mai",
     "fai mâi",
     "fire; be on fire",
     "The two ไ vowel signs make this phrase visually distinctive.",
@@ -1105,7 +1003,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mat-ma",
     "หมัดหมา",
-    "mat ma",
     "màt mǎ",
     "dog flea",
     "Both syllables begin with a leading ห consonant pattern.",
@@ -1115,7 +1012,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kha-mu",
     "ขาหมู",
-    "kha mu",
     "khǎ mǔ",
     "pork leg",
     "Read it as ขา, leg, plus หมู, pork.",
@@ -1125,7 +1021,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-du-mi",
     "ดูหมี",
-    "du mi",
     "du mǐ",
     "look at the bear",
     "Both chunks use a long vowel sound.",
@@ -1135,7 +1030,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-pi-naa",
     "ปีหน้า",
-    "pi naa",
     "pi nâa",
     "next year",
     "หน้า means next when it follows a unit of time.",
@@ -1145,7 +1039,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ya-kha",
     "หญ้าคา",
-    "ya kha",
     "yâ kha",
     "cogon grass",
     "Read the initial หญ cluster in หญ้า as a y sound.",
@@ -1155,7 +1048,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-pha-mai",
     "ผ้าไหม",
-    "pha mai",
     "phâ mǎi",
     "silk cloth",
     "Read it as ผ้า, cloth, plus ไหม, silk.",
@@ -1165,7 +1057,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-phu-yai",
     "ผู้ใหญ่",
-    "phu yai",
     "phû yài",
     "adult; elder",
     "The silent ห in ใหญ่ helps determine the tone.",
@@ -1175,7 +1066,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wing-ni",
     "วิ่งหนี",
-    "wing ni",
     "wîng nǐ",
     "run away",
     "Read it as วิ่ง, run, plus หนี, escape.",
@@ -1185,7 +1075,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wi-phom",
     "หวีผม",
-    "wi phom",
     "wǐ phòm",
     "comb one's hair",
     "Read it as หวี, comb, plus ผม, hair.",
@@ -1195,7 +1084,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wap-wam",
     "วาบหวาม",
-    "wap wam",
     "wâp wǎm",
     "sensually thrilled; stirred",
     "The leading ห in หวาม shapes the second syllable's tone.",
@@ -1205,7 +1093,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wat-wan",
     "หวาดหวั่น",
-    "wat wan",
     "wàt wàn",
     "fearful; apprehensive",
     "Both halves begin with the หว consonant cluster.",
@@ -1215,7 +1102,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ta-le",
     "ตาเหล่",
-    "ta le",
     "ta lè",
     "cross-eyed; squinting",
     "Read it as ตา, eye, plus เหล่, squinting.",
@@ -1225,7 +1111,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khao-lam",
     "ข้าวหลาม",
-    "khao lam",
     "khâo lǎm",
     "sticky rice roasted in bamboo",
     "This food name is read as ข้าว plus หลาม.",
@@ -1235,7 +1120,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-yiat-yam",
     "เหยียดหยาม",
-    "yiat yam",
     "yìat yǎm",
     "disdain; look down on",
     "The final ด in เหยียด is pronounced as a t stop.",
@@ -1245,7 +1129,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-luk-lan",
     "ลูกหลาน",
-    "luk lan",
     "lûk lǎn",
     "children and descendants",
     "Read it as ลูก plus หลาน.",
@@ -1255,7 +1138,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-len-lon",
     "เหลนโหลน",
-    "len lon",
     "lěn lǒn",
     "great-grandchildren and later descendants",
     "The leading ห is silent in both family terms.",
@@ -1265,7 +1147,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-nam-tam",
     "หนามตำ",
-    "nam tam",
     "nǎm tam",
     "be pricked by a thorn",
     "Read it as หนาม, thorn, plus ตำ, prick.",
@@ -1275,7 +1156,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-yot-laem",
     "ยอดแหลม",
-    "yot laem",
     "yôt lǎem",
     "pointed tip; sharp peak",
     "The final ด in ยอด is pronounced as a t stop.",
@@ -1285,7 +1165,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ya-rang",
     "หย่าร้าง",
-    "ya rang",
     "yà ráng",
     "separate; divorce",
     "Read it as two related verbs: หย่า and ร้าง.",
@@ -1295,7 +1174,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-yot-yoi",
     "หยดย้อย",
-    "yot yoi",
     "yòt yói",
     "drip down; hang in drops",
     "The final ด in หยด is pronounced as a t stop.",
@@ -1305,7 +1183,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-tok-lon",
     "ตกหล่น",
-    "tok lon",
     "tòk lòn",
     "fall off; be omitted",
     "Both chunks end with a short final consonant sound.",
@@ -1315,7 +1192,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ngon-kai",
     "หงอนไก่",
-    "ngon kai",
     "ngǒn kài",
     "rooster's comb",
     "Read it as หงอน, comb, plus ไก่, chicken.",
@@ -1325,7 +1201,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-phom-ngok",
     "ผมหงอก",
-    "phom ngok",
     "phǒm ngòk",
     "gray hair",
     "Read it as ผม, hair, plus หงอก, gray.",
@@ -1335,7 +1210,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mon-nun",
     "หมอนหนุน",
-    "mon nun",
     "mǒn nǔn",
     "supporting pillow",
     "Both chunks use a silent leading ห.",
@@ -1345,7 +1219,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mun-klap",
     "หมุนกลับ",
-    "mun klap",
     "mǔn klàp",
     "turn back; rotate back",
     "Read it as หมุน, turn, plus กลับ, return.",
@@ -1355,7 +1228,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-long-lai",
     "หลงใหล",
-    "long lai",
     "lǒng lǎi",
     "be fascinated; be infatuated",
     "The leading ห is silent in both syllables.",
@@ -1365,7 +1237,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-nam-lai",
     "น้ำไหล",
-    "nam lai",
     "nám lǎi",
     "water flows",
     "Read it as น้ำ, water, plus ไหล, flow.",
@@ -1375,7 +1246,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-lai-khwa",
     "ไหล่ขวา",
-    "lai khwa",
     "lài khwǎ",
     "right shoulder",
     "Read it as ไหล่, shoulder, plus ขวา, right.",
@@ -1385,7 +1255,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-lok-luang",
     "หลอกลวง",
-    "lok luang",
     "lǒk luang",
     "deceive; trick",
     "The first syllable ends with a k stop before ลวง.",
@@ -1395,7 +1264,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ngao-ngoi",
     "เหงาหงอย",
-    "ngao ngoi",
     "ngǎo ngǒi",
     "lonely and dejected",
     "Both syllables end in open vowel sounds.",
@@ -1405,7 +1273,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-lum-luek",
     "หลุมลึก",
-    "lum luek",
     "lǔm lúek",
     "deep hole",
     "Read it as หลุม, hole, plus ลึก, deep.",
@@ -1415,7 +1282,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-men-naa",
     "เหม็นหน้า",
-    "men naa",
     "měn nâa",
     "dislike intensely; cannot stand the sight of",
     "This idiom combines เหม็น, stink, with หน้า, face.",
@@ -1425,7 +1291,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-muean-kan",
     "เหมือนกัน",
-    "muean kan",
     "mǔean kan",
     "the same; alike; too",
     "Read it as เหมือน plus กัน.",
@@ -1435,7 +1300,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-luea-kho",
     "เหลือขอ",
-    "luea kho",
     "lǔea khǒ",
     "incorrigible; outrageous",
     "This fixed expression is read as two chunks.",
@@ -1445,7 +1309,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-lak-lai",
     "หลากหลาย",
-    "lak lai",
     "làk lǎi",
     "varied; diverse; many kinds",
     "The first chunk ends in a k stop before หลาย.",
@@ -1455,7 +1318,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-thong-yot",
     "ทองหยอด",
-    "thong yot",
     "thong yòt",
     "golden egg-yolk drop dessert",
     "This Thai dessert name literally combines gold and drops.",
@@ -1465,7 +1327,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-lot-nam",
     "หลอดน้ำ",
-    "lot nam",
     "lòt nám",
     "drinking straw",
     "The final ด in หลอด is pronounced as a t stop.",
@@ -1475,7 +1336,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mai-ta",
     "หมายตา",
-    "mai ta",
     "mǎi ta",
     "set one's sights on; have one's eye on",
     "This idiom combines หมาย, intend, with ตา, eye.",
@@ -1485,7 +1345,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mong-moen",
     "หมองเมิน",
-    "mong moen",
     "mǒng moen",
     "be distant; ignore",
     "Read this rhyming expression as two chunks.",
@@ -1495,7 +1354,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wat-klua",
     "หวาดกลัว",
-    "wat klua",
     "wàt klua",
     "afraid; terrified",
     "Read it as two related fear words: หวาด and กลัว.",
@@ -1505,7 +1363,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-aep-yik",
     "แอบหยิก",
-    "aep yik",
     "àep yìk",
     "secretly pinch",
     "Read it as แอบ, secretly, plus หยิก, pinch.",
@@ -1515,7 +1372,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-yip-kin",
     "หยิบกิน",
-    "yip kin",
     "yìp kin",
     "pick up and eat",
     "Read it as two consecutive actions: หยิบ and กิน.",
@@ -1525,7 +1381,6 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-mu-yong",
     "หมูหยอง",
-    "mu yong",
     "mǔ yǒng",
     "pork floss",
     "Read it as หมู, pork, plus หยอง, shredded and fluffy.",

@@ -127,24 +127,23 @@ describe("thai-tone", () => {
     // entries into nulls and make this test pass by checking less.
     const exempt = deck.filter(
       (entry) =>
-        markTransliteration(entry.thai, entry.transliterationMarked) === null,
+        markTransliteration(entry.thai, entry.transliteration) === null,
     );
     expect(exempt.length).toBe(EXEMPT_FROM_DRIFT[name]);
 
     const drifted = deck
       .map((entry) => ({
         entry,
-        derived: markTransliteration(entry.thai, entry.transliterationMarked),
+        derived: markTransliteration(entry.thai, entry.transliteration),
       }))
       .filter(
         ({ entry, derived }) =>
           derived !== null &&
-          derived.normalize("NFC") !==
-            entry.transliterationMarked.normalize("NFC"),
+          derived.normalize("NFC") !== entry.transliteration.normalize("NFC"),
       )
       .map(
         ({ entry, derived }) =>
-          `${entry.thai}: ${entry.transliterationMarked} != ${derived}`,
+          `${entry.thai}: ${entry.transliteration} != ${derived}`,
       );
 
     expect(drifted).toEqual([]);

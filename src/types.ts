@@ -31,7 +31,6 @@ export type StudyEntry = {
   id: string;
   thai: string;
   transliteration: string;
-  transliterationMarked: string;
   meaning: string;
   note: string;
   difficulty: 1 | 2 | 3 | 4 | 5;

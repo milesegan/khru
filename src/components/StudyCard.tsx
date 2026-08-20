@@ -318,7 +318,7 @@ export function StudyCard({
               isKnownCelebrating ? "text-emerald-700" : "text-muted"
             }`}
           >
-            {item.transliterationMarked}
+            {item.transliteration}
           </p>
           <p
             className={`m-0 font-serif text-[1.75rem] font-medium ${

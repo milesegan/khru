@@ -1,61 +1,27 @@
 import type { StudyEntry } from "../types";
 
-type WordArgs =
-  | [
-      id: string,
-      thai: string,
-      transliteration: string,
-      meaning: string,
-      note: string,
-      difficulty: 1 | 2 | 3 | 4 | 5,
-      tags: string[],
-    ]
-  | [
-      id: string,
-      thai: string,
-      transliteration: string,
-      transliterationMarked: string,
-      meaning: string,
-      note: string,
-      difficulty: 1 | 2 | 3 | 4 | 5,
-      tags: string[],
-    ];
-
-const word = (...args: WordArgs): StudyEntry => {
-  const [id, thai, transliteration, fourth, fifth, sixth, seventh, eighth] =
-    args;
-  const hasMarkedTransliteration = Array.isArray(eighth);
-
-  if (hasMarkedTransliteration) {
-    return {
-      id,
-      thai,
-      transliteration,
-      transliterationMarked: fourth,
-      meaning: fifth,
-      note: sixth as string,
-      difficulty: seventh as 1 | 2 | 3 | 4 | 5,
-      tags: eighth,
-    };
-  }
-
-  return {
-    id,
-    thai,
-    transliteration,
-    transliterationMarked: transliteration,
-    meaning: fourth,
-    note: fifth,
-    difficulty: sixth as 1 | 2 | 3 | 4 | 5,
-    tags: seventh as string[],
-  };
-};
+const word = (
+  id: string,
+  thai: string,
+  transliteration: string,
+  meaning: string,
+  note: string,
+  difficulty: 1 | 2 | 3 | 4 | 5,
+  tags: string[],
+): StudyEntry => ({
+  id,
+  thai,
+  transliteration,
+  meaning,
+  note,
+  difficulty,
+  tags,
+});
 
 export const words: StudyEntry[] = [
   word(
     "chan",
     "ฉัน",
-    "chan",
     "chǎn",
     "I; me",
     "The final น closes the syllable with an n sound.",
@@ -65,7 +31,6 @@ export const words: StudyEntry[] = [
   word(
     "phom",
     "ผม",
-    "phom",
     "phǒm",
     "I; me (male speaker)",
     "The vowel is written after the consonant but read in the middle.",
@@ -93,7 +58,6 @@ export const words: StudyEntry[] = [
   word(
     "khao-pronoun",
     "เขา",
-    "khao",
     "khǎo",
     "he; she; they",
     "This common word uses the เ-า vowel pattern.",
@@ -112,7 +76,6 @@ export const words: StudyEntry[] = [
   word(
     "phuak-rao",
     "พวกเรา",
-    "phuak rao",
     "phûak rao",
     "we; us (group)",
     "พวก is often used to mark a group before a pronoun.",
@@ -122,7 +85,6 @@ export const words: StudyEntry[] = [
   word(
     "phuak-khao",
     "พวกเขา",
-    "phuak khao",
     "phûak khǎo",
     "they",
     "Read it as two chunks: พวก and เขา.",
@@ -141,7 +103,6 @@ export const words: StudyEntry[] = [
   word(
     "phuying",
     "ผู้หญิง",
-    "phu ying",
     "phûu yǐng",
     "woman",
     "This word is read in two parts and ends with the ง sound.",
@@ -151,7 +112,6 @@ export const words: StudyEntry[] = [
   word(
     "phuchai",
     "ผู้ชาย",
-    "phu chai",
     "phûu chaai",
     "man",
     "ชาย ends with ย, which helps form the ai sound.",
@@ -161,7 +121,6 @@ export const words: StudyEntry[] = [
   word(
     "dek",
     "เด็ก",
-    "dek",
     "dèk",
     "child",
     "The final ก gives a short k stop at the end.",
@@ -171,7 +130,6 @@ export const words: StudyEntry[] = [
   word(
     "phuean",
     "เพื่อน",
-    "phuean",
     "phûean",
     "friend",
     "The vowel comes before the consonant in writing but is read with it.",
@@ -181,7 +139,6 @@ export const words: StudyEntry[] = [
   word(
     "khropkhrua",
     "ครอบครัว",
-    "khrop khrua",
     "khrôp khrua",
     "family",
     "Read this as two parts: ครอบ and ครัว.",
@@ -191,7 +148,6 @@ export const words: StudyEntry[] = [
   word(
     "mae",
     "แม่",
-    "mae",
     "mâe",
     "mother",
     "The mai ek tone mark sits above the syllable.",
@@ -201,7 +157,6 @@ export const words: StudyEntry[] = [
   word(
     "pho",
     "พ่อ",
-    "pho",
     "phâo",
     "father",
     "The tone mark changes the spoken contour even in a short word.",
@@ -211,7 +166,6 @@ export const words: StudyEntry[] = [
   word(
     "phi",
     "พี่",
-    "phi",
     "phîi",
     "older sibling",
     "The long ii vowel is easy to spot in this short word.",
@@ -221,7 +175,6 @@ export const words: StudyEntry[] = [
   word(
     "nong",
     "น้อง",
-    "nong",
     "nóng",
     "younger sibling",
     "The final ง gives the ng ending sound.",
@@ -240,7 +193,6 @@ export const words: StudyEntry[] = [
   word(
     "naa-aunt",
     "น้า",
-    "naa",
     "náa",
     "aunt; uncle (mother's younger sibling)",
     "The long aa vowel is easy to hear in this family word.",
@@ -250,7 +202,6 @@ export const words: StudyEntry[] = [
   word(
     "paa-aunt",
     "ป้า",
-    "paa",
     "pâa",
     "aunt (older than a parent)",
     "A long aa syllable with a tone mark.",
@@ -260,7 +211,6 @@ export const words: StudyEntry[] = [
   word(
     "luk",
     "ลูก",
-    "luk",
     "lûuk",
     "child; offspring",
     "ู writes a long uu sound before the final ก.",
@@ -270,7 +220,6 @@ export const words: StudyEntry[] = [
   word(
     "sami",
     "สามี",
-    "saa mii",
     "sǎa mii",
     "husband",
     "This is read in two beats with long vowels in both parts.",
@@ -280,7 +229,6 @@ export const words: StudyEntry[] = [
   word(
     "phanya",
     "ภรรยา",
-    "phan-ra-yaa",
     "phan-rá-yaa",
     "wife",
     "This longer word is easiest when read in three chunks.",
@@ -290,7 +238,6 @@ export const words: StudyEntry[] = [
   word(
     "pu",
     "ปู่",
-    "puu",
     "pùu",
     "grandfather (father's side)",
     "The long uu vowel is marked by ู.",
@@ -300,7 +247,6 @@ export const words: StudyEntry[] = [
   word(
     "yaa-grandma",
     "ย่า",
-    "yaa",
     "yâa",
     "grandmother (father's side)",
     "This is a long open syllable ending in a vowel sound.",
@@ -320,7 +266,6 @@ export const words: StudyEntry[] = [
     "yai-grandma",
     "ยาย",
     "yaai",
-    "yaai",
     "grandmother (mother's side)",
     "The final ย contributes to the ai sound.",
     2,
@@ -330,7 +275,6 @@ export const words: StudyEntry[] = [
   word(
     "sawatdi",
     "สวัสดี",
-    "sa-wat-dii",
     "sà-wàt-dii",
     "hello",
     "This greeting is easiest to read as three chunks.",
@@ -340,7 +284,6 @@ export const words: StudyEntry[] = [
   word(
     "khopkhun",
     "ขอบคุณ",
-    "khop khun",
     "khòp khun",
     "thank you",
     "Read it as two common pieces: ขอบ and คุณ.",
@@ -350,7 +293,6 @@ export const words: StudyEntry[] = [
   word(
     "khothot",
     "ขอโทษ",
-    "kho thot",
     "khǒ thôot",
     "sorry; excuse me",
     "This phrase is usually read in two clear syllables.",
@@ -360,7 +302,6 @@ export const words: StudyEntry[] = [
   word(
     "chai",
     "ใช่",
-    "chai",
     "châi",
     "yes; correct",
     "The final ย helps make the ai sound.",
@@ -370,7 +311,6 @@ export const words: StudyEntry[] = [
   word(
     "mai-question",
     "ไหม",
-    "mai",
     "mǎi",
     "question particle",
     "This short particle often appears at the end of a sentence.",
@@ -380,7 +320,6 @@ export const words: StudyEntry[] = [
   word(
     "mai-not",
     "ไม่",
-    "mai",
     "mâi",
     "not",
     "The tone mark is part of this very common negation word.",
@@ -390,7 +329,6 @@ export const words: StudyEntry[] = [
   word(
     "dai-yes",
     "ได้",
-    "dai",
     "dâi",
     "can; okay; got it",
     "The final ย helps form the ai sound.",
@@ -400,7 +338,6 @@ export const words: StudyEntry[] = [
   word(
     "na-kha",
     "นะ",
-    "na",
     "ná",
     "softening particle",
     "This is a short open syllable often used in speech.",
@@ -410,7 +347,6 @@ export const words: StudyEntry[] = [
   word(
     "khrap",
     "ครับ",
-    "khrap",
     "khráp",
     "polite particle (male)",
     "The final บ is read as a p stop at the end.",
@@ -420,7 +356,6 @@ export const words: StudyEntry[] = [
   word(
     "kha",
     "ค่ะ",
-    "kha",
     "khâ",
     "polite particle (female)",
     "A short word with the vowel placed after the consonant.",
@@ -440,7 +375,6 @@ export const words: StudyEntry[] = [
     "yin-dii",
     "ยินดี",
     "yin dii",
-    "yin dii",
     "glad; pleased",
     "Read it in two parts, with the final ดี carrying a long ii sound.",
     2,
@@ -450,7 +384,6 @@ export const words: StudyEntry[] = [
   word(
     "arai",
     "อะไร",
-    "a-rai",
     "à-rai",
     "what",
     "ไร ends with ย, which supports the ai sound.",
@@ -478,7 +411,6 @@ export const words: StudyEntry[] = [
   word(
     "thinai",
     "ที่ไหน",
-    "thii nai",
     "thîi nǎi",
     "where",
     "Read it as two words: ที่ and ไหน.",
@@ -488,7 +420,6 @@ export const words: StudyEntry[] = [
   word(
     "muearai",
     "เมื่อไร",
-    "muea-rai",
     "mûea-rai",
     "when",
     "This question word is easiest in two chunks.",
@@ -499,7 +430,6 @@ export const words: StudyEntry[] = [
     "thammai",
     "ทำไม",
     "tham-mai",
-    "tham-mai",
     "why",
     "Read it as two short pieces with final mai.",
     2,
@@ -509,7 +439,6 @@ export const words: StudyEntry[] = [
     "yangngai",
     "ยังไง",
     "yang ngai",
-    "yang ngai",
     "how",
     "The final ไง chunk is common in spoken Thai.",
     2,
@@ -518,7 +447,6 @@ export const words: StudyEntry[] = [
   word(
     "an-nii",
     "อันนี้",
-    "an nii",
     "an níi",
     "this one",
     "Read it as two pieces, ending with a long ii sound.",
@@ -528,7 +456,6 @@ export const words: StudyEntry[] = [
   word(
     "an-nan",
     "อันนั้น",
-    "an nan",
     "an nán",
     "that one",
     "นัน closes with น for an n ending.",
@@ -538,7 +465,6 @@ export const words: StudyEntry[] = [
   word(
     "nii",
     "นี่",
-    "nii",
     "nîi",
     "this",
     "The long ii sound is the main reading clue here.",
@@ -548,7 +474,6 @@ export const words: StudyEntry[] = [
   word(
     "nan",
     "นั้น",
-    "nan",
     "nán",
     "that",
     "The final น gives the short n ending.",
@@ -558,23 +483,15 @@ export const words: StudyEntry[] = [
   word(
     "thi",
     "ที่",
-    "thii",
     "thîi",
     "at; place marker",
     "This very common word has a long ii sound.",
     1,
     ["connector"],
   ),
-  word(
-    "kap",
-    "กับ",
-    "kap",
-    "kàp",
-    "with",
-    "The final บ is heard as a p stop.",
-    1,
-    ["connector"],
-  ),
+  word("kap", "กับ", "kàp", "with", "The final บ is heard as a p stop.", 1, [
+    "connector",
+  ]),
   word(
     "nai",
     "ใน",
@@ -596,7 +513,6 @@ export const words: StudyEntry[] = [
   word(
     "lae",
     "และ",
-    "lae",
     "láe",
     "and",
     "A simple open syllable with the vowel sign before the consonant.",
@@ -606,7 +522,6 @@ export const words: StudyEntry[] = [
   word(
     "reu",
     "หรือ",
-    "rue",
     "rǔe",
     "or",
     "This high-frequency connector is easiest to remember as one shape.",
@@ -616,7 +531,6 @@ export const words: StudyEntry[] = [
   word(
     "tae",
     "แต่",
-    "tae",
     "tàe",
     "but",
     "The tone mark sits above the syllable.",
@@ -626,7 +540,6 @@ export const words: StudyEntry[] = [
   word(
     "ko",
     "ก็",
-    "ko",
     "kô",
     "also; then",
     "A tiny but common word with a short o sound.",
@@ -645,7 +558,6 @@ export const words: StudyEntry[] = [
   word(
     "laeo",
     "แล้ว",
-    "laeo",
     "láeo",
     "already; then",
     "The เ-า shape is part of the laeo sound.",
@@ -655,7 +567,6 @@ export const words: StudyEntry[] = [
   word(
     "ik",
     "อีก",
-    "iik",
     "ìik",
     "again; more",
     "A long ii sound comes before the final ก.",
@@ -665,7 +576,6 @@ export const words: StudyEntry[] = [
   word(
     "bang",
     "บ้าง",
-    "baang",
     "bâang",
     "some; a bit",
     "The final ง provides the nasal ending.",
@@ -675,7 +585,6 @@ export const words: StudyEntry[] = [
   word(
     "thuk",
     "ทุก",
-    "thuk",
     "thúk",
     "every",
     "The final ก gives a short clipped ending.",
@@ -685,7 +594,6 @@ export const words: StudyEntry[] = [
   word(
     "thangmot",
     "ทั้งหมด",
-    "thang mot",
     "tháng mòt",
     "all; whole",
     "Read this as two chunks: ทั้ง and หมด.",
@@ -699,7 +607,6 @@ export const words: StudyEntry[] = [
   word(
     "wan-nii",
     "วันนี้",
-    "wan nii",
     "wan níi",
     "today",
     "Read it as วัน plus the common pointer นี้.",
@@ -709,7 +616,6 @@ export const words: StudyEntry[] = [
   word(
     "phrung-nii",
     "พรุ่งนี้",
-    "phrung nii",
     "phrûng níi",
     "tomorrow",
     "This common time word ends with the pointer นี้.",
@@ -719,7 +625,6 @@ export const words: StudyEntry[] = [
   word(
     "mueawan",
     "เมื่อวาน",
-    "muea waan",
     "mûea waan",
     "yesterday",
     "Read it in two parts: เมื่อ and วาน.",
@@ -729,7 +634,6 @@ export const words: StudyEntry[] = [
   word(
     "ton-nii",
     "ตอนนี้",
-    "ton nii",
     "ton níi",
     "now",
     "The final นี้ chunk is common across many phrases.",
@@ -739,7 +643,6 @@ export const words: StudyEntry[] = [
   word(
     "chao",
     "เช้า",
-    "chao",
     "cháo",
     "morning",
     "The เ-า pattern helps signal the ao sound.",
@@ -749,7 +652,6 @@ export const words: StudyEntry[] = [
   word(
     "sai",
     "สาย",
-    "saai",
     "sǎai",
     "late morning",
     "The final ย helps produce the long ai sound.",
@@ -759,7 +661,6 @@ export const words: StudyEntry[] = [
   word(
     "bai",
     "บ่าย",
-    "baai",
     "bàai",
     "afternoon",
     "The final ย makes the ai sound in this time word.",
@@ -796,7 +697,6 @@ export const words: StudyEntry[] = [
   word(
     "chua-mong",
     "ชั่วโมง",
-    "chua-mong",
     "chûa-mong",
     "hour",
     "Read it as two beats, ending with ง.",
@@ -815,7 +715,6 @@ export const words: StudyEntry[] = [
   word(
     "sapdaa",
     "สัปดาห์",
-    "sap-daa",
     "sàp-daa",
     "week",
     "The first syllable ends in a clipped p sound.",
@@ -861,7 +760,6 @@ export const words: StudyEntry[] = [
   word(
     "wan-phut",
     "วันพุธ",
-    "wan phut",
     "wan phút",
     "Wednesday",
     "พุธ has the short u written below the consonant.",
@@ -880,7 +778,6 @@ export const words: StudyEntry[] = [
   word(
     "wan-suk",
     "วันศุกร์",
-    "wan suk",
     "wan sùk",
     "Friday",
     "ศุกร์ ends with a clipped k sound.",
@@ -890,7 +787,6 @@ export const words: StudyEntry[] = [
   word(
     "wan-sao",
     "วันเสาร์",
-    "wan sao",
     "wan sǎo",
     "Saturday",
     "เสาร์ uses the เ-า pattern for the ao sound.",
@@ -900,7 +796,6 @@ export const words: StudyEntry[] = [
   word(
     "wan-athit",
     "วันอาทิตย์",
-    "wan aa-thit",
     "wan aa-thít",
     "Sunday",
     "Read it as วัน plus อาทิตย์.",
@@ -919,7 +814,6 @@ export const words: StudyEntry[] = [
   word(
     "cha-cha",
     "ช้า",
-    "chaa",
     "cháa",
     "slow; slowly",
     "A long aa syllable with a tone mark.",
@@ -930,23 +824,15 @@ export const words: StudyEntry[] = [
   word(
     "baan",
     "บ้าน",
-    "baan",
     "bâan",
     "house; home",
     "Mai tho appears over the long aa syllable.",
     1,
     ["place"],
   ),
-  word(
-    "hong",
-    "ห้อง",
-    "hong",
-    "hông",
-    "room",
-    "The final ง gives the ng ending.",
-    1,
-    ["place"],
-  ),
+  word("hong", "ห้อง", "hông", "room", "The final ง gives the ng ending.", 1, [
+    "place",
+  ]),
   word(
     "rongrian",
     "โรงเรียน",
@@ -977,7 +863,6 @@ export const words: StudyEntry[] = [
   word(
     "raan",
     "ร้าน",
-    "raan",
     "ráan",
     "shop",
     "The long aa vowel is followed by final น.",
@@ -987,7 +872,6 @@ export const words: StudyEntry[] = [
   word(
     "talat",
     "ตลาด",
-    "ta-laat",
     "tà-làat",
     "market",
     "Read it in two syllables with a long aa in the second.",
@@ -997,7 +881,6 @@ export const words: StudyEntry[] = [
   word(
     "rot-fai",
     "รถไฟ",
-    "rot fai",
     "rót fai",
     "train",
     "This compound is easiest as รถ plus ไฟ.",
@@ -1007,7 +890,6 @@ export const words: StudyEntry[] = [
   word(
     "rot-may",
     "รถเมล์",
-    "rot mee",
     "rót mee",
     "bus",
     "This loanword is usually remembered as one block after รถ.",
@@ -1017,7 +899,6 @@ export const words: StudyEntry[] = [
   word(
     "rot-yon",
     "รถยนต์",
-    "rot yon",
     "rót yon",
     "car",
     "ยนต์ ends with a clipped t stop.",
@@ -1036,7 +917,6 @@ export const words: StudyEntry[] = [
   word(
     "thanon",
     "ถนน",
-    "tha-non",
     "thǎ-nón",
     "road",
     "The doubled look helps you remember the two short syllables.",
@@ -1046,7 +926,6 @@ export const words: StudyEntry[] = [
   word(
     "sathanii",
     "สถานี",
-    "sa-thaa-nii",
     "sà-thǎa-nii",
     "station",
     "Read this as three open syllables.",
@@ -1056,7 +935,6 @@ export const words: StudyEntry[] = [
   word(
     "sanaam-bin",
     "สนามบิน",
-    "sa-naam-bin",
     "sà-nǎam-bin",
     "airport",
     "This compound is easiest as สนาม plus บิน.",
@@ -1066,7 +944,6 @@ export const words: StudyEntry[] = [
   word(
     "rongphayabaan",
     "โรงพยาบาล",
-    "rong-pha-yaa-baan",
     "rong-phá-yaa-baan",
     "hospital",
     "Read it in four chunks and notice the final บ้าน sound.",
@@ -1076,7 +953,6 @@ export const words: StudyEntry[] = [
   word(
     "raan-ahaan",
     "ร้านอาหาร",
-    "raan aa-haan",
     "ráan aa-hǎan",
     "restaurant",
     "This common place name combines shop plus food.",
@@ -1086,7 +962,6 @@ export const words: StudyEntry[] = [
   word(
     "hongnam",
     "ห้องน้ำ",
-    "hong naam",
     "hông náam",
     "bathroom",
     "Read it as room plus water; the second part has a long aa.",
@@ -1096,7 +971,6 @@ export const words: StudyEntry[] = [
   word(
     "phak",
     "พัก",
-    "phak",
     "phák",
     "rest; stay",
     "The final ก gives a clipped ending.",
@@ -1106,7 +980,6 @@ export const words: StudyEntry[] = [
   word(
     "krungthep",
     "กรุงเทพ",
-    "krung-thep",
     "krung-thêp",
     "Bangkok",
     "This place name is easiest in two chunks.",
@@ -1116,7 +989,6 @@ export const words: StudyEntry[] = [
   word(
     "thalee",
     "ทะเล",
-    "tha-lee",
     "thá-lee",
     "sea",
     "Read it in two open syllables, ending with a long ee sound.",
@@ -1126,7 +998,6 @@ export const words: StudyEntry[] = [
   word(
     "tai-under",
     "ใต้",
-    "tai",
     "tâi",
     "under; below",
     "The ไ vowel sign helps mark the ai sound in this short word.",
@@ -1136,7 +1007,6 @@ export const words: StudyEntry[] = [
   word(
     "faa",
     "ฟ้า",
-    "faa",
     "fáa",
     "sky; blue",
     "A long aa syllable with a tone mark.",
@@ -1166,7 +1036,6 @@ export const words: StudyEntry[] = [
   word(
     "yuu",
     "อยู่",
-    "yuu",
     "yùu",
     "stay; live; be located",
     "The long uu sound is central to this common verb.",
@@ -1179,7 +1048,6 @@ export const words: StudyEntry[] = [
   word(
     "duem",
     "ดื่ม",
-    "duem",
     "dùem",
     "drink",
     "The vowel pattern here is one to memorize by shape.",
@@ -1207,7 +1075,6 @@ export const words: StudyEntry[] = [
   word(
     "tuen",
     "ตื่น",
-    "tuen",
     "tùen",
     "wake up",
     "The เ-ือ pattern creates the ue sound.",
@@ -1223,16 +1090,9 @@ export const words: StudyEntry[] = [
     2,
     ["verb"],
   ),
-  word(
-    "son",
-    "สอน",
-    "son",
-    "sǒn",
-    "teach",
-    "A long o sound followed by final น.",
-    2,
-    ["verb"],
-  ),
+  word("son", "สอน", "sǒn", "teach", "A long o sound followed by final น.", 2, [
+    "verb",
+  ]),
   word(
     "tham",
     "ทำ",
@@ -1254,7 +1114,6 @@ export const words: StudyEntry[] = [
   word(
     "len",
     "เล่น",
-    "len",
     "lên",
     "play",
     "The tone mark sits above the main consonant.",
@@ -1276,27 +1135,18 @@ export const words: StudyEntry[] = [
   word(
     "phuut",
     "พูด",
-    "phuut",
     "phûut",
     "speak",
     "ู marks the long uu sound before the final ด.",
     1,
     ["verb"],
   ),
-  word(
-    "bok",
-    "บอก",
-    "bok",
-    "bòk",
-    "tell",
-    "The final ก gives a clipped ending.",
-    2,
-    ["verb"],
-  ),
+  word("bok", "บอก", "bòk", "tell", "The final ก gives a clipped ending.", 2, [
+    "verb",
+  ]),
   word(
     "tham-khwaam-saad",
     "ทำความสะอาด",
-    "tham khwaam sa-aat",
     "tham khwaam sà-àat",
     "clean",
     "This phrase is best learned in three chunks.",
@@ -1306,7 +1156,6 @@ export const words: StudyEntry[] = [
   word(
     "sue",
     "ซื้อ",
-    "sue",
     "súe",
     "buy",
     "The long ue sound is a useful vowel pattern to spot.",
@@ -1316,7 +1165,6 @@ export const words: StudyEntry[] = [
   word(
     "khaai",
     "ขาย",
-    "khaai",
     "khǎai",
     "sell",
     "The final ย helps create the ai sound.",
@@ -1326,7 +1174,6 @@ export const words: StudyEntry[] = [
   word(
     "chai-verb",
     "ใช้",
-    "chai",
     "chái",
     "use",
     "This very common verb uses the ai pattern with final ย.",
@@ -1351,30 +1198,15 @@ export const words: StudyEntry[] = [
     1,
     ["verb"],
   ),
-  word(
-    "hai",
-    "ให้",
-    "hai",
-    "hâi",
-    "give; let",
-    "The final ย makes the ai sound.",
-    1,
-    ["verb"],
-  ),
-  word(
-    "rap",
-    "รับ",
-    "rap",
-    "ráp",
-    "receive",
-    "The final บ is heard as a p stop.",
-    2,
-    ["verb"],
-  ),
+  word("hai", "ให้", "hâi", "give; let", "The final ย makes the ai sound.", 1, [
+    "verb",
+  ]),
+  word("rap", "รับ", "ráp", "receive", "The final บ is heard as a p stop.", 2, [
+    "verb",
+  ]),
   word(
     "poet",
     "เปิด",
-    "poet",
     "pòet",
     "open; turn on",
     "The vowel sign comes before the consonant in writing.",
@@ -1384,7 +1216,6 @@ export const words: StudyEntry[] = [
   word(
     "pit",
     "ปิด",
-    "pit",
     "pìt",
     "close; turn off",
     "A short closed syllable ending in t.",
@@ -1394,7 +1225,6 @@ export const words: StudyEntry[] = [
   word(
     "nang",
     "นั่ง",
-    "nang",
     "nâng",
     "sit",
     "The final ง gives the nasal ending.",
@@ -1422,7 +1252,6 @@ export const words: StudyEntry[] = [
   word(
     "wing",
     "วิ่ง",
-    "wing",
     "wîng",
     "run",
     "The short i sound is followed by final ง.",
@@ -1432,7 +1261,6 @@ export const words: StudyEntry[] = [
   word(
     "khao-verb",
     "เข้า",
-    "khao",
     "khâo",
     "enter",
     "The เ-า pattern gives the ao sound in this motion verb.",
@@ -1442,7 +1270,6 @@ export const words: StudyEntry[] = [
   word(
     "ok",
     "ออก",
-    "ok",
     "òk",
     "go out; exit",
     "The final ก gives the clipped ending.",
@@ -1452,7 +1279,6 @@ export const words: StudyEntry[] = [
   word(
     "klap",
     "กลับ",
-    "klap",
     "klàp",
     "return",
     "The final บ is heard as p at the end.",
@@ -1471,7 +1297,6 @@ export const words: StudyEntry[] = [
   word(
     "khuen-verb",
     "ขึ้น",
-    "khuen",
     "khûen",
     "go up; get on",
     "The เ-ือ pattern creates the ue sound.",
@@ -1481,7 +1306,6 @@ export const words: StudyEntry[] = [
   word(
     "long-thabian",
     "ลงทะเบียน",
-    "long tha-bian",
     "long thá-bian",
     "register",
     "This common compound is easiest in three chunks.",
@@ -1491,7 +1315,6 @@ export const words: StudyEntry[] = [
   word(
     "choep",
     "ชอบ",
-    "chop",
     "chôp",
     "like",
     "The final บ is heard as p at the end.",
@@ -1501,7 +1324,6 @@ export const words: StudyEntry[] = [
   word(
     "rak",
     "รัก",
-    "rak",
     "rák",
     "love",
     "A short closed syllable ending with ก.",
@@ -1511,7 +1333,6 @@ export const words: StudyEntry[] = [
   word(
     "waa",
     "ว่า",
-    "waa",
     "wâa",
     "say; that",
     "A long aa syllable with a tone mark.",
@@ -1521,7 +1342,6 @@ export const words: StudyEntry[] = [
   word(
     "wai",
     "ไว้",
-    "wai",
     "wái",
     "keep; put aside",
     "The ไ vowel sign plus final ย creates the ai sound.",
@@ -1540,16 +1360,13 @@ export const words: StudyEntry[] = [
   word(
     "khit",
     "คิด",
-    "khit",
     "khít",
     "think",
     "A short closed syllable ending in t.",
     1,
     ["verb"],
   ),
-  word("roo", "รู้", "ruu", "rúu", "know", "ู marks the long uu sound.", 1, [
-    "verb",
-  ]),
+  word("roo", "รู้", "rúu", "know", "ู marks the long uu sound.", 1, ["verb"]),
   word("jam", "จำ", "jam", "remember", "The final ม gives the m ending.", 2, [
     "verb",
   ]),
@@ -1565,7 +1382,6 @@ export const words: StudyEntry[] = [
   word(
     "yaak",
     "อยาก",
-    "yaak",
     "yàak",
     "want",
     "The initial อย helps produce the y sound here.",
@@ -1575,7 +1391,6 @@ export const words: StudyEntry[] = [
   word(
     "tong",
     "ต้อง",
-    "tong",
     "tông",
     "must; need to",
     "The tone mark sits over a long vowel plus ง ending.",
@@ -1585,7 +1400,6 @@ export const words: StudyEntry[] = [
   word(
     "chuai",
     "ช่วย",
-    "chuai",
     "chûai",
     "help",
     "This word ends with ย, which helps form the ai sound.",
@@ -1608,7 +1422,6 @@ export const words: StudyEntry[] = [
   word(
     "mai-dii",
     "ไม่ดี",
-    "mai dii",
     "mâi dii",
     "bad; not good",
     "Read it as the negation ไม่ plus ดี.",
@@ -1618,7 +1431,6 @@ export const words: StudyEntry[] = [
   word(
     "suai",
     "สวย",
-    "suai",
     "sǔai",
     "beautiful",
     "The final ย helps build the ai sound.",
@@ -1628,7 +1440,6 @@ export const words: StudyEntry[] = [
   word(
     "lo",
     "หล่อ",
-    "lo",
     "lò",
     "handsome",
     "A short open syllable with a tone mark.",
@@ -1638,7 +1449,6 @@ export const words: StudyEntry[] = [
   word(
     "na-rak",
     "น่ารัก",
-    "naa-rak",
     "nâa-rák",
     "cute",
     "Read it in two parts with a long aa first syllable.",
@@ -1657,7 +1467,6 @@ export const words: StudyEntry[] = [
   word(
     "yai",
     "ใหญ่",
-    "yai",
     "yài",
     "big",
     "The final ย helps produce the ai sound.",
@@ -1667,7 +1476,6 @@ export const words: StudyEntry[] = [
   word(
     "lek",
     "เล็ก",
-    "lek",
     "lék",
     "small",
     "The vowel sign comes before the consonant, and final ก closes it.",
@@ -1686,7 +1494,6 @@ export const words: StudyEntry[] = [
   word(
     "san",
     "สั้น",
-    "san",
     "sân",
     "short",
     "The final น closes the syllable tightly.",
@@ -1696,27 +1503,18 @@ export const words: StudyEntry[] = [
   word(
     "mai",
     "ใหม่",
-    "mai",
     "mài",
     "new",
     "The final ย creates the ai sound in this common adjective.",
     1,
     ["adjective"],
   ),
-  word(
-    "kao",
-    "เก่า",
-    "gao",
-    "gào",
-    "old",
-    "The เ-า pattern gives the ao sound.",
-    1,
-    ["adjective"],
-  ),
+  word("kao", "เก่า", "gào", "old", "The เ-า pattern gives the ao sound.", 1, [
+    "adjective",
+  ]),
   word(
     "ron",
     "ร้อน",
-    "ron",
     "rón",
     "hot",
     "A long vowel plus final น gives a strong closed ending.",
@@ -1726,7 +1524,6 @@ export const words: StudyEntry[] = [
   word(
     "naao",
     "หนาว",
-    "naao",
     "nǎao",
     "cold",
     "The final ว helps create the ao ending.",
@@ -1745,7 +1542,6 @@ export const words: StudyEntry[] = [
   word(
     "ngaai",
     "ง่าย",
-    "ngaai",
     "ngâai",
     "easy",
     "The final ย produces the long ai sound.",
@@ -1755,7 +1551,6 @@ export const words: StudyEntry[] = [
   word(
     "yaak-adj",
     "ยาก",
-    "yaak",
     "yâak",
     "difficult",
     "A long aa vowel before the final ก.",
@@ -1765,7 +1560,6 @@ export const words: StudyEntry[] = [
   word(
     "mak",
     "มาก",
-    "maak",
     "mâak",
     "very; much",
     "A long aa sound before final ก.",
@@ -1775,7 +1569,6 @@ export const words: StudyEntry[] = [
   word(
     "noi",
     "น้อย",
-    "noi",
     "nói",
     "little; few",
     "The final ย helps create the oi sound.",
@@ -1794,7 +1587,6 @@ export const words: StudyEntry[] = [
   word(
     "thuuk",
     "ถูก",
-    "thuuk",
     "thùuk",
     "cheap; correct",
     "ู marks the long uu sound before final ก.",
@@ -1804,7 +1596,6 @@ export const words: StudyEntry[] = [
   word(
     "sadaak",
     "สะดวก",
-    "sa-duak",
     "sà-dùak",
     "convenient",
     "Read it in two chunks, ending with the duak sound.",
@@ -1814,7 +1605,6 @@ export const words: StudyEntry[] = [
   word(
     "yung",
     "ยุ่ง",
-    "yung",
     "yûng",
     "busy",
     "The short u vowel is followed by final ง.",
@@ -1824,7 +1614,6 @@ export const words: StudyEntry[] = [
   word(
     "wang",
     "ว่าง",
-    "waang",
     "wâang",
     "free; empty",
     "The final ง gives a nasal ending.",
@@ -1834,7 +1623,6 @@ export const words: StudyEntry[] = [
   word(
     "suk",
     "สุข",
-    "suk",
     "sùk",
     "happy",
     "A short closed syllable ending in k.",
@@ -1844,7 +1632,6 @@ export const words: StudyEntry[] = [
   word(
     "sao",
     "เศร้า",
-    "sao",
     "sâo",
     "sad",
     "The เ-า pattern helps form the ao sound.",
@@ -1854,27 +1641,19 @@ export const words: StudyEntry[] = [
   word(
     "nua",
     "เหนื่อย",
-    "nueai",
     "nùeai",
     "tired",
     "This longer vowel shape is best memorized as one unit.",
     3,
     ["feeling", "adjective"],
   ),
-  word(
-    "hiu",
-    "หิว",
-    "hiu",
-    "hìu",
-    "hungry",
-    "The final ว gives the iu ending.",
-    2,
-    ["feeling", "adjective"],
-  ),
+  word("hiu", "หิว", "hìu", "hungry", "The final ว gives the iu ending.", 2, [
+    "feeling",
+    "adjective",
+  ]),
   word(
     "nguang",
     "ง่วง",
-    "nguaang",
     "ngûaang",
     "sleepy",
     "The final ง gives the ng ending.",
@@ -1884,7 +1663,6 @@ export const words: StudyEntry[] = [
   word(
     "klaa",
     "กล้า",
-    "glaa",
     "glâa",
     "brave",
     "The consonant cluster starts the word, then a long aa vowel follows.",
@@ -1894,7 +1672,6 @@ export const words: StudyEntry[] = [
   word(
     "sai-adj",
     "ใส",
-    "sai",
     "sǎi",
     "clear; transparent",
     "The ใ vowel sign is the visual clue for this word.",
@@ -1904,7 +1681,6 @@ export const words: StudyEntry[] = [
   word(
     "mued",
     "มืด",
-    "muet",
     "mûet",
     "dark",
     "The vowel pattern gives the ue sound before final ด.",
@@ -1917,7 +1693,6 @@ export const words: StudyEntry[] = [
   word(
     "sii-color",
     "สี",
-    "sii",
     "sǐi",
     "color",
     "A simple long ii syllable that is useful in describing phrases.",
@@ -1927,7 +1702,6 @@ export const words: StudyEntry[] = [
   word(
     "sawang",
     "สว่าง",
-    "sa-waang",
     "sà-wàang",
     "bright",
     "This is easiest to read as two syllables.",
@@ -1938,7 +1712,6 @@ export const words: StudyEntry[] = [
   word(
     "naam",
     "น้ำ",
-    "naam",
     "náam",
     "water",
     "A long aa vowel plus final ม makes this common word.",
@@ -1948,7 +1721,6 @@ export const words: StudyEntry[] = [
   word(
     "khao-food",
     "ข้าว",
-    "khao",
     "khâo",
     "rice; meal",
     "The เ-า pattern gives the ao sound here.",
@@ -1958,7 +1730,6 @@ export const words: StudyEntry[] = [
   word(
     "ahaan",
     "อาหาร",
-    "aa-haan",
     "aa-hǎan",
     "food",
     "Read it in two parts with a long aa start.",
@@ -1968,7 +1739,6 @@ export const words: StudyEntry[] = [
   word(
     "kin-khao",
     "กินข้าว",
-    "kin khao",
     "kin khâo",
     "eat a meal",
     "This phrase combines two very common words.",
@@ -1993,7 +1763,6 @@ export const words: StudyEntry[] = [
   word(
     "naam-waan",
     "น้ำหวาน",
-    "naam waan",
     "náam wǎan",
     "sweet drink",
     "Read it as water plus sweet.",
@@ -2012,7 +1781,6 @@ export const words: StudyEntry[] = [
   word(
     "lao",
     "เหล้า",
-    "lao",
     "lâo",
     "liquor",
     "The เ-า pattern gives the ao sound.",
@@ -2022,7 +1790,6 @@ export const words: StudyEntry[] = [
   word(
     "phak-food",
     "ผัก",
-    "phak",
     "phàk",
     "vegetable",
     "The final ก gives a clipped ending.",
@@ -2032,23 +1799,16 @@ export const words: StudyEntry[] = [
   word(
     "neua",
     "เนื้อ",
-    "nuea",
     "núea",
     "meat",
     "The vowel pattern gives the uea sound.",
     2,
     ["food"],
   ),
-  word(
-    "muu",
-    "หมู",
-    "muu",
-    "mǔu",
-    "pork; pig",
-    "ู marks the long uu sound.",
-    1,
-    ["food", "animal"],
-  ),
+  word("muu", "หมู", "mǔu", "pork; pig", "ู marks the long uu sound.", 1, [
+    "food",
+    "animal",
+  ]),
   word(
     "puu-crab",
     "ปู",
@@ -2061,7 +1821,6 @@ export const words: StudyEntry[] = [
   word(
     "kai",
     "ไก่",
-    "gai",
     "gài",
     "chicken",
     "The ไ vowel sign is an easy reading clue.",
@@ -2080,7 +1839,6 @@ export const words: StudyEntry[] = [
   word(
     "khai",
     "ไข่",
-    "khai",
     "khài",
     "egg",
     "The ใ/ไ family of vowel signs often signals an ai sound.",
@@ -2099,7 +1857,6 @@ export const words: StudyEntry[] = [
   word(
     "kluai",
     "กล้วย",
-    "gluai",
     "glûai",
     "banana",
     "The consonant cluster begins the word, then the ua-ai ending follows.",
@@ -2109,27 +1866,18 @@ export const words: StudyEntry[] = [
   word(
     "mamuang",
     "มะม่วง",
-    "ma-muang",
     "má-mûang",
     "mango",
     "Read it as two chunks ending with ง.",
     2,
     ["food"],
   ),
-  word(
-    "som",
-    "ส้ม",
-    "som",
-    "sôm",
-    "orange",
-    "The final ม closes the syllable.",
-    1,
-    ["food"],
-  ),
+  word("som", "ส้ม", "sôm", "orange", "The final ม closes the syllable.", 1, [
+    "food",
+  ]),
   word(
     "ma-khuea-thep",
     "มะเขือเทศ",
-    "ma-khuea-thet",
     "má-khǔea-thêt",
     "tomato",
     "This longer food word is easier in three chunks.",
@@ -2139,7 +1887,6 @@ export const words: StudyEntry[] = [
   word(
     "phrik",
     "พริก",
-    "phrik",
     "phrík",
     "chili",
     "A short closed syllable ending in k.",
@@ -2149,7 +1896,6 @@ export const words: StudyEntry[] = [
   word(
     "namtaan",
     "น้ำตาล",
-    "naam-taan",
     "náam-taan",
     "sugar",
     "Read it as water plus long taa-n ending.",
@@ -2168,7 +1914,6 @@ export const words: StudyEntry[] = [
   word(
     "aroi",
     "อร่อย",
-    "a-roi",
     "à-ròi",
     "delicious",
     "The final ย helps create the roi sound.",
@@ -2178,7 +1923,6 @@ export const words: StudyEntry[] = [
   word(
     "im",
     "อิ่ม",
-    "im",
     "ìm",
     "full",
     "The short i vowel is followed by final ม.",
@@ -2188,7 +1932,6 @@ export const words: StudyEntry[] = [
   word(
     "chaang",
     "ช้าง",
-    "chaang",
     "cháang",
     "elephant",
     "The final ง gives the ng ending after a long aa vowel.",
@@ -2207,7 +1950,6 @@ export const words: StudyEntry[] = [
   word(
     "maa-dog",
     "หมา",
-    "maa",
     "mǎa",
     "dog",
     "A long aa syllable with no final consonant.",
@@ -2217,7 +1959,6 @@ export const words: StudyEntry[] = [
   word(
     "maa-horse",
     "ม้า",
-    "maa",
     "máa",
     "horse",
     "The tone mark sits above this long aa syllable.",
@@ -2227,7 +1968,6 @@ export const words: StudyEntry[] = [
   word(
     "mii-bear",
     "หมี",
-    "mii",
     "mǐi",
     "bear",
     "The long ii vowel is followed by no final consonant.",
@@ -2238,7 +1978,6 @@ export const words: StudyEntry[] = [
   word(
     "to",
     "โต๊ะ",
-    "to",
     "tó",
     "table",
     "A short open syllable with a tone mark.",
@@ -2248,7 +1987,6 @@ export const words: StudyEntry[] = [
   word(
     "kao-ii",
     "เก้าอี้",
-    "gao-ii",
     "gâo-îi",
     "chair",
     "Read it in two chunks, with the second ending in long ii.",
@@ -2267,7 +2005,6 @@ export const words: StudyEntry[] = [
   word(
     "pratuu",
     "ประตู",
-    "pra-tuu",
     "prà-tuu",
     "door",
     "Read it as two syllables ending with long uu.",
@@ -2277,7 +2014,6 @@ export const words: StudyEntry[] = [
   word(
     "naatang",
     "หน้าต่าง",
-    "naa-taang",
     "nâa-tàang",
     "window",
     "This compound is easiest in two parts.",
@@ -2296,7 +2032,6 @@ export const words: StudyEntry[] = [
   word(
     "phatlom",
     "พัดลม",
-    "phat-lom",
     "phát-lom",
     "fan",
     "Read it in two chunks ending with ม.",
@@ -2306,7 +2041,6 @@ export const words: StudyEntry[] = [
   word(
     "khrueang-prap-akaat",
     "เครื่องปรับอากาศ",
-    "khreuuang prap aa-kaat",
     "khrêuuang pràp aa-kàat",
     "air conditioner",
     "This long compound should be read in several chunks.",
@@ -2316,7 +2050,6 @@ export const words: StudyEntry[] = [
   word(
     "sabuu",
     "สบู่",
-    "sa-buu",
     "sà-bùu",
     "soap",
     "The long uu sound is marked by ู.",
@@ -2326,7 +2059,6 @@ export const words: StudyEntry[] = [
   word(
     "yaa-sii-fan",
     "ยาสีฟัน",
-    "yaa sii fan",
     "yaa sǐi fan",
     "toothpaste",
     "Read it as three chunks with a final n.",
@@ -2336,7 +2068,6 @@ export const words: StudyEntry[] = [
   word(
     "paeeng",
     "แป้ง",
-    "paeng",
     "pâeng",
     "powder; flour",
     "The final ง provides the nasal ending.",
@@ -2346,7 +2077,6 @@ export const words: StudyEntry[] = [
   word(
     "seua",
     "เสื้อ",
-    "seua",
     "sêua",
     "shirt",
     "The vowel pattern creates the uea sound.",
@@ -2365,7 +2095,6 @@ export const words: StudyEntry[] = [
   word(
     "rongthao",
     "รองเท้า",
-    "rong-thao",
     "rong-tháo",
     "shoes",
     "The second chunk uses the เ-า pattern for ao.",
@@ -2375,7 +2104,6 @@ export const words: StudyEntry[] = [
   word(
     "moak",
     "หมวก",
-    "muak",
     "mùak",
     "hat",
     "The ua vowel shape appears before the final ก.",
@@ -2385,7 +2113,6 @@ export const words: StudyEntry[] = [
   word(
     "thanung-sue",
     "หนังสือ",
-    "nang-sue",
     "nǎng-sǔe",
     "book",
     "Read it as two chunks; the second has the ue sound.",
@@ -2395,7 +2122,6 @@ export const words: StudyEntry[] = [
   word(
     "pen",
     "ปากกา",
-    "paak-gaa",
     "pàak-gaa",
     "pen",
     "This everyday object is read in two parts.",
@@ -2405,7 +2131,6 @@ export const words: StudyEntry[] = [
   word(
     "dinsor",
     "ดินสอ",
-    "din-saw",
     "din-sǎw",
     "pencil",
     "Read it in two chunks, ending with an open aw sound.",
@@ -2433,7 +2158,6 @@ export const words: StudyEntry[] = [
   word(
     "mue-thue",
     "มือถือ",
-    "mue-thue",
     "mue-thǔe",
     "mobile phone",
     "Read it as hand plus hold.",
@@ -2452,7 +2176,6 @@ export const words: StudyEntry[] = [
   word(
     "bat",
     "บัตร",
-    "bat",
     "bàt",
     "card",
     "A short closed syllable ending in t.",
@@ -2462,7 +2185,6 @@ export const words: StudyEntry[] = [
   word(
     "ruup",
     "รูป",
-    "ruup",
     "rûup",
     "picture; image",
     "ู marks the long uu sound before final ป.",
@@ -2472,7 +2194,6 @@ export const words: StudyEntry[] = [
   word(
     "siang",
     "เสียง",
-    "siang",
     "sǐang",
     "sound; voice",
     "The vowel pattern and final ง make a longer syllable.",
@@ -2480,42 +2201,25 @@ export const words: StudyEntry[] = [
     ["object"],
   ),
 
-  word(
-    "hua",
-    "หัว",
-    "hua",
-    "hǔa",
-    "head",
-    "This word uses the ua vowel shape.",
-    1,
-    ["body"],
-  ),
+  word("hua", "หัว", "hǔa", "head", "This word uses the ua vowel shape.", 1, [
+    "body",
+  ]),
   word("taa-eye", "ตา", "taa", "eye", "A simple long aa syllable.", 1, [
     "body",
   ]),
-  word("huu", "หู", "huu", "hǔu", "ear", "ู marks the long uu sound.", 1, [
-    "body",
-  ]),
+  word("huu", "หู", "hǔu", "ear", "ู marks the long uu sound.", 1, ["body"]),
   word(
     "ja-muuk",
     "จมูก",
-    "ja-muuk",
     "jà-mùuk",
     "nose",
     "Read it in two chunks ending with long uu plus k.",
     2,
     ["body"],
   ),
-  word(
-    "paak",
-    "ปาก",
-    "paak",
-    "pàak",
-    "mouth",
-    "A long aa vowel before final ก.",
-    1,
-    ["body"],
-  ),
+  word("paak", "ปาก", "pàak", "mouth", "A long aa vowel before final ก.", 1, [
+    "body",
+  ]),
   word("fan", "ฟัน", "fan", "tooth", "The final น closes the syllable.", 1, [
     "body",
   ]),
@@ -2540,20 +2244,12 @@ export const words: StudyEntry[] = [
     2,
     ["body"],
   ),
-  word(
-    "khaa-leg",
-    "ขา",
-    "khaa",
-    "khǎa",
-    "leg",
-    "A simple long aa syllable.",
-    1,
-    ["body"],
-  ),
+  word("khaa-leg", "ขา", "khǎa", "leg", "A simple long aa syllable.", 1, [
+    "body",
+  ]),
   word(
     "thaao",
     "เท้า",
-    "thao",
     "tháo",
     "foot",
     "The เ-า pattern gives the ao sound.",
@@ -2563,7 +2259,6 @@ export const words: StudyEntry[] = [
   word(
     "hua-jai",
     "หัวใจ",
-    "hua jai",
     "hǔa jai",
     "heart",
     "Read it as two chunks ending with jai.",
@@ -2574,67 +2269,30 @@ export const words: StudyEntry[] = [
   word(
     "nueng",
     "หนึ่ง",
-    "nueng",
     "nùeng",
     "one",
     "The vowel pattern gives the ue sound before final ง.",
     1,
     ["number"],
   ),
-  word(
-    "song",
-    "สอง",
-    "song",
-    "sǒng",
-    "two",
-    "The final ง gives the ng ending.",
-    1,
-    ["number"],
-  ),
-  word(
-    "saam",
-    "สาม",
-    "saam",
-    "sǎam",
-    "three",
-    "A long aa sound plus final ม.",
-    1,
-    ["number"],
-  ),
-  word(
-    "sii",
-    "สี่",
-    "sii",
-    "sìi",
-    "four",
-    "A long ii syllable with a tone mark.",
-    1,
-    ["number"],
-  ),
-  word(
-    "haa",
-    "ห้า",
-    "haa",
-    "hâa",
-    "five",
-    "A long aa syllable with a tone mark.",
-    1,
-    ["number"],
-  ),
-  word(
-    "hok",
-    "หก",
-    "hok",
-    "hòk",
-    "six",
-    "A short closed syllable ending in k.",
-    1,
-    ["number"],
-  ),
+  word("song", "สอง", "sǒng", "two", "The final ง gives the ng ending.", 1, [
+    "number",
+  ]),
+  word("saam", "สาม", "sǎam", "three", "A long aa sound plus final ม.", 1, [
+    "number",
+  ]),
+  word("sii", "สี่", "sìi", "four", "A long ii syllable with a tone mark.", 1, [
+    "number",
+  ]),
+  word("haa", "ห้า", "hâa", "five", "A long aa syllable with a tone mark.", 1, [
+    "number",
+  ]),
+  word("hok", "หก", "hòk", "six", "A short closed syllable ending in k.", 1, [
+    "number",
+  ]),
   word(
     "chet",
     "เจ็ด",
-    "jet",
     "jèt",
     "seven",
     "The vowel sign is written before the consonant.",
@@ -2644,7 +2302,6 @@ export const words: StudyEntry[] = [
   word(
     "paet",
     "แปด",
-    "paet",
     "pàet",
     "eight",
     "The แ vowel sign is an easy visual clue.",
@@ -2654,20 +2311,16 @@ export const words: StudyEntry[] = [
   word(
     "kao-number",
     "เก้า",
-    "gao",
     "gâo",
     "nine",
     "The เ-า pattern creates the ao sound.",
     1,
     ["number"],
   ),
-  word("sip", "สิบ", "sip", "sìp", "ten", "The final บ is heard as p.", 1, [
-    "number",
-  ]),
+  word("sip", "สิบ", "sìp", "ten", "The final บ is heard as p.", 1, ["number"]),
   word(
     "thang-khao",
     "ทางเข้า",
-    "thaang khao",
     "thaang khâo",
     "entrance",
     "Read it as ทาง plus เข้า, a common sign compound.",
@@ -2677,7 +2330,6 @@ export const words: StudyEntry[] = [
   word(
     "thang-ok",
     "ทางออก",
-    "thaang ok",
     "thaang òk",
     "exit",
     "Read it as ทาง plus ออก.",
@@ -2687,7 +2339,6 @@ export const words: StudyEntry[] = [
   word(
     "poet-sign",
     "เปิด",
-    "poet",
     "pòet",
     "open",
     "A common sign word with a final t stop.",
@@ -2697,7 +2348,6 @@ export const words: StudyEntry[] = [
   word(
     "pit-sign",
     "ปิด",
-    "pit",
     "pìt",
     "closed; shut",
     "A short closed syllable ending in t.",
@@ -2717,20 +2367,13 @@ export const words: StudyEntry[] = [
     2,
     ["sign", "verb"],
   ),
-  word(
-    "yut",
-    "หยุด",
-    "yut",
-    "yùt",
-    "stop",
-    "The final ด is heard as a t stop.",
-    2,
-    ["sign", "verb"],
-  ),
+  word("yut", "หยุด", "yùt", "stop", "The final ด is heard as a t stop.", 2, [
+    "sign",
+    "verb",
+  ]),
   word(
     "rawang",
     "ระวัง",
-    "ra-wang",
     "rá-wang",
     "caution; watch out",
     "Read this warning word in two chunks.",
@@ -2740,7 +2383,6 @@ export const words: StudyEntry[] = [
   word(
     "haam",
     "ห้าม",
-    "haam",
     "hâam",
     "forbidden; do not",
     "This common prohibition word uses a long aa sound.",
@@ -2750,7 +2392,6 @@ export const words: StudyEntry[] = [
   word(
     "chai-ngaan",
     "ใช้งาน",
-    "chai-ngaan",
     "chái-ngaan",
     "in use",
     "Read it as ใช้ plus งาน.",
@@ -2760,7 +2401,6 @@ export const words: StudyEntry[] = [
   word(
     "waang-sign",
     "ว่าง",
-    "waang",
     "wâang",
     "vacant; available",
     "The final ง gives a nasal ending.",
@@ -2779,7 +2419,6 @@ export const words: StudyEntry[] = [
   word(
     "hongnam-sign",
     "ห้องน้ำ",
-    "hong naam",
     "hông náam",
     "bathroom; toilet",
     "Read it as ห้อง plus น้ำ.",
@@ -2798,7 +2437,6 @@ export const words: StudyEntry[] = [
   word(
     "ying-sign",
     "หญิง",
-    "ying",
     "yǐng",
     "women; female",
     "On signs this often marks the women's side.",
@@ -2817,7 +2455,6 @@ export const words: StudyEntry[] = [
   word(
     "chan-floor",
     "ชั้น",
-    "chan",
     "chán",
     "floor; level",
     "Often seen on elevators and directories.",
@@ -2827,7 +2464,6 @@ export const words: StudyEntry[] = [
   word(
     "lift",
     "ลิฟต์",
-    "lift",
     "líft",
     "elevator",
     "A short borrowed word often seen on signs.",
@@ -2846,7 +2482,6 @@ export const words: StudyEntry[] = [
   word(
     "lot-raakhaa",
     "ลดราคา",
-    "lot raa-khaa",
     "lót raa-khaa",
     "discount",
     "A common sale sign phrase read in three chunks.",
@@ -2856,7 +2491,6 @@ export const words: StudyEntry[] = [
   word(
     "promotion",
     "โปรโมชั่น",
-    "pro-mo-chan",
     "pro-mo-chân",
     "promotion",
     "A borrowed retail word broken into clear chunks.",
@@ -2866,7 +2500,6 @@ export const words: StudyEntry[] = [
   word(
     "khai-sign",
     "ขาย",
-    "khaai",
     "khǎai",
     "for sale; sell",
     "The final ย helps form the ai sound.",
@@ -2876,7 +2509,6 @@ export const words: StudyEntry[] = [
   word(
     "rap-bat",
     "รับบัตร",
-    "rap bat",
     "ráp bàt",
     "cards accepted",
     "Read it as รับ plus บัตร.",
@@ -2886,7 +2518,6 @@ export const words: StudyEntry[] = [
   word(
     "rap-ngoen-sot",
     "รับเงินสด",
-    "rap ngoen sot",
     "ráp ngoen sòt",
     "cash accepted",
     "A practical payment phrase often seen at counters.",
@@ -2914,7 +2545,6 @@ export const words: StudyEntry[] = [
   word(
     "thi-jot-rot",
     "ที่จอดรถ",
-    "thii jot rot",
     "thîi jot ròt",
     "parking",
     "Read it as ที่ plus จอดรถ.",
@@ -2924,7 +2554,6 @@ export const words: StudyEntry[] = [
   word(
     "samnakngaan",
     "สำนักงาน",
-    "sam-nak-ngaan",
     "sǎm-nák-ngaan",
     "office",
     "A common building label read in three chunks.",
@@ -2934,7 +2563,6 @@ export const words: StudyEntry[] = [
   word(
     "kwaa",
     "กว่า",
-    "gwaa",
     "gwàa",
     "than; more than",
     "The initial กว cluster is read together before the long aa sound.",
@@ -2944,7 +2572,6 @@ export const words: StudyEntry[] = [
   word(
     "gon-before",
     "ก่อน",
-    "gon",
     "gòn",
     "before; first",
     "The อ helps support the long o sound before final น.",
@@ -2963,7 +2590,6 @@ export const words: StudyEntry[] = [
   word(
     "kep",
     "เก็บ",
-    "kep",
     "kèp",
     "keep; collect; put away",
     "The final บ is heard as a p stop.",
@@ -2973,7 +2599,6 @@ export const words: StudyEntry[] = [
   word(
     "kaeo-glass",
     "แก้ว",
-    "kaeo",
     "kâeo",
     "glass; cup",
     "The แ vowel plus final ว creates the aeo sound.",
@@ -2983,7 +2608,6 @@ export const words: StudyEntry[] = [
   word(
     "glai-near",
     "ใกล้",
-    "glai",
     "glâi",
     "near; close",
     "The ใ vowel sign points to the ai sound in this consonant cluster.",
@@ -3002,7 +2626,6 @@ export const words: StudyEntry[] = [
   word(
     "khong",
     "ของ",
-    "khong",
     "khǒng",
     "thing; of",
     "The final ง gives the ng ending.",
@@ -3012,7 +2635,6 @@ export const words: StudyEntry[] = [
   word(
     "khian",
     "เขียน",
-    "khian",
     "khǐan",
     "write",
     "The เ-ีย pattern gives the ia sound before final น.",
@@ -3022,7 +2644,6 @@ export const words: StudyEntry[] = [
   word(
     "khaeng-hard",
     "แข็ง",
-    "khaeng",
     "khǎeng",
     "hard; strong",
     "The final ง closes the syllable with an ng sound.",
@@ -3032,7 +2653,6 @@ export const words: StudyEntry[] = [
   word(
     "khaeng-race",
     "แข่ง",
-    "khaeng",
     "khàeng",
     "compete; race",
     "The tone mark sits above the syllable and the final ง closes it.",
@@ -3051,7 +2671,6 @@ export const words: StudyEntry[] = [
   word(
     "jaak-from",
     "จาก",
-    "jaak",
     "jàak",
     "from",
     "A long aa vowel comes before the final ก.",
@@ -3061,7 +2680,6 @@ export const words: StudyEntry[] = [
   word(
     "joe-encounter",
     "เจอะ",
-    "joe",
     "jòe",
     "meet; come across",
     "The vowel sign is written before the consonant in this short verb.",
@@ -3071,7 +2689,6 @@ export const words: StudyEntry[] = [
   word(
     "ching-chaa",
     "ชิงช้า",
-    "ching-chaa",
     "ching-cháa",
     "swing",
     "Read it as two chunks ending with a long aa sound.",
@@ -3081,7 +2698,6 @@ export const words: StudyEntry[] = [
   word(
     "duai",
     "ด้วย",
-    "duai",
     "dûai",
     "too; with",
     "The final ย helps form the ai sound.",
@@ -3100,7 +2716,6 @@ export const words: StudyEntry[] = [
   word(
     "top-answer",
     "ตอบ",
-    "top",
     "tòp",
     "answer",
     "The final บ is heard as a p stop.",
@@ -3110,7 +2725,6 @@ export const words: StudyEntry[] = [
   word(
     "ta-graa",
     "ตะกร้า",
-    "ta-graa",
     "tà-grâa",
     "basket",
     "Read it as two chunks with a long aa ending.",
@@ -3120,7 +2734,6 @@ export const words: StudyEntry[] = [
   word(
     "tit",
     "ติด",
-    "tit",
     "tìt",
     "stick; be attached",
     "The final ด is heard as a t stop.",
@@ -3130,7 +2743,6 @@ export const words: StudyEntry[] = [
   word(
     "thaa-if",
     "ถ้า",
-    "thaa",
     "thâa",
     "if",
     "A long aa syllable with a tone mark.",
@@ -3140,7 +2752,6 @@ export const words: StudyEntry[] = [
   word(
     "thueng",
     "ถึง",
-    "thueng",
     "thǔeng",
     "reach; arrive; to",
     "The vowel pattern gives the ue sound before the final ง.",
@@ -3159,7 +2770,6 @@ export const words: StudyEntry[] = [
   word(
     "thao-equal",
     "เท่า",
-    "thao",
     "thâo",
     "equal; as much as",
     "The tone mark changes the tone on the same เ-า pattern.",
@@ -3178,7 +2788,6 @@ export const words: StudyEntry[] = [
   word(
     "nan-over-there",
     "นั่น",
-    "nan",
     "nân",
     "that over there",
     "The final น closes the syllable and the tone mark shifts the tone.",
@@ -3188,7 +2797,6 @@ export const words: StudyEntry[] = [
   word(
     "naalikaa",
     "นาฬิกา",
-    "naa-li-gaa",
     "naa-lí-gaa",
     "clock; watch",
     "This common object word is easiest in three chunks.",
@@ -3198,7 +2806,6 @@ export const words: StudyEntry[] = [
   word(
     "nii-this",
     "นี้",
-    "nii",
     "níi",
     "this; this one",
     "The long ii sound is marked clearly in this common pointer.",
@@ -3208,7 +2815,6 @@ export const words: StudyEntry[] = [
   word(
     "phro",
     "เพราะ",
-    "phro",
     "phró",
     "because",
     "The consonant cluster plus อ helps create the ro sound.",
@@ -3218,7 +2824,6 @@ export const words: StudyEntry[] = [
   word(
     "phuea",
     "เพื่อ",
-    "phuea",
     "phûea",
     "for; in order to",
     "The เ-ือ pattern gives the uea sound.",
@@ -3228,7 +2833,6 @@ export const words: StudyEntry[] = [
   word(
     "muea",
     "เมื่อ",
-    "muea",
     "mûea",
     "when; once",
     "The เ-ือ pattern gives the uea sound before final อ.",
@@ -3238,7 +2842,6 @@ export const words: StudyEntry[] = [
   word(
     "waai-naam",
     "ว่ายน้ำ",
-    "waai naam",
     "wâai náam",
     "swim",
     "Read it as ว่าย plus น้ำ, a very common verb phrase.",
@@ -3248,7 +2851,6 @@ export const words: StudyEntry[] = [
   word(
     "naa-taa",
     "หน้าตา",
-    "naa-taa",
     "nâa-taa",
     "face; looks; appearance",
     "Read it as หน้า plus ตา.",
@@ -3258,7 +2860,6 @@ export const words: StudyEntry[] = [
   word(
     "nii-run-away",
     "หนี",
-    "nii",
     "nǐi",
     "run away; escape",
     "The initial ห is silent but helps shape the tone.",
@@ -3268,7 +2869,6 @@ export const words: StudyEntry[] = [
   word(
     "nuu",
     "หนู",
-    "nuu",
     "nǔu",
     "mouse; rat; I/me (young speaker)",
     "The initial ห is silent and ู marks the long uu vowel.",
@@ -3278,7 +2878,6 @@ export const words: StudyEntry[] = [
   word(
     "lang",
     "หลัง",
-    "lang",
     "lǎng",
     "back; behind; after",
     "The final ง gives the ng ending.",
@@ -3288,7 +2887,6 @@ export const words: StudyEntry[] = [
   word(
     "nai-question",
     "ไหน",
-    "nai",
     "nǎi",
     "which; where",
     "The ใ vowel sign is a strong visual clue for the ai sound.",
@@ -3298,7 +2896,6 @@ export const words: StudyEntry[] = [
   word(
     "uen",
     "อื่น",
-    "uen",
     "ùen",
     "other; another",
     "The long ue sound appears before the final น.",
@@ -3308,7 +2905,6 @@ export const words: StudyEntry[] = [
   word(
     "hru-hraa",
     "หรูหรา",
-    "hru hraa",
     "hrǔ hrǎa",
     "luxurious; elegant",
     "Both syllables begin with หร consonant clusters.",
@@ -3318,7 +2914,6 @@ export const words: StudyEntry[] = [
   word(
     "wa-we",
     "ว้าเหว่",
-    "wa we",
     "wá wè",
     "lonely; forlorn",
     "The tone marks distinguish the two open syllables.",
@@ -3328,7 +2923,6 @@ export const words: StudyEntry[] = [
   word(
     "luk-lik",
     "หลุกหลิก",
-    "luk lik",
     "lùk lìk",
     "fidgety; restless",
     "This expressive pair repeats the หล consonant pattern.",
@@ -3338,7 +2932,6 @@ export const words: StudyEntry[] = [
   word(
     "noi-naa",
     "น้อยหน่า",
-    "noi naa",
     "nói nàa",
     "sugar apple; custard apple",
     "This fruit name is read as two tone-marked chunks.",
@@ -3348,7 +2941,6 @@ export const words: StudyEntry[] = [
   word(
     "yum-yim",
     "หยุมหยิม",
-    "yum yim",
     "yǔm yǐm",
     "fussy; trivial; overly detailed",
     "This expressive pair repeats the หย consonant pattern.",
@@ -3358,7 +2950,6 @@ export const words: StudyEntry[] = [
   word(
     "yuk-yik",
     "หยุกหยิก",
-    "yuk yik",
     "yùk yìk",
     "fidgety; restless",
     "The repeated หย pattern gives this word its playful rhythm.",
