@@ -61,7 +61,7 @@ const KNOWN_TONES: [string, string][] = [
  */
 const EXEMPT_FROM_DRIFT: Record<string, number> = {
   words: 5,
-  conversation: 39,
+  conversation: 10,
 };
 
 describe("thai-tone", () => {

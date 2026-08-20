@@ -22,7 +22,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-sawasdee-khrap",
     "สวัสดีครับ",
-    "sawatdi khrap",
+    "sà-wàt-di khráp",
     "Hello. (male speaker)",
     "ครับ is the polite particle commonly used by male speakers.",
     1,
@@ -31,7 +31,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-sawasdee-kha",
     "สวัสดีค่ะ",
-    "sawatdi kha",
+    "sà-wàt-di khâ",
     "Hello. (female speaker)",
     "ค่ะ is the polite particle commonly used by female speakers.",
     1,
@@ -40,7 +40,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-sabai-di-mai",
     "สบายดีไหม",
-    "sabai di mai",
+    "sà-bai di mǎi",
     "How are you?",
     "ไหม turns the statement into a yes-or-no question.",
     1,
@@ -49,7 +49,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-sabai-di",
     "ฉันสบายดี",
-    "chan sabai di",
+    "chǎn sà-bai di",
     "I am well.",
     "This is a simple answer to สบายดีไหม.",
     1,
@@ -76,7 +76,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-sawatdi-ton-chao",
     "สวัสดีตอนเช้า",
-    "sawatdi ton chao",
+    "sà-wàt-di ton cháo",
     "Good morning.",
     "ตอนเช้า means in the morning.",
     1,
@@ -85,7 +85,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-sawatdi-ton-bai",
     "สวัสดีตอนบ่าย",
-    "sawatdi ton bai",
+    "sà-wàt-di ton bài",
     "Good afternoon.",
     "ตอนบ่าย means in the afternoon.",
     1,
@@ -112,7 +112,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-sabai-di-khop-khun",
     "ฉันสบายดี ขอบคุณ",
-    "chan sabai di khop khun",
+    "chǎn sà-bai di khòp khun",
     "I am fine, thank you.",
     "This is a natural polite answer after someone asks how you are.",
     1,
@@ -301,7 +301,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-chue-anna",
     "ฉันชื่อแอนนา",
-    "chan chue Anna",
+    "chǎn chûe An-na",
     "My name is Anna.",
     "This uses the common self-introduction pattern ฉันชื่อ....",
     1,
@@ -310,7 +310,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khun-chue-arai",
     "คุณชื่ออะไร",
-    "khun chue arai",
+    "khun chûe à-rai",
     "What is your name?",
     "อะไร means what and sits at the end here.",
     1,
@@ -328,7 +328,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-rian-phasa-thai",
     "ฉันเรียนภาษาไทย",
-    "chan rian phasa thai",
+    "chǎn rian pha-sǎ thai",
     "I study Thai.",
     "ภาษาไทย is the word for the Thai language.",
     2,
@@ -364,7 +364,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-yu-krungthep",
     "ฉันอยู่กรุงเทพ",
-    "chan yu Krungthep",
+    "chǎn yù Krung-thêp",
     "I live in Bangkok.",
     "อยู่ can mean live or be located, depending on context.",
     2,
@@ -400,7 +400,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-chop-ahaan-thai",
     "ฉันชอบอาหารไทย",
-    "chan chop ahaan thai",
+    "chǎn chôp a-hǎan thai",
     "I like Thai food.",
     "ชอบ comes before the thing you like.",
     1,
@@ -409,7 +409,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-phut-phasa-thai-dai-nit-noi",
     "ฉันพูดภาษาไทยได้นิดหน่อย",
-    "chan phut phasa thai dai nit noi",
+    "chǎn phût pha-sǎ thai dâi nít nòi",
     "I can speak a little Thai.",
     "ได้นิดหน่อย means can do a little.",
     3,
@@ -427,7 +427,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-khun-ayu-thao-rai",
     "คุณอายุเท่าไหร่",
-    "khun ayu thao rai",
+    "khun a-yú thâo rài",
     "How old are you?",
     "เท่าไหร่ asks how much or how many.",
     2,
@@ -490,7 +490,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-tongkan-khwam-chuai-luea",
     "ฉันต้องการความช่วยเหลือ",
-    "chan tongkan khwam chuai luea",
+    "chǎn tông-kan khwam chûai lǔea",
     "I need help.",
     "ต้องการ is a direct way to say need or want.",
     3,
@@ -517,7 +517,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-mai-sabai",
     "ฉันไม่สบาย",
-    "chan mai sabai",
+    "chǎn mâi sà-bai",
     "I feel sick.",
     "ไม่สบาย is used for feeling unwell.",
     1,
@@ -526,7 +526,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-tongkan-mo",
     "ฉันต้องการหมอ",
-    "chan tongkan mo",
+    "chǎn tông-kan mǒ",
     "I need a doctor.",
     "หมอ means doctor in everyday speech.",
     2,
@@ -544,7 +544,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kho-du-menu-dai-mai",
     "ขอดูเมนูได้ไหม",
-    "kho du menu dai mai",
+    "khǒ du me-nu dâi mǎi",
     "Can I see the menu?",
     "ดู means look or see.",
     2,
@@ -571,7 +571,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-tongkan-wifi",
     "ฉันต้องการไวไฟ",
-    "chan tongkan wifi",
+    "chǎn tông-kan wi-fi",
     "I need Wi-Fi.",
     "ไวไฟ is the Thai spelling for Wi-Fi.",
     2,
@@ -607,7 +607,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-pai-sathani-rot-fai-yang-ngai",
     "ไปสถานีรถไฟยังไง",
-    "pai sathani rot fai yang ngai",
+    "pai sà-thǎ-ni rót fai yang ngai",
     "How do I get to the train station?",
     "ยังไง asks how in an everyday spoken style.",
     3,
@@ -688,7 +688,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-doen-ha-nathi",
     "เดินห้านาที",
-    "doen ha nathi",
+    "doen hâ na-thi",
     "Walk five minutes.",
     "เดิน means walk.",
     2,
@@ -715,7 +715,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-yak-pai-sanam-bin",
     "ฉันอยากไปสนามบิน",
-    "chan yak pai sanam bin",
+    "chǎn yàk pai sà-nǎm bin",
     "I want to go to the airport.",
     "สนามบิน means airport.",
     2,
@@ -724,7 +724,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-rot-me-khan-ni-pai-silom-mai",
     "รถเมล์คันนี้ไปสีลมไหม",
-    "rot me khan ni pai Silom mai",
+    "rót me khan ní pai Sǐ-lom mǎi",
     "Does this bus go to Silom?",
     "คันนี้ is used for this vehicle.",
     3,
@@ -769,7 +769,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-wan-ni-wan-arai",
     "วันนี้วันอะไร",
-    "wan ni wan arai",
+    "wan ní wan à-rai",
     "What day is it today?",
     "วันนี้ means today and starts the question topic.",
     1,
@@ -778,7 +778,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-phrung-ni-wan-arai",
     "พรุ่งนี้วันอะไร",
-    "phrung ni wan arai",
+    "phrûng ní wan à-rai",
     "What day is it tomorrow?",
     "พรุ่งนี้ means tomorrow.",
     1,
@@ -850,7 +850,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ro-sip-nathi",
     "รอสิบนาที",
-    "ro sip nathi",
+    "ro sìp na-thi",
     "Wait ten minutes.",
     "นาที means minute.",
     2,
@@ -877,7 +877,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-kan-prachum-roem-kao-mong",
     "การประชุมเริ่มเก้าโมง",
-    "kan prachum roem kao mong",
+    "kan prà-chum rôem kâo mong",
     "The meeting starts at nine.",
     "เริ่ม means start or begin.",
     3,
@@ -886,7 +886,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-ton-ni-chan-mi-wela",
     "ตอนนี้ฉันมีเวลา",
-    "ton ni chan mi wela",
+    "ton ní chǎn mi we-la",
     "I have time now.",
     "มีเวลา means have time.",
     2,
@@ -895,7 +895,7 @@ export const conversation: StudyEntry[] = [
   sentence(
     "conv-chan-mai-mi-wela",
     "ฉันไม่มีเวลา",
-    "chan mai mi wela",
+    "chǎn mâi mi we-la",
     "I do not have time.",
     "ไม่มีเวลา is the common pattern for not having time.",
     2,
