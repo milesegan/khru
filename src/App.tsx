@@ -59,7 +59,6 @@ function StudyView({ decks }: StudyViewProps) {
     "",
     category,
   );
-  const matchingItems = getMatchingItems(activeDeck, mode, "", category);
   const categoryItems = getMatchingItems(activeDeck, mode, "", category);
   const currentItem =
     studyItems.length === 0
@@ -232,7 +231,7 @@ function StudyView({ decks }: StudyViewProps) {
             onRate={handleRating}
           />
         ) : (
-          <EmptyStudyState mode={mode} hasMatches={matchingItems.length > 0} />
+          <EmptyStudyState mode={mode} hasMatches={categoryItems.length > 0} />
         )}
       </div>
 

@@ -48,7 +48,7 @@ const CLUSTERS = new Set([
 ]);
 const isCluster = (a, b) => CLUSTERS.has(a + b);
 
-export // \u0e4c is karan, which silences the consonant it sits on.
+// \u0e4c is karan, which silences the consonant it sits on.
 const THAI_KARAN_RE =
   /[\u0e01-\u0e2e][\u0e30-\u0e39\u0e47]?[\u0e48-\u0e4b]?\u0e4c/g;
 // A syllable takes only one final consonant; a second one is silent.
