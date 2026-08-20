@@ -278,10 +278,6 @@ export default function App({
     return studyStore;
   });
 
-  useEffect(() => {
-    store.set(studyDecksAtom, { words, conversation });
-  }, [conversation, store, words]);
-
   return (
     <Provider store={store}>
       <StudyStateHydrator decks={decks} />
