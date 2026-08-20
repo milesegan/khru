@@ -32,57 +32,46 @@ export default {
             transform: "translateY(0)",
           },
         },
+        // Sampled from a damped spring so the browser only has to interpolate
+        // between closely spaced stops. Timing must stay `linear` -- an easing
+        // curve would be re-applied to every segment and reintroduce the steps.
         "known-word-pulse": {
-          "0%": {
-            transform: "scale(1)",
-            filter: "drop-shadow(0 0 0 rgba(34, 197, 94, 0))",
-          },
-          "18%": {
-            transform: "scale(1.18)",
-            filter: "drop-shadow(0 0 18px rgba(110, 231, 183, 0.36))",
-          },
-          "36%": {
-            transform: "scale(1.06)",
-            filter: "drop-shadow(0 0 10px rgba(34, 197, 94, 0.22))",
-          },
-          "58%": {
-            transform: "scale(1.24)",
-            filter: "drop-shadow(0 0 28px rgba(110, 231, 183, 0.44))",
-          },
-          "78%": {
-            transform: "scale(1.1)",
-            filter: "drop-shadow(0 0 12px rgba(34, 197, 94, 0.2))",
-          },
-          "100%": {
-            transform: "scale(1)",
-            filter: "drop-shadow(0 0 0 rgba(34, 197, 94, 0))",
-          },
+          "0%": { transform: "scale(1)" },
+          "5%": { transform: "scale(1.127)" },
+          "10%": { transform: "scale(1.16)" },
+          "15%": { transform: "scale(1.129)" },
+          "20%": { transform: "scale(1.07)" },
+          "25%": { transform: "scale(1.014)" },
+          "30%": { transform: "scale(0.991)" },
+          "35%": { transform: "scale(0.985)" },
+          "42%": { transform: "scale(0.99)" },
+          "50%": { transform: "scale(0.997)" },
+          "60%": { transform: "scale(1.008)" },
+          "70%": { transform: "scale(1.006)" },
+          "82%": { transform: "scale(0.999)" },
+          "100%": { transform: "scale(1)" },
         },
         "known-support-pulse": {
-          "0%": {
-            transform: "scale(1)",
-            opacity: "1",
-          },
-          "28%": {
-            transform: "scale(1.035)",
-            opacity: "1",
-          },
-          "54%": {
-            transform: "scale(1.015)",
-            opacity: "0.94",
-          },
-          "100%": {
-            transform: "scale(1)",
-            opacity: "1",
-          },
+          "0%": { transform: "scale(1)" },
+          "8%": { transform: "scale(1.035)" },
+          "17%": { transform: "scale(1.028)" },
+          "25%": { transform: "scale(1.01)" },
+          "35%": { transform: "scale(0.998)" },
+          "55%": { transform: "scale(1)" },
+          "100%": { transform: "scale(1)" },
+        },
+        "known-glow-bloom": {
+          "0%": { opacity: "0", transform: "scale(0.82)" },
+          "12%": { opacity: "1", transform: "scale(1.02)" },
+          "40%": { opacity: "0.55", transform: "scale(1.06)" },
+          "100%": { opacity: "0", transform: "scale(1.12)" },
         },
       },
       animation: {
         "fade-in": "fade-in 0.4s ease-out forwards",
-        "known-word-pulse":
-          "known-word-pulse 0.46s cubic-bezier(0.16, 1, 0.3, 1)",
-        "known-support-pulse":
-          "known-support-pulse 0.46s cubic-bezier(0.25, 1, 0.5, 1)",
+        "known-word-pulse": "known-word-pulse 0.62s linear",
+        "known-support-pulse": "known-support-pulse 0.62s linear",
+        "known-glow-bloom": "known-glow-bloom 0.62s ease-out both",
       },
     },
   },

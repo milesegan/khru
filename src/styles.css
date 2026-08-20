@@ -44,6 +44,35 @@
 }
 
 @layer components {
+  /* The celebration glow lives on its own layer so the pulse only animates
+     opacity/transform. Animating a drop-shadow on the Thai glyphs repainted
+     the whole text every frame and dropped the animation to a slideshow. */
+  .known-celebration {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .known-celebration::before {
+    position: absolute;
+    z-index: -1;
+    inset: -22% -14%;
+    border-radius: 999px;
+    background: radial-gradient(
+      closest-side,
+      oklch(85% 0.16 152 / 0.42),
+      oklch(85% 0.16 152 / 0) 74%
+    );
+    opacity: 0;
+    content: "";
+    will-change: opacity, transform;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .known-celebration::before {
+      animation: known-glow-bloom 0.62s ease-out both;
+    }
+  }
+
   .conversation-thai-line {
     display: inline-flex;
     flex-wrap: wrap;

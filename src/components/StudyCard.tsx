@@ -10,7 +10,8 @@ import {
 import { getStudyAudioSrc } from "../lib/audio";
 import type { StudyEntry, StudyMode, StudyRating } from "../types";
 
-export const KNOWN_FEEDBACK_DURATION_MS = 460;
+// Matches the known-word-pulse animation so the card advances as it settles.
+export const KNOWN_FEEDBACK_DURATION_MS = 620;
 
 type StudyCardProps = {
   item: StudyEntry;
@@ -264,8 +265,8 @@ export function StudyCard({
   return (
     <article className="flex w-full max-w-3xl flex-col items-center gap-4 text-center md:gap-5">
       <div
-        className={`${thaiTextClassName} ${thaiTextLeadingClassName} font-light ${
-          isKnownCelebrating ? "text-emerald-600" : "text-ink"
+        className={`${thaiTextClassName} ${thaiTextLeadingClassName} font-light transition-colors duration-200 ${
+          isKnownCelebrating ? "known-celebration text-emerald-600" : "text-ink"
         }`}
       >
         {mode === "conversation" && (
@@ -273,11 +274,11 @@ export function StudyCard({
         )}
         <span
           data-testid="study-card-thai"
-          className={`origin-center will-change-transform ${
+          className={`origin-center ${
             mode === "conversation" ? "conversation-thai-line" : "inline-block"
           } ${
             isKnownCelebrating
-              ? "animate-known-word-pulse motion-reduce:animate-none"
+              ? "animate-known-word-pulse will-change-transform motion-reduce:animate-none"
               : ""
           }`}
           aria-hidden={mode === "conversation" ? "true" : undefined}
@@ -308,20 +309,20 @@ export function StudyCard({
         <div
           className={`flex flex-col items-center gap-2 ${
             isKnownCelebrating
-              ? "animate-known-support-pulse text-emerald-700 motion-reduce:animate-none"
+              ? "animate-known-support-pulse text-emerald-700 will-change-transform motion-reduce:animate-none"
               : "animate-fade-in"
           }`}
           aria-live="polite"
         >
           <p
-            className={`m-0 text-xl tracking-[0.05em] ${
+            className={`m-0 text-xl tracking-[0.05em] transition-colors duration-200 ${
               isKnownCelebrating ? "text-emerald-700" : "text-muted"
             }`}
           >
             {item.transliteration}
           </p>
           <p
-            className={`m-0 font-serif text-[1.75rem] font-medium ${
+            className={`m-0 font-serif text-[1.75rem] font-medium transition-colors duration-200 ${
               isKnownCelebrating ? "text-emerald-800" : "text-ink"
             }`}
           >
@@ -329,7 +330,7 @@ export function StudyCard({
           </p>
           {item.note && (
             <p
-              className={`m-0 max-w-[40ch] text-base leading-6 ${
+              className={`m-0 max-w-[40ch] text-base leading-6 transition-colors duration-200 ${
                 isKnownCelebrating ? "text-emerald-700" : "text-muted"
               }`}
             >
