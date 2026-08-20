@@ -1,5 +1,5 @@
 import { Provider, createStore, useAtom, useSetAtom } from "jotai";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EmptyStudyState } from "./components/EmptyStudyState";
 import { HeroHeader } from "./components/HeroHeader";
 import { StudyCard } from "./components/StudyCard";
@@ -51,37 +51,24 @@ function StudyView({ decks }: StudyViewProps) {
   const activeDeck = decks[mode];
   const categoryOptions = STUDY_CATEGORY_OPTIONS[mode];
 
-  const studyItems = useMemo(
-    () => getStudyItems(activeDeck, progress, mode, new Date(), "", category),
-    [activeDeck, category, mode, progress],
+  const studyItems = getStudyItems(
+    activeDeck,
+    progress,
+    mode,
+    new Date(),
+    "",
+    category,
   );
-  const matchingItems = useMemo(
-    () => getMatchingItems(activeDeck, mode, "", category),
-    [activeDeck, category, mode],
-  );
-  const categoryItems = useMemo(
-    () => getMatchingItems(activeDeck, mode, "", category),
-    [activeDeck, category, mode],
-  );
-  const currentItem = useMemo(() => {
-    if (studyItems.length === 0) {
-      return null;
-    }
-
-    return (
-      studyItems.find((item) => item.id === currentItemId) ?? studyItems[0]
-    );
-  }, [currentItemId, studyItems]);
+  const matchingItems = getMatchingItems(activeDeck, mode, "", category);
+  const categoryItems = getMatchingItems(activeDeck, mode, "", category);
+  const currentItem =
+    studyItems.length === 0
+      ? null
+      : (studyItems.find((item) => item.id === currentItemId) ?? studyItems[0]);
   const currentCardKey = currentItem ? `${mode}:${currentItem.id}` : "";
-  const knownItems = useMemo(
-    () => countKnownItems(progress, mode),
-    [mode, progress],
-  );
+  const knownItems = countKnownItems(progress, mode);
   const revealed = currentCardKey !== "" && revealedCardKey === currentCardKey;
-  const resetItemIds = useMemo(
-    () => categoryItems.map((item) => item.id),
-    [categoryItems],
-  );
+  const resetItemIds = categoryItems.map((item) => item.id);
   const selectedCategoryLabel =
     categoryOptions.find((option) => option.value === category)?.label ??
     (mode === "words" ? "All words" : "All sentences");
@@ -281,13 +268,10 @@ export default function App({
   words = defaultWords,
   conversation = defaultConversation,
 }: AppProps) {
-  const decks = useMemo(
-    () => ({
-      words,
-      conversation,
-    }),
-    [conversation, words],
-  );
+  const decks = {
+    words,
+    conversation,
+  };
   const [store] = useState(() => {
     const studyStore = createStore();
     studyStore.set(studyDecksAtom, decks);
@@ -295,8 +279,8 @@ export default function App({
   });
 
   useEffect(() => {
-    store.set(studyDecksAtom, decks);
-  }, [decks, store]);
+    store.set(studyDecksAtom, { words, conversation });
+  }, [conversation, store, words]);
 
   return (
     <Provider store={store}>

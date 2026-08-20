@@ -1,0 +1,20 @@
+#!/bin/sh
+# Runs Prettier and ESLint before every commit.
+# Installed via the package.json "prepare" script (git config core.hooksPath .githooks).
+# Bypass with `git commit --no-verify` when you really need to.
+set -eu
+
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pre-commit: pnpm not found in PATH; skipping format/lint checks." >&2
+  exit 0
+fi
+
+if ! pnpm run --silent format:check; then
+  echo "pre-commit: Prettier found unformatted files. Run 'pnpm run format', then stage the result." >&2
+  exit 1
+fi
+
+if ! pnpm run --silent lint; then
+  echo "pre-commit: ESLint failed. Run 'pnpm run lint:fix' for the safe fixes, then stage the result." >&2
+  exit 1
+fi

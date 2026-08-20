@@ -14,8 +14,7 @@ import type {
 } from "../types";
 
 type ProgressUpdate =
-  | StudyProgress
-  | ((currentProgress: StudyProgress) => StudyProgress);
+  StudyProgress | ((currentProgress: StudyProgress) => StudyProgress);
 type StudySelection = {
   mode: StudyMode;
   category: StudyCategory;
