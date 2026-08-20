@@ -1,11 +1,7 @@
-import { atom } from "jotai";
-import { atomWithStorage, createJSONStorage } from "jotai/utils";
-import {
-  createInitialProgress,
-  normalizeProgress,
-  STORAGE_KEY,
-  STUDY_CATEGORY_OPTIONS,
-} from "../lib/study";
+import { useMemo } from "react";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { normalizeProgress, STUDY_CATEGORY_OPTIONS } from "../lib/study";
 import type {
   StudyCategory,
   StudyDecks,
@@ -13,20 +9,36 @@ import type {
   StudyProgress,
 } from "../types";
 
-type ProgressUpdate =
-  StudyProgress | ((currentProgress: StudyProgress) => StudyProgress);
+const LEGACY_PROGRESS_STORAGE_KEY = "khru-study-progress-v2";
+const LEGACY_SELECTION_STORAGE_KEY = "khru-study-selection-v1";
+
+export const STUDY_STORAGE_KEY = "khru-study-v1";
+export const STUDY_STORAGE_VERSION = 1;
+
 type StudySelection = {
   mode: StudyMode;
   category: StudyCategory;
 };
 
-const progressStorage = createJSONStorage<StudyProgress | null>(
-  () => window.localStorage,
-);
-const selectionStorage = createJSONStorage<StudySelection | null>(
-  () => window.localStorage,
-);
-const STUDY_SELECTION_STORAGE_KEY = "khru-study-selection-v1";
+type PersistedStudyState = StudySelection & {
+  // Kept exactly as stored so a deck change can normalize it against the
+  // current items instead of dropping entries for cards that moved decks.
+  progress: StudyProgress | null;
+};
+
+type StudyActions = {
+  setMode: (mode: StudyMode) => void;
+  setCategory: (category: StudyCategory) => void;
+  setCurrentItemId: (itemId: string) => void;
+  setRevealedCardKey: (cardKey: string) => void;
+  setProgress: (progress: StudyProgress) => void;
+};
+
+type StudyState = PersistedStudyState & {
+  currentItemId: string;
+  revealedCardKey: string;
+  actions: StudyActions;
+};
 
 function normalizeCategoryForMode(
   mode: StudyMode,
@@ -41,7 +53,7 @@ function normalizeCategoryForMode(
 }
 
 function normalizeSelection(
-  selection: StudySelection | null | undefined,
+  selection: Partial<StudySelection> | null | undefined,
 ): StudySelection {
   const mode = selection?.mode === "conversation" ? "conversation" : "words";
 
@@ -51,66 +63,140 @@ function normalizeSelection(
   };
 }
 
-export const studyDecksAtom = atom<StudyDecks>({
-  words: [],
-  conversation: [],
-});
-export const currentItemIdAtom = atom("");
-export const revealedCardKeyAtom = atom("");
+export function createInitialStudyState(): Omit<StudyState, "actions"> {
+  return {
+    mode: "words",
+    category: "all",
+    currentItemId: "",
+    revealedCardKey: "",
+    progress: null,
+  };
+}
 
-const storedSelectionAtom = atomWithStorage<StudySelection | null>(
-  STUDY_SELECTION_STORAGE_KEY,
-  null,
-  selectionStorage,
-  { getOnInit: true },
-);
+function readStoredJSON<Value>(storage: Storage, key: string): Value | null {
+  const raw = storage.getItem(key);
 
-export const modeAtom = atom(
-  (get) => normalizeSelection(get(storedSelectionAtom)).mode,
-  (get, set, nextMode: StudyMode) => {
-    const currentSelection = normalizeSelection(get(storedSelectionAtom));
+  if (!raw) {
+    return null;
+  }
 
-    set(storedSelectionAtom, {
-      mode: nextMode,
-      category: normalizeCategoryForMode(nextMode, currentSelection.category),
-    });
+  try {
+    return JSON.parse(raw) as Value;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Folds the two pre-zustand localStorage keys into the single persisted store
+ * entry so existing study progress survives the migration. Runs only when the
+ * store has never been written.
+ */
+export function migrateLegacyStudyState(storage: Storage) {
+  if (storage.getItem(STUDY_STORAGE_KEY)) {
+    return;
+  }
+
+  const legacyProgress = readStoredJSON<StudyProgress>(
+    storage,
+    LEGACY_PROGRESS_STORAGE_KEY,
+  );
+  const legacySelection = readStoredJSON<Partial<StudySelection>>(
+    storage,
+    LEGACY_SELECTION_STORAGE_KEY,
+  );
+
+  if (!legacyProgress && !legacySelection) {
+    return;
+  }
+
+  const persistedState: PersistedStudyState = {
+    ...normalizeSelection(legacySelection),
+    progress: legacyProgress,
+  };
+
+  storage.setItem(
+    STUDY_STORAGE_KEY,
+    JSON.stringify({ state: persistedState, version: STUDY_STORAGE_VERSION }),
+  );
+}
+
+// Resolved lazily so the legacy fold-in happens on the persist read rather
+// than as an import-time side effect.
+const studyStorage = createJSONStorage<PersistedStudyState>(() => ({
+  getItem: (key) => {
+    migrateLegacyStudyState(window.localStorage);
+    return window.localStorage.getItem(key);
   },
-);
+  setItem: (key, value) => {
+    // Revealing and advancing a card go through the store too, so skip the
+    // write when the persisted slice itself has not moved.
+    if (window.localStorage.getItem(key) === value) {
+      return;
+    }
 
-export const categoryAtom = atom(
-  (get) => {
-    const selection = normalizeSelection(get(storedSelectionAtom));
-    return normalizeCategoryForMode(selection.mode, selection.category);
+    window.localStorage.setItem(key, value);
   },
-  (get, set, nextCategory: StudyCategory) => {
-    const currentSelection = normalizeSelection(get(storedSelectionAtom));
-
-    set(storedSelectionAtom, {
-      ...currentSelection,
-      category: normalizeCategoryForMode(currentSelection.mode, nextCategory),
-    });
+  removeItem: (key) => {
+    window.localStorage.removeItem(key);
   },
+}));
+
+export const useStudyStore = create<StudyState>()(
+  persist(
+    (set) => ({
+      ...createInitialStudyState(),
+      actions: {
+        setMode: (mode) =>
+          set((state) => ({
+            mode,
+            category: normalizeCategoryForMode(mode, state.category),
+          })),
+        setCategory: (category) =>
+          set((state) => ({
+            category: normalizeCategoryForMode(state.mode, category),
+          })),
+        setCurrentItemId: (currentItemId) => set({ currentItemId }),
+        setRevealedCardKey: (revealedCardKey) => set({ revealedCardKey }),
+        setProgress: (progress) => set({ progress }),
+      },
+    }),
+    {
+      name: STUDY_STORAGE_KEY,
+      version: STUDY_STORAGE_VERSION,
+      storage: studyStorage,
+      partialize: (state): PersistedStudyState => ({
+        mode: state.mode,
+        category: state.category,
+        progress: state.progress,
+      }),
+      merge: (persistedState, currentState): StudyState => {
+        const persisted = (persistedState ??
+          {}) as Partial<PersistedStudyState>;
+
+        return {
+          ...currentState,
+          ...normalizeSelection(persisted),
+          progress: persisted.progress ?? null,
+        };
+      },
+    },
+  ),
 );
 
-const storedProgressAtom = atomWithStorage<StudyProgress | null>(
-  STORAGE_KEY,
-  null,
-  progressStorage,
-  { getOnInit: true },
-);
+export function useStudyActions() {
+  return useStudyStore((state) => state.actions);
+}
 
-export const progressAtom = atom(
-  (get) => normalizeProgress(get(studyDecksAtom), get(storedProgressAtom)),
-  (get, set, update: ProgressUpdate) => {
-    const decks = get(studyDecksAtom);
-    const currentProgress = normalizeProgress(decks, get(storedProgressAtom));
-    const nextProgress =
-      typeof update === "function" ? update(currentProgress) : update;
+/**
+ * Persisted progress reshaped against the decks currently in play, so cards
+ * added or removed since the last visit still get a progress entry.
+ */
+export function useStudyProgress(decks: StudyDecks): StudyProgress {
+  const storedProgress = useStudyStore((state) => state.progress);
 
-    set(storedProgressAtom, normalizeProgress(decks, nextProgress));
-  },
-);
-
-export function getInitialProgress(decks: StudyDecks) {
-  return createInitialProgress(decks);
+  return useMemo(
+    () => normalizeProgress(decks, storedProgress),
+    [decks, storedProgress],
+  );
 }

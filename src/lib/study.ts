@@ -10,8 +10,6 @@ import type {
   WordStudyCategory,
 } from "../types";
 
-export const STORAGE_KEY = "khru-study-progress-v2";
-
 export const STUDY_MODE_OPTIONS: { value: StudyMode; label: string }[] = [
   { value: "words", label: "Words" },
   { value: "conversation", label: "Conversation" },
@@ -310,28 +308,6 @@ export function matchesCategory(
   return categoryTags
     ? categoryTags.some((tag: string) => item.tags.includes(tag))
     : false;
-}
-
-export function loadProgress(
-  decks: StudyDecks,
-  storage: Storage,
-): StudyProgress {
-  const raw = storage.getItem(STORAGE_KEY);
-
-  if (!raw) {
-    return createInitialProgress(decks);
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as StudyProgress;
-    return normalizeProgress(decks, parsed);
-  } catch {
-    return createInitialProgress(decks);
-  }
-}
-
-export function saveProgress(progress: StudyProgress, storage: Storage) {
-  storage.setItem(STORAGE_KEY, JSON.stringify(progress));
 }
 
 export function countKnownItems(progress: StudyProgress, mode: StudyMode) {

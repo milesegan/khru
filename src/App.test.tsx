@@ -3,7 +3,27 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { KNOWN_FEEDBACK_DURATION_MS } from "./components/StudyCard";
+import {
+  createInitialStudyState,
+  STUDY_STORAGE_KEY,
+  useStudyStore,
+} from "./state/study";
 import type { StudyEntry } from "./types";
+
+// The store outlives a React unmount, so stand in for a page reload: blank the
+// store, then read localStorage back. The persisted entry is snapshotted around
+// the reset because persist would otherwise overwrite it with the blank state.
+async function reloadStudyStore() {
+  const persisted = window.localStorage.getItem(STUDY_STORAGE_KEY);
+
+  useStudyStore.setState(createInitialStudyState());
+
+  if (persisted !== null) {
+    window.localStorage.setItem(STUDY_STORAGE_KEY, persisted);
+  }
+
+  await useStudyStore.persist.rehydrate();
+}
 
 const words: StudyEntry[] = [
   {
@@ -333,6 +353,7 @@ describe("App", () => {
     );
 
     firstRender.unmount();
+    await reloadStudyStore();
     render(<App words={words} conversation={conversation} />);
 
     expect(screen.getByTestId("known-count")).toHaveTextContent("1");
@@ -362,6 +383,7 @@ describe("App", () => {
     );
 
     firstRender.unmount();
+    await reloadStudyStore();
     render(<App words={words} conversation={conversation} />);
 
     expect(screen.getByRole("combobox", { name: /study mode/i })).toHaveValue(

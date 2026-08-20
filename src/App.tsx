@@ -1,5 +1,4 @@
-import { Provider, createStore, useAtom, useSetAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { EmptyStudyState } from "./components/EmptyStudyState";
 import { HeroHeader } from "./components/HeroHeader";
 import { StudyCard } from "./components/StudyCard";
@@ -10,19 +9,16 @@ import { words as defaultWords } from "./data/words";
 import {
   applyRating,
   countKnownItems,
+  createInitialProgress,
   getMatchingItems,
   getStudyItems,
   resetProgressForItemIds,
   STUDY_CATEGORY_OPTIONS,
 } from "./lib/study";
 import {
-  categoryAtom,
-  currentItemIdAtom,
-  getInitialProgress,
-  modeAtom,
-  progressAtom,
-  revealedCardKeyAtom,
-  studyDecksAtom,
+  useStudyActions,
+  useStudyProgress,
+  useStudyStore,
 } from "./state/study";
 import type { StudyDecks, StudyEntry, StudyMode } from "./types";
 import { getRewardAudioSrc } from "./lib/audio";
@@ -36,16 +32,19 @@ type StudyViewProps = {
   decks: StudyDecks;
 };
 
-type StudyStateHydratorProps = {
-  decks: StudyDecks;
-};
-
 function StudyView({ decks }: StudyViewProps) {
-  const [mode, setMode] = useAtom(modeAtom);
-  const [category, setCategory] = useAtom(categoryAtom);
-  const [progress, setProgress] = useAtom(progressAtom);
-  const [revealedCardKey, setRevealedCardKey] = useAtom(revealedCardKeyAtom);
-  const [currentItemId, setCurrentItemId] = useAtom(currentItemIdAtom);
+  const mode = useStudyStore((state) => state.mode);
+  const category = useStudyStore((state) => state.category);
+  const revealedCardKey = useStudyStore((state) => state.revealedCardKey);
+  const currentItemId = useStudyStore((state) => state.currentItemId);
+  const progress = useStudyProgress(decks);
+  const {
+    setMode,
+    setCategory,
+    setCurrentItemId,
+    setProgress,
+    setRevealedCardKey,
+  } = useStudyActions();
   const rewardAudioTemplateRef = useRef<HTMLAudioElement | null>(null);
   const activeRewardAudioRef = useRef(new Set<HTMLAudioElement>());
   const activeDeck = decks[mode];
@@ -163,7 +162,7 @@ function StudyView({ decks }: StudyViewProps) {
   function handleResetProgress() {
     const nextProgress =
       category === "all"
-        ? getInitialProgress(decks)
+        ? createInitialProgress(decks)
         : resetProgressForItemIds(progress, mode, resetItemIds);
     const nextStudyItems = getStudyItems(
       activeDeck,
@@ -253,33 +252,11 @@ function StudyView({ decks }: StudyViewProps) {
   );
 }
 
-function StudyStateHydrator({ decks }: StudyStateHydratorProps) {
-  const setDecks = useSetAtom(studyDecksAtom);
-
-  useEffect(() => {
-    setDecks(decks);
-  }, [decks, setDecks]);
-
-  return <StudyView decks={decks} />;
-}
-
 export default function App({
   words = defaultWords,
   conversation = defaultConversation,
 }: AppProps) {
-  const decks = {
-    words,
-    conversation,
-  };
-  const [store] = useState(() => {
-    const studyStore = createStore();
-    studyStore.set(studyDecksAtom, decks);
-    return studyStore;
-  });
+  const decks = useMemo(() => ({ words, conversation }), [words, conversation]);
 
-  return (
-    <Provider store={store}>
-      <StudyStateHydrator decks={decks} />
-    </Provider>
-  );
+  return <StudyView decks={decks} />;
 }

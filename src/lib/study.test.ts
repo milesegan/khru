@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   applyRating,
   countKnownItems,
@@ -6,13 +6,10 @@ import {
   getDueStudyItems,
   getStudyItems,
   isKnownItem,
-  loadProgress,
   matchesCategory,
   resetProgressForItemIds,
-  saveProgress,
-  STORAGE_KEY,
 } from "./study";
-import type { StudyDecks, StudyEntry, StudyProgress } from "../types";
+import type { StudyDecks, StudyEntry } from "../types";
 
 const decks: StudyDecks = {
   words: [
@@ -240,32 +237,5 @@ describe("study helpers", () => {
     expect(
       resetConversation.conversation["conv-sawasdee"].lastRating,
     ).toBeNull();
-  });
-
-  it("falls back to fresh progress when storage data is corrupt", () => {
-    const storage = {
-      getItem: vi.fn(() => "{nope"),
-      setItem: vi.fn(),
-    } as unknown as Storage;
-
-    const progress = loadProgress(decks, storage);
-
-    expect(progress.words.chan.exposureCount).toBe(0);
-    expect(progress.conversation["conv-sawasdee"].exposureCount).toBe(0);
-  });
-
-  it("saves study progress under the stable key", () => {
-    const storage = {
-      getItem: vi.fn(),
-      setItem: vi.fn(),
-    } as unknown as Storage;
-    const progress: StudyProgress = createInitialProgress(decks);
-
-    saveProgress(progress, storage);
-
-    expect(storage.setItem).toHaveBeenCalledWith(
-      STORAGE_KEY,
-      JSON.stringify(progress),
-    );
   });
 });

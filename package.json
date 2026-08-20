@@ -18,10 +18,10 @@
     "audio:list-voices": "node scripts/generate-thai-audio.mjs --list-voices"
   },
   "dependencies": {
-    "jotai": "^2.20.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-icons": "^5.7.0"
+    "react-icons": "^5.7.0",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
