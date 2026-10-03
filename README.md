@@ -65,7 +65,7 @@ pnpm audio:generate --mode=conversation --voice-id=YOUR_THAI_VOICE_ID
 
 The generator uses:
 
-- model: `eleven_v3`
+- model: `eleven_v4`
 - language code: `th`
 - format: `opus_48000_96`
 
