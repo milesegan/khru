@@ -260,10 +260,14 @@ const DIACRITICS = {
 };
 
 /**
- * Readings whose tones the rules above cannot derive, because a consonant is
- * read twice (ผลไม้ = phǒn-lá-mái) or a compound boundary defeats the
- * segmenter. Tones here are taken from Wiktionary's IPA rather than from this
- * module, so they are reference data, not a second opinion from the same rules.
+ * Reference readings for pronunciations and syllable boundaries the spelling
+ * parser cannot infer reliably. These include silent vowels, consonants read
+ * twice, compound boundaries, and loanwords. Keep these explicit so every
+ * vocabulary card remains covered by the tone drift check.
+ *
+ * Reference examples: https://en.wiktionary.org/wiki/ประโยค,
+ * https://en.wiktionary.org/wiki/ศาสนา,
+ * https://en.wiktionary.org/wiki/อุปสรรค.
  */
 export const IRREGULARS = {
   "\u0e01\u0e47": ["falling"], // ก็ — written short/dead, spoken long and falling
@@ -308,6 +312,83 @@ export const IRREGULARS = {
     "mid",
   ],
   เมื่อวานอากาศร้อน: ["falling", "mid", "mid", "low", "high"],
+  ชาติ: ["falling"],
+  ประโยค: ["low", "low"],
+  แมลง: ["high", "mid"],
+  ระเบียบ: ["high", "low"],
+  ฤๅษี: ["mid", "rising"],
+  ขณะ: ["low", "low"],
+  ขโมย: ["low", "mid"],
+  เฉพาะ: ["low", "high"],
+  ญาติ: ["falling"],
+  นิทรรศการ: ["high", "high", "low", "mid"],
+  ประโยชน์: ["low", "low"],
+  แมลงสาบ: ["high", "mid", "low"],
+  ศาสนา: ["low", "low", "rising"],
+  สกปรก: ["low", "low", "low"],
+  เสมอ: ["low", "rising"],
+  เหตุ: ["low"],
+  กรกฎาคม: ["low", "high", "low", "mid", "mid"],
+  กันยายน: ["mid", "mid", "mid"],
+  ข้าพเจ้า: ["falling", "high", "falling"],
+  คณิตศาสตร์: ["high", "high", "low", "low"],
+  โฆษณา: ["falling", "low", "mid"],
+  เฉลย: ["low", "rising"],
+  ตุลาคม: ["low", "mid", "mid"],
+  ทะนุถนอม: ["high", "high", "low", "rising"],
+  โทรทัศน์: ["mid", "high", "high"],
+  ธรรมชาติ: ["mid", "high", "falling"],
+  ธรรมดา: ["mid", "high", "mid"],
+  ธันวาคม: ["mid", "mid", "mid"],
+  บริษัท: ["mid", "high", "low"],
+  ประมาท: ["low", "low"],
+  ปาฏิหาริย์: ["mid", "low", "rising"],
+  พฤศจิกายน: ["high", "low", "low", "mid", "mid"],
+  พฤษภาคม: ["high", "low", "mid", "mid"],
+  มกราคม: ["high", "low", "mid", "mid"],
+  มิถุนายน: ["high", "low", "mid", "mid"],
+  มีนาคม: ["mid", "mid", "mid"],
+  เมษายน: ["mid", "rising", "mid"],
+  วัฒนธรรม: ["high", "high", "high", "mid"],
+  สนุกสนาน: ["low", "low", "low", "rising"],
+  สะดวกสบาย: ["low", "low", "low", "mid"],
+  สาเหตุ: ["rising", "low"],
+  สำเร็จ: ["rising", "low"],
+  สิงหาคม: ["rising", "rising", "mid"],
+  อังกฤษ: ["mid", "low"],
+  อารมณ์: ["mid", "mid"],
+  อุบัติเหตุ: ["low", "low", "low", "low"],
+  กรุงเทพมหานคร: ["mid", "falling", "high", "rising", "high", "mid"],
+  เกียรติ: ["low"],
+  เจริญเติบโต: ["low", "mid", "low", "mid"],
+  ทรมาน: ["mid", "high", "mid"],
+  ปฏิบัติ: ["low", "low", "low"],
+  ประวัติศาสตร์: ["low", "low", "low", "low"],
+  ปรากฏ: ["mid", "low"],
+  ผจญภัย: ["low", "mid", "mid"],
+  เผชิญ: ["low", "mid"],
+  พระมหากษัตริย์: ["high", "high", "rising", "low", "low"],
+  พระราชกรณียกิจ: [
+    "high",
+    "falling",
+    "high",
+    "low",
+    "high",
+    "mid",
+    "high",
+    "low",
+  ],
+  พระราชนิพนธ์: ["high", "falling", "high", "high", "mid"],
+  มหัศจรรย์: ["high", "low", "low", "mid"],
+  รังเกียจ: ["mid", "low"],
+  วิทยาศาสตร์: ["high", "high", "mid", "low"],
+  เศรษฐกิจ: ["low", "low", "low"],
+  สมัครสมานสามัคคี: ["low", "low", "low", "rising", "rising", "high", "mid"],
+  สรุป: ["low", "low"],
+  สารภาพ: ["rising", "high", "falling"],
+  อนาคต: ["low", "mid", "high"],
+  อนุญาต: ["low", "high", "falling"],
+  อุปสรรค: ["low", "low", "low"],
 };
 
 /** Place a tone diacritic on the first vowel letter of a romanised syllable. */

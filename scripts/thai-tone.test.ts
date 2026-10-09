@@ -107,6 +107,18 @@ describe("thai-tone", () => {
     expect(markTransliteration("ก็", "ko")).toBe("kô");
   });
 
+  it.each([
+    ["ชาติ", "chaat", "châat"],
+    ["ญาติ", "yaat", "yâat"],
+    ["ประโยค", "pra yook", "prà yòok"],
+    ["ขโมย", "kha mooi", "khà mooi"],
+    ["ฤๅษี", "rue sii", "rue sǐi"],
+    ["ศาสนา", "saat sa naa", "sàat sà nǎa"],
+    ["อุปสรรค", "up pa sak", "ùp pà sàk"],
+  ])("uses the reference reading for %s", (thai, roman, expected) => {
+    expect(markTransliteration(thai, roman)).toBe(expected);
+  });
+
   it("is idempotent", () => {
     const once = markTransliteration("เด็ก", "dek");
     expect(once).toBe("dèk");

@@ -9,6 +9,7 @@ import {
   useStudyStore,
 } from "./state/study";
 import type { StudyEntry } from "./types";
+import { AGE_VOCABULARY } from "./data/age-levels";
 
 // The store outlives a React unmount, so stand in for a page reload: blank the
 // store, then read localStorage back. The persisted entry is snapshotted around
@@ -33,7 +34,7 @@ const words: StudyEntry[] = [
     meaning: "I; me",
     note: "The final consonant makes an n ending.",
     difficulty: 1,
-    tags: ["pronoun"],
+    tags: ["pronoun", "age-6"],
   },
   {
     id: "baan",
@@ -42,7 +43,7 @@ const words: StudyEntry[] = [
     meaning: "house",
     note: "Mai tho marks the falling tone here.",
     difficulty: 1,
-    tags: ["place"],
+    tags: ["place", "age-7"],
   },
   {
     id: "poet",
@@ -94,6 +95,46 @@ describe("App", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
+
+  it.each(Object.entries(AGE_VOCABULARY))(
+    "offers %s in the menu and studies only that age group",
+    async (category, vocabulary) => {
+      const user = userEvent.setup();
+      render(<App />);
+
+      await user.selectOptions(
+        screen.getByRole("combobox", { name: /study category/i }),
+        category,
+      );
+
+      expect(screen.getByTestId("total-count")).toHaveTextContent(
+        String(vocabulary.length),
+      );
+      expect(vocabulary).toContain(
+        screen.getByTestId("study-card-thai").textContent,
+      );
+
+      await user.click(screen.getByRole("button", { name: /reveal/i }));
+      expect(
+        screen.getByRole("button", { name: /rate as okay/i }),
+      ).toBeEnabled();
+      await user.click(screen.getByRole("button", { name: /rate as okay/i }));
+      expect(vocabulary).toContain(
+        screen.getByTestId("study-card-thai").textContent,
+      );
+
+      await user.selectOptions(
+        screen.getByRole("combobox", { name: /study mode/i }),
+        "conversation",
+      );
+      expect(
+        screen.queryByRole("option", { name: /^Age / }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("combobox", { name: /study category/i }),
+      ).toHaveValue("all");
+    },
+  );
 
   it("reveals transliteration, meaning, and note for the active card", async () => {
     const user = userEvent.setup();
@@ -328,6 +369,44 @@ describe("App", () => {
       "words",
     );
 
+    expect(screen.getByTestId("known-count")).toHaveTextContent("1");
+  });
+
+  it("tracks and resets known words within the selected age group", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<App words={words} conversation={conversation} />);
+    const categoryMenu = screen.getByRole("combobox", {
+      name: /study category/i,
+    });
+
+    await user.selectOptions(categoryMenu, "age-6");
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(
+      () => expect(screen.getByTestId("known-count")).toHaveTextContent("1"),
+      { timeout: KNOWN_FEEDBACK_DURATION_MS + 300 },
+    );
+
+    await user.selectOptions(categoryMenu, "age-7");
+    expect(screen.getByTestId("known-count")).toHaveTextContent("0");
+    expect(screen.getByText("บ้าน")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /mark as mastered/i }));
+    await waitFor(
+      () => expect(screen.getByTestId("known-count")).toHaveTextContent("1"),
+      { timeout: KNOWN_FEEDBACK_DURATION_MS + 300 },
+    );
+
+    await user.selectOptions(categoryMenu, "age-6");
+    await user.click(
+      screen.getByRole("button", { name: /clear known words/i }),
+    );
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Clear known words and reset study progress for Age 6?",
+    );
+    expect(screen.getByTestId("known-count")).toHaveTextContent("0");
+    expect(screen.getByText("ฉัน")).toBeInTheDocument();
+
+    await user.selectOptions(categoryMenu, "age-7");
     expect(screen.getByTestId("known-count")).toHaveTextContent("1");
   });
 

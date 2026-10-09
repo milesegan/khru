@@ -110,6 +110,14 @@ export function StudyCard({
     mode === "conversation" ? "leading-[1.32]" : "leading-[1.1]";
   const thaiWordParts =
     mode === "conversation" ? getThaiWordParts(item.thai) : [item.thai];
+  // Vowels and tone marks above/below a consonant do not add horizontal width.
+  const wordTextLength = [...item.thai.replace(/\p{Mark}/gu, "")].length;
+  const longWordStyle =
+    mode === "words" && wordTextLength > 7
+      ? {
+          fontSize: `clamp(1.5rem, ${120 / wordTextLength}vw, ${72 / wordTextLength}rem)`,
+        }
+      : undefined;
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const knownTimeoutRef = useRef<number | null>(null);
@@ -265,6 +273,7 @@ export function StudyCard({
   return (
     <article className="flex w-full max-w-3xl flex-col items-center gap-4 text-center md:gap-5">
       <div
+        style={longWordStyle}
         className={`${thaiTextClassName} ${thaiTextLeadingClassName} font-light transition-colors duration-200 ${
           isKnownCelebrating ? "known-celebration text-emerald-600" : "text-ink"
         }`}
@@ -275,7 +284,9 @@ export function StudyCard({
         <span
           data-testid="study-card-thai"
           className={`origin-center ${
-            mode === "conversation" ? "conversation-thai-line" : "inline-block"
+            mode === "conversation"
+              ? "conversation-thai-line"
+              : "inline-block whitespace-nowrap"
           } ${
             isKnownCelebrating
               ? "animate-known-word-pulse will-change-transform motion-reduce:animate-none"

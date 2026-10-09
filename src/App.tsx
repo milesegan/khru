@@ -8,10 +8,10 @@ import { conversation as defaultConversation } from "./data/conversation";
 import { words as defaultWords } from "./data/words";
 import {
   applyRating,
-  countKnownItems,
   createInitialProgress,
   getMatchingItems,
   getStudyItems,
+  isKnownItem,
   resetProgressForItemIds,
   STUDY_CATEGORY_OPTIONS,
 } from "./lib/study";
@@ -64,7 +64,9 @@ function StudyView({ decks }: StudyViewProps) {
       ? null
       : (studyItems.find((item) => item.id === currentItemId) ?? studyItems[0]);
   const currentCardKey = currentItem ? `${mode}:${currentItem.id}` : "";
-  const knownItems = countKnownItems(progress, mode);
+  const knownItems = categoryItems.filter((item) =>
+    isKnownItem(progress, mode, item.id),
+  ).length;
   const revealed = currentCardKey !== "" && revealedCardKey === currentCardKey;
   const resetItemIds = categoryItems.map((item) => item.id);
   const selectedCategoryLabel =

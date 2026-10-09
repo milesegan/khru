@@ -2,7 +2,11 @@ export type StudyRating = "again" | "okay" | "known";
 
 export type StudyMode = "words" | "conversation";
 
+export type AgeStudyCategory =
+  "age-6" | "age-7" | "age-8" | "age-9" | "age-10" | "age-11";
+
 export type WordStudyCategory =
+  | AgeStudyCategory
   | "all"
   | "basics"
   | "people"

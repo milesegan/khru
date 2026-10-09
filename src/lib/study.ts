@@ -21,6 +21,12 @@ export const STUDY_CATEGORY_OPTIONS: Record<
 > = {
   words: [
     { value: "all", label: "All words" },
+    { value: "age-6", label: "Age 6" },
+    { value: "age-7", label: "Age 7" },
+    { value: "age-8", label: "Age 8" },
+    { value: "age-9", label: "Age 9" },
+    { value: "age-10", label: "Age 10" },
+    { value: "age-11", label: "Age 11" },
     { value: "basics", label: "Basics" },
     { value: "people", label: "People" },
     { value: "food", label: "Food & drink" },
@@ -79,6 +85,12 @@ const WORD_CATEGORY_TAGS: Record<
   home: ["home", "object", "clothes"],
   body: ["body"],
   signs: ["sign"],
+  "age-6": ["age-6"],
+  "age-7": ["age-7"],
+  "age-8": ["age-8"],
+  "age-9": ["age-9"],
+  "age-10": ["age-10"],
+  "age-11": ["age-11"],
 };
 
 const CONVERSATION_CATEGORY_TAGS: Record<
